@@ -2,7 +2,7 @@ export const environment = {
     production: true,
     name: 'production',
 
-    apiUrl: 'https://revo-report-hub.fly.dev',
+    apiUrl: 'https://reports.revore.mx',
     encryptKey: 'RevoreCompany#2023',
 
     enableDebugMode: false,
@@ -22,7 +22,6 @@ export const environment = {
     },
     revore: {
         allowedDomain: 'revore.mx',
-        // TODO BACKEND: reemplazar con URL de Fly.io cuando esté desplegado
-        backendUrl: 'https://revo-report-hub.fly.dev',
+        backendUrl: 'https://reports.revore.mx',
     },
 };
