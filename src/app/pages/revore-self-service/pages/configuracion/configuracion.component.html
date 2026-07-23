@@ -10,7 +10,7 @@
       }
     </div>
     @if (selectedConfig !== 'none') {
-      <button class="ss-btn ss-btn--outline" (click)="selectedConfig = 'none'">← Volver</button>
+      <button class="ss-btn ss-btn--outline" (click)="selectedConfig = 'none'">Volver</button>
     }
   </header>
 
@@ -22,7 +22,7 @@
     <!-- ── SELECTOR DE CONFIGURACIÓN ── -->
     <div class="ss-config-cards">
       <button class="ss-config-card" (click)="selectedConfig = 'metas'">
-        <span class="ss-config-card__icon">🎯</span>
+        <span class="ss-config-card__index">01</span>
         <span class="ss-config-card__label">Metas</span>
         <span class="ss-config-card__desc">Metas mensuales por proyecto (Inversión, Leads, Visitas, Apartados, Ventas)</span>
       </button>
@@ -51,7 +51,7 @@
 
         <span class="ss-section-count">{{ metas.length }} meta(s)</span>
       </div>
-      <button class="ss-btn ss-btn--primary" (click)="openCreateMeta()">+ Agregar meta</button>
+      <button class="ss-btn ss-btn--primary" (click)="openCreateMeta()">Agregar meta</button>
     </div>
 
     @if (metasLoading) {
@@ -92,8 +92,8 @@
                 <td>{{ m.details?.Ventas ?? 0 }}</td>
                 <td>
                   <div class="ss-actions">
-                    <button class="ss-btn ss-btn--outline ss-btn--sm" (click)="openEditMeta(m)">Editar</button>
-                    <button class="ss-btn ss-btn--danger ss-btn--sm" (click)="requestDeleteMeta(m.id)">Eliminar</button>
+                    <button class="action-link" (click)="openEditMeta(m)">Editar</button>
+                    <button class="action-link action-link-danger" (click)="requestDeleteMeta(m.id)">Eliminar</button>
                   </div>
                 </td>
               </tr>
@@ -112,7 +112,7 @@
     <div class="ss-modal" (click)="$event.stopPropagation()">
       <div class="ss-modal__header">
         <h2>{{ isEditingMeta ? 'Editar meta' : 'Nueva meta mensual' }}</h2>
-        <button class="ss-modal__close" (click)="closeMetaModal()">✕</button>
+        <button class="ss-modal__close" (click)="closeMetaModal()" aria-label="Cerrar">&times;</button>
       </div>
       <div class="ss-modal__body">
         <form [formGroup]="metaForm" class="ss-form">

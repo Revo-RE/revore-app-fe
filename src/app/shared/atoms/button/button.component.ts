@@ -11,7 +11,9 @@ export class ButtonComponent {
   @Input({required:true}) isLoading!: boolean;
   @Input({required:true}) theme!: 'primary' | 'light' | 'warning';
   @Input({required:true}) name!:string;
-  @Input({required:true}) icon!:string;
+  // Sin efecto visual: se conserva solo para no romper bindings existentes
+  // mientras dure la transición al rediseño sin íconos.
+  @Input() icon?: string;
   @Output() onClickButton: EventEmitter<boolean> = new EventEmitter();
 
   clickButton(){

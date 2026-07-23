@@ -2,10 +2,10 @@
     <section class="modalform">
         <h2 class="modalform__title">¿Estás seguro de realizar esta acción?</h2>
         <div class="modalform__group modalform__group-inline" style="justify-content: center; width: 100%;">
-            <app-button icon="/assets/icons/add.svg" theme="primary" [isLoading]="false" name="Confirmar"
+            <app-button theme="primary" [isLoading]="false" name="Confirmar"
                 (onClickButton)="close(true)" />
             &nbsp; &nbsp; &nbsp;
-            <app-button icon="/assets/icons/minus.svg" theme="warning" [isLoading]="false" name="Cancelar"
+            <app-button theme="warning" [isLoading]="false" name="Cancelar"
                 (onClickButton)="close(false)" />
         </div>
     </section>

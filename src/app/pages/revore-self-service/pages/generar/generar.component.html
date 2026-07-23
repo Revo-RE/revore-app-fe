@@ -11,7 +11,7 @@
       <div class="ss-steps__item"
         [class.ss-steps__item--active]="step === s"
         [class.ss-steps__item--done]="step > s">
-        <div class="ss-steps__circle">{{ step > s ? '✓' : s }}</div>
+        <div class="ss-steps__circle">{{ s }}</div>
         <span class="ss-steps__label">
           {{ s === 1 ? 'Servicio' : s === 2 ? 'Tipo' : s === 3 ? 'Modalidad' : 'Condiciones' }}
         </span>
@@ -25,8 +25,7 @@
   <!-- Success -->
   @if (submitSuccess) {
     <div class="ss-success">
-      <span class="ss-success__icon">✅</span>
-      <p>{{ selectedModalidad === 'on_demand' ? '¡Reporte en cola! Sigue el estado en Historial.' : '¡Programación creada exitosamente!' }}</p>
+      <p>{{ selectedModalidad === 'on_demand' ? 'Reporte en cola. Sigue el estado en Historial.' : 'Programación creada exitosamente.' }}</p>
     </div>
   }
 
@@ -86,7 +85,6 @@
             [class.modalidad-card--active]="selectedModalidad === 'on_demand'"
             (click)="selectModalidad('on_demand')"
           >
-            <span class="modalidad-card__icon">⚡</span>
             <span class="modalidad-card__title">Por demanda</span>
             <span class="modalidad-card__desc">Genera y envía el reporte una sola vez</span>
           </button>
@@ -95,7 +93,6 @@
             [class.modalidad-card--active]="selectedModalidad === 'recurring'"
             (click)="selectModalidad('recurring')"
           >
-            <span class="modalidad-card__icon">🔁</span>
             <span class="modalidad-card__title">Recurrente</span>
             <span class="modalidad-card__desc">Programa envíos automáticos periódicos</span>
           </button>
@@ -209,14 +206,14 @@
     <!-- Nav -->
     <div class="ss-generar__nav">
       @if (step > 1) {
-        <button class="ss-btn ss-btn--outline" (click)="back()">← Atrás</button>
+        <button class="ss-btn ss-btn--outline" (click)="back()">Atrás</button>
       } @else {
         <span></span>
       }
 
       @if (step < totalSteps) {
         <button class="ss-btn ss-btn--primary" (click)="next()" [disabled]="!canGoNext()">
-          Continuar →
+          Continuar
         </button>
       } @else {
         <button class="ss-btn ss-btn--primary" (click)="submit()" [disabled]="!canGoNext() || isSubmitting">

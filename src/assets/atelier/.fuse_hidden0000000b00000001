@@ -1,0 +1,1475 @@
+<!DOCTYPE html>
+<!--
+  ATELIER GRAN CIUDAD · Estudio de diseño de marca
+  Creado por Claude (Fable) para Mariana Jaramillo · Revo Re · Julio 2026
+  Funciona 100% local y sin internet. Doble clic para abrir en el navegador.
+  Las reglas por sede están cableadas al master graphic: la app no permite violarlas.
+  v2 (2026-07-15): mundos Orgánico/Pauta (Grid solo en Orgánico) + QA de exportación
+  con revisión automática de resolución/brillo, corrector ortográfico y checklist.
+  v3 (2026-07-15): Banco clasificado por amenidad + con/sin gente (visión de Claude);
+  pestaña Checklist Pauta (76 puntos RevoRE VEQ) con reglas de pieza en el QA de export.
+  v4 (2026-07-15): mundos REALMENTE separados — cada uno con su propio estado de trabajo
+  (pieza, foto, textos, formato), identidad visual propia (lime=Orgánico, terracota=Pauta),
+  banner de contexto y defaults propios (Pauta arranca en Story con plantilla comercial).
+  v5 (2026-07-15): Bóveda por mundo (Pauta = banco comercial por sede con datos verificados);
+  pestaña Escáner QA — análisis de píxeles (exposición, nitidez, horizonte, contraste, color,
+  resolución) con overlays, memoria de imágenes y escaneo profundo vía Claude.
+  v6 (2026-07-15): SAFE ZONES en Pauta — overlay amarillo por formato (9:16 unificada Meta
+  mar-2026 + Google Shorts; feed = padding editorial) + bloqueo en QA si un elemento invade
+  la franja tapada en 9:16.
+  v7 (2026-07-15): safe zone 9:16 centrada (120px ambos lados); foto arrastrable sobre el
+  lienzo + zoom (habilita encuadre vertical); QA en modo veredicto — la app dice si cumple,
+  lista solo los problemas con su solución y corrige el texto automáticamente cuando puede.
+  Pendiente (roadmap): conectar resultados de performance de la pauta al Atelier.
+-->
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Atelier Gran Ciudad</title>
+<script src="assets/fotos_v3.js"></script>
+<script src="assets/embed.js"></script>
+<style>
+@font-face{font-family:'Maison';src:url('assets/fonts/MaisonNeue-Medium.otf');font-weight:500}
+@font-face{font-family:'Maison';src:url('assets/fonts/MaisonNeue-Light.otf');font-weight:300}
+@font-face{font-family:'Stanley';src:url('assets/fonts/Stanley Italic.ttf');font-style:italic}
+:root{--mid:#0A2240;--gra:#1B355D;--cream:#FEFCF3;--lime:#D7C724;--terra:#B86748;--amar:#EEAF00;
+--ink:#13203a;--soft:#8fa0bb;--tint:#f2eedd;--line:#2a3f63;--acc:#D7C724;--accTxt:#0A2240}
+body.pauta{--acc:#B86748;--accTxt:#FEFCF3}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--mid);color:var(--cream);font:300 14px/1.5 'Maison',sans-serif;height:100vh;overflow:hidden;display:flex;flex-direction:column}
+b,strong,.md{font-weight:500}
+.st{font-family:'Stanley';font-style:italic}
+
+header{display:flex;align-items:center;gap:18px;padding:14px 26px;border-bottom:1px solid var(--line);flex:none}
+header img{height:34px}
+header h1{font-size:17px;font-weight:500;letter-spacing:.04em}
+header h1 .st{color:var(--acc)}
+nav{display:flex;gap:6px;margin-left:auto;align-items:center}
+nav button{background:none;border:1px solid transparent;color:var(--soft);font:300 13px 'Maison';padding:8px 16px;cursor:pointer;letter-spacing:.06em}
+nav button.on{color:var(--cream);border-color:var(--line);background:var(--gra)}
+nav button:hover{color:var(--cream)}
+#mundos{display:flex;border:1px solid var(--line);margin-right:14px}
+#mundos button{border:none;padding:8px 18px;letter-spacing:.1em;text-transform:uppercase;font-size:11px}
+#mundos button.on[data-m="org"]{background:var(--lime);color:var(--mid);font-weight:500}
+#mundos button.on[data-m="pauta"]{background:var(--terra);color:var(--cream);font-weight:500}
+
+main{flex:1;overflow:hidden;display:none}
+main.on{display:flex}
+
+/* ---------- COMPOSITOR ---------- */
+#panelCtl{width:330px;flex:none;overflow-y:auto;padding:20px 22px;border-right:1px solid var(--line)}
+.lbl{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--soft);margin:16px 0 7px;font-weight:500}
+.lbl:first-child{margin-top:0}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{background:var(--gra);border:1px solid var(--line);color:var(--cream);font:300 12px 'Maison';padding:7px 12px;cursor:pointer}
+.seg button.on{background:var(--cream);color:var(--mid);font-weight:500}
+.seg button:disabled{opacity:.25;cursor:not-allowed;text-decoration:line-through}
+textarea,input[type=text]{width:100%;background:var(--gra);border:1px solid var(--line);color:var(--cream);font:300 13px 'Maison';padding:9px 11px;resize:vertical}
+select{background:var(--gra);border:1px solid var(--line);color:var(--cream);font:300 12px 'Maison';padding:7px 9px}
+textarea:focus,input:focus{outline:1px solid var(--acc)}
+.hint{font-size:11px;color:var(--soft);margin-top:5px;line-height:1.45}
+input[type=range]{width:100%;accent-color:var(--acc)}
+.row2{display:flex;gap:8px}.row2>*{flex:1}
+#drop{border:1.5px dashed var(--line);padding:18px 12px;text-align:center;color:var(--soft);cursor:pointer;font-size:12px;line-height:1.5}
+#drop.hay{border-color:var(--acc);color:var(--cream)}
+.btn{display:block;width:100%;background:var(--acc);color:var(--accTxt);border:none;font:500 14px 'Maison';padding:13px;cursor:pointer;margin-top:18px;letter-spacing:.04em}
+#mundoBanner{background:var(--acc);color:var(--accTxt);font-size:10px;letter-spacing:.24em;text-transform:uppercase;font-weight:500;padding:8px 12px;text-align:center;margin:-20px -22px 16px}
+.btn.sec{background:var(--gra);color:var(--cream);border:1px solid var(--line);font-weight:300}
+.btn:hover{filter:brightness(1.08)}
+
+#lienzo{flex:1;display:flex;align-items:center;justify-content:center;padding:26px;background:
+repeating-conic-gradient(#0d2748 0 25%,#0A2240 0 50%) 0 0/28px 28px}
+#wrapCv{box-shadow:0 22px 70px rgba(0,0,0,.5);position:relative}
+#cv{display:block;max-height:calc(100vh - 160px);max-width:100%}
+#regla{position:absolute;top:-26px;left:0;font-size:10px;letter-spacing:.18em;color:var(--soft);text-transform:uppercase}
+
+/* ---------- GRID ---------- */
+#gwrap{flex:1;overflow-y:auto;display:flex;gap:40px;padding:34px;justify-content:center}
+#phone{width:378px;flex:none}
+#phead{background:#fff;color:#111;padding:12px 14px;font:500 14px -apple-system,sans-serif;display:flex;gap:10px;align-items:center}
+#phead img{width:30px;height:30px;border-radius:50%;background:var(--mid);padding:5px}
+#pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5px;background:#fff}
+.celda{aspect-ratio:1/1;background:#e8e8e8;position:relative;cursor:pointer;overflow:hidden}
+.celda img{width:100%;height:100%;object-fit:cover;display:block}
+.celda.sel{outline:3px solid var(--lime);outline-offset:-3px}
+.celda .n{position:absolute;top:4px;left:6px;font-size:10px;color:#fff;text-shadow:0 0 4px #000}
+#gside{width:300px}
+#gside .lbl{margin-top:22px}
+
+/* ---------- BANCO ---------- */
+#bwrap{flex:1;display:flex;flex-direction:column;overflow:hidden}
+#bfiltros{padding:16px 26px;border-bottom:1px solid var(--line);display:flex;gap:22px;flex-wrap:wrap;align-items:center;flex:none}
+#bfiltros .grupo{display:flex;gap:6px;align-items:center}
+#bfiltros .glbl{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--soft)}
+#bgal{flex:1;overflow-y:auto;padding:20px 26px;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;align-content:start}
+.thumb{aspect-ratio:1/1;background:var(--gra);cursor:pointer;position:relative;overflow:hidden}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.thumb .tag{position:absolute;bottom:0;left:0;right:0;font-size:9px;padding:3px 6px;background:rgba(10,34,64,.82);color:var(--soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.thumb .gold{position:absolute;top:6px;right:6px;width:10px;height:10px;border-radius:50%;background:var(--lime)}
+#bcount{margin-left:auto;color:var(--soft);font-size:12px}
+
+/* modal */
+#modal{position:fixed;inset:0;background:rgba(4,10,22,.88);display:none;align-items:center;justify-content:center;z-index:50}
+#modal.on{display:flex}
+#mbox{background:var(--gra);max-width:880px;width:92%;max-height:90vh;overflow-y:auto;padding:26px;border:1px solid var(--line)}
+#mbox img{max-width:100%;max-height:56vh;display:block;margin:0 auto}
+#mmeta{margin-top:14px;font-size:12px;color:var(--soft);line-height:1.7;word-break:break-all}
+#mbox .btn{margin-top:14px}
+.qaitem{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--line);font-size:13px;cursor:pointer}
+.qaitem input{margin-top:3px;accent-color:var(--acc)}
+.qauto{padding:7px 0;font-size:13px;line-height:1.5;border-bottom:1px solid var(--line)}
+.qauto.ok{color:#9fd6a8}.qauto.warn{color:var(--amar)}.qauto.fail{color:#ff8d7a;font-weight:500}
+.spell{background:#fff;color:#111;padding:10px 12px;font:300 15px 'Maison',sans-serif;margin-bottom:7px;min-height:22px;line-height:1.5}
+.spell:focus{outline:2px solid var(--lime)}
+#mbox .lbl{margin-top:20px}
+
+/* ---------- BÓVEDA ---------- */
+#vwrap{flex:1;overflow-y:auto;padding:30px 40px}
+.vcard{background:var(--gra);border:1px solid var(--line);padding:20px 24px;margin-bottom:16px;max-width:900px}
+.vcard h3{font-size:15px;font-weight:500;margin-bottom:10px}
+.vcard h3 span{color:var(--lime)}
+.chip{display:inline-block;background:var(--mid);border:1px solid var(--line);padding:6px 13px;margin:0 6px 8px 0;cursor:pointer;font-size:13px}
+.chip:hover{border-color:var(--lime)}
+.chip.st{font-size:15px}
+.oro{border-left:3px solid var(--terra);padding:8px 14px;margin:10px 0;font-size:13px;color:#dfe4ee;cursor:pointer;line-height:1.6}
+.oro:hover{background:var(--mid)}
+.regla{font-size:12.5px;color:var(--soft);line-height:1.7}
+#toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);background:var(--acc);color:var(--accTxt);padding:10px 22px;font-weight:500;font-size:13px;display:none;z-index:99}
+
+/* ---------- ESCÁNER QA ---------- */
+#scan{display:none}#scan.on{display:flex}
+#scPanel{width:300px;flex:none;overflow-y:auto;padding:20px 22px;border-right:1px solid var(--line)}
+#scMain{flex:1;display:flex;flex-direction:column;overflow:hidden}
+#scStage{flex:1;display:flex;align-items:center;justify-content:center;padding:20px;position:relative;overflow:hidden;
+background:repeating-conic-gradient(#0d2748 0 25%,#0A2240 0 50%) 0 0/28px 28px}
+#scWrap{position:relative;box-shadow:0 18px 60px rgba(0,0,0,.5)}
+#scv{display:block;max-height:calc(100vh - 300px);max-width:100%}
+#scLine{position:absolute;left:0;right:0;top:0;height:3px;background:var(--acc);box-shadow:0 0 18px 4px var(--acc);display:none}
+#scWrap.scanning #scLine{display:block;animation:sweep 1.4s linear}
+@keyframes sweep{from{top:0}to{top:calc(100% - 3px)}}
+#scRes{flex:none;max-height:220px;overflow-y:auto;border-top:1px solid var(--line);padding:14px 24px}
+#scHist{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+#scHist img{width:52px;height:52px;object-fit:cover;cursor:pointer;border:1px solid var(--line)}
+#scHist img:hover{border-color:var(--acc)}
+.scitem{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px;cursor:pointer}
+.scitem input{margin-top:3px;accent-color:var(--acc)}
+#scEmpty{color:var(--soft);font-size:13px;text-align:center;line-height:1.7;max-width:340px}
+
+/* ---------- CHECKLIST PAUTA ---------- */
+#ckwrap{flex:1;overflow-y:auto;padding:30px 40px}
+#ckhead{max-width:900px;margin-bottom:18px}
+#ckbar{height:8px;background:var(--gra);border:1px solid var(--line);max-width:900px;margin:10px 0 4px}
+#ckfill{height:100%;background:var(--terra);width:0%;transition:width .3s}
+.cksec{background:var(--gra);border:1px solid var(--line);padding:18px 22px;margin-bottom:14px;max-width:900px}
+.cksec h3{font-size:14px;font-weight:500;margin-bottom:4px;display:flex;justify-content:space-between;cursor:pointer}
+.cksec h3 .pc{color:var(--soft);font-weight:300;font-size:12px}
+.ckit{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px;cursor:pointer;line-height:1.5}
+.ckit:last-child{border-bottom:none}
+.ckit input{margin-top:3px;accent-color:var(--terra);flex:none}
+.ckit.done{color:var(--soft);text-decoration:line-through}
+.ckit .pri{flex:none;font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;margin-top:2px;border:1px solid var(--line)}
+.ckit .pri.alta{color:#ff8d7a;border-color:#ff8d7a55}
+.ckit .pri.media{color:var(--amar);border-color:#eeaf0055}
+</style>
+</head>
+<body>
+
+<header>
+  <img src="assets/monogram_cream.png" alt="">
+  <h1>Atelier <span class="st">Gran Ciudad</span></h1>
+  <nav>
+    <span id="mundos">
+      <button data-m="org" class="on">Orgánico</button>
+      <button data-m="pauta">Pauta</button>
+    </span>
+    <button data-t="comp" class="on">Compositor</button>
+    <button data-t="grid">Grid</button>
+    <button data-t="check">Checklist Pauta</button>
+    <button data-t="scan">Escáner QA</button>
+    <button data-t="banco">Banco de fotos</button>
+    <button data-t="voz">Bóveda de copys</button>
+  </nav>
+</header>
+
+<!-- ============ COMPOSITOR ============ -->
+<main id="comp" class="on">
+  <div id="panelCtl">
+    <div id="mundoBanner"></div>
+    <div class="lbl">Sede</div>
+    <div class="seg" id="selSede"></div>
+    <div class="hint" id="sedeInfo"></div>
+
+    <div class="lbl">Formato</div>
+    <div class="seg" id="selFmt"></div>
+    <div class="seg" id="segSafe" style="margin-top:6px;display:none"><button id="tgSafe">⚠ SAFE ZONES</button></div>
+    <div class="hint" id="safeHint" style="display:none">Amarillo = zona segura para textos, logos e
+    información. En 9:16 lo de afuera lo tapa la interfaz (Meta unificó Stories+Reels en marzo 2026:
+    270px arriba, 670px abajo, 65px lados; +120px derecha por los íconos de Google Shorts).
+    En 1:1 y 4:5 el feed no tapa la imagen: el margen es padding recomendado. La guía nunca se exporta.</div>
+
+    <div class="lbl">Tipo de pieza</div>
+    <div class="seg" id="selTipo"></div>
+    <div class="hint" id="tipoInfo"></div>
+
+    <div class="lbl">Fotografía</div>
+    <div id="drop">Arrastra aquí una foto desde Finder<br>(o haz clic para elegirla)</div>
+    <input type="file" id="fileIn" accept="image/*" hidden>
+    <div class="lbl">Encuadre <span style="text-transform:none;letter-spacing:0">· o arrastra la foto sobre la pieza</span></div>
+    <div class="row2"><input type="range" id="fx" min="0" max="100" value="50" title="horizontal">
+    <input type="range" id="fy" min="0" max="100" value="50" title="vertical"></div>
+    <div class="lbl">Zoom de la foto</div>
+    <input type="range" id="fz" min="100" max="300" value="100">
+    <div class="hint">La foto siempre llena el lienzo: si su proporción coincide con el formato,
+    no hay margen para moverla. <b>Sube el zoom (+100%)</b> y podrás arrastrarla libremente en
+    horizontal y vertical, directo con el mouse.</div>
+
+    <div class="lbl">Titular <span style="text-transform:none;letter-spacing:0">· *palabra* = Stanley Italic</span></div>
+    <textarea id="titular" rows="2">The culture of a *Social Club.*</textarea>
+    <div class="lbl">Subtexto (Maison Light)</div>
+    <textarea id="subtexto" rows="2">Where every day feels like a private invitation.</textarea>
+    <div class="lbl">Tamaño del titular</div>
+    <input type="range" id="tsize" min="40" max="240" value="86">
+    <div class="lbl">Tamaño del subtexto</div>
+    <input type="range" id="ssize" min="14" max="72" value="22">
+    <div class="hint"><b>El titular y el subtexto se arrastran por separado directamente
+    sobre la pieza</b> — igual que el logo y el panel.</div>
+    <div class="lbl">Posición vertical del texto (bloques)</div>
+    <input type="range" id="bpos" min="18" max="72" value="42">
+
+    <div class="lbl">Opciones</div>
+    <div class="seg" id="selPanelPos">
+      <button data-v="der" class="on">Panel der.</button><button data-v="izq">izq.</button><button data-v="inf">inf.</button>
+    </div>
+    <div class="seg" style="margin-top:6px" id="selPanelCol">
+      <button data-v="cream" class="on">Panel Cream</button><button data-v="mid">Midnight</button>
+    </div>
+    <div class="lbl">Tamaño exacto del panel/recuadro (px)</div>
+    <div class="row2">
+      <input type="text" id="panW" placeholder="ancho · auto" inputmode="numeric">
+      <input type="text" id="panH" placeholder="alto · auto" inputmode="numeric">
+    </div>
+    <div class="hint">Vacío = automático. El lienzo mide 1080 px de ancho (1350/1920 de alto según formato).</div>
+    <div class="lbl">Cream exacto (hex)</div>
+    <input type="text" id="creamHex" value="#FEFCF3">
+    <div class="hint">El oficial del brandbook es #FEFCF3. Cambia el valor y toda la pieza lo usa.</div>
+    <div class="lbl">Color de acento (sliver)</div>
+    <div class="seg" id="selAcc">
+      <button data-v="auto" class="on">Auto</button>
+      <button data-v="#D7C724" style="border-bottom:3px solid #D7C724">Lime</button>
+      <button data-v="#EEAF00" style="border-bottom:3px solid #EEAF00">Amarillo</button>
+      <button data-v="#B86748" style="border-bottom:3px solid #B86748">Terracota</button>
+    </div>
+    <div class="lbl">Acento · orientación</div>
+    <div class="seg" id="selAccOri">
+      <button data-v="h" class="on">Horizontal</button><button data-v="v">Vertical</button>
+    </div>
+    <div class="lbl">Acento · largo</div>
+    <input type="range" id="accLen" min="24" max="1080" value="64">
+    <div class="lbl">Acento · grosor</div>
+    <input type="range" id="accTh" min="3" max="30" value="6">
+    <div class="hint"><b>El acento también se arrastra sobre la pieza</b> al punto exacto
+    que quieras. Por defecto aparece bajo el titular.</div>
+    <div class="seg" style="margin-top:6px">
+      <button id="tgSliver">Sliver acento</button>
+      <button id="tgLogo" class="on">Monograma</button>
+      <button id="tgPattern">Pattern</button>
+      <button id="tgCentro">Centrar texto</button>
+    </div>
+    <div class="lbl">Logo de la pieza</div>
+    <div id="logoDrop" style="border:1.5px dashed var(--line);padding:10px;text-align:center;color:var(--soft);cursor:pointer;font-size:11.5px">
+      Subir logo PNG de la sede (clic o arrastrar)<br>· vacío = monograma GC automático ·</div>
+    <input type="file" id="logoIn" accept="image/png,image/svg+xml,image/webp" hidden>
+    <div class="seg" style="margin-top:6px"><button id="logoClear" style="display:none">✕ Quitar logo subido</button></div>
+    <div class="lbl">Posición del logo</div>
+    <div class="seg" id="selLogoPos">
+      <button data-v="si">Sup. izq.</button><button data-v="sd">Sup. der.</button>
+      <button data-v="ii">Inf. izq.</button><button data-v="id" class="on">Inf. der.</button>
+      <button data-v="c">Centro</button>
+    </div>
+    <div class="hint">También puedes <b>arrastrar el logo con el mouse directamente sobre la
+    pieza</b> para ponerlo en el punto exacto. Los botones de posición lo devuelven a su lugar.</div>
+    <div class="lbl">Tamaño del logo</div>
+    <input type="range" id="lsize" min="40" max="720" value="86">
+
+    <button class="btn" id="btnExport">Exportar PNG (pasa QA)</button>
+    <button class="btn sec" id="btnFolder">📁 Elegir carpeta de guardado (Atelier GC)</button>
+    <button class="btn sec" id="btnPrompt">Copiar prompt Claude Design</button>
+    <button class="btn sec" id="btnGrid">Enviar al Grid →</button>
+    <button class="btn sec" id="btnCheck" style="display:none">Checklist Pauta →</button>
+  </div>
+  <div id="lienzo"><div id="wrapCv"><div id="regla"></div><canvas id="cv"></canvas></div></div>
+</main>
+
+<!-- ============ GRID ============ -->
+<main id="grid">
+  <div id="gwrap">
+    <div>
+      <div id="phone">
+        <div id="phead"><img src="assets/monogram_cream.png"><span id="ghandle">granciudadnp</span></div>
+        <div id="pgrid"></div>
+      </div>
+    </div>
+    <div id="gside">
+      <div class="lbl">Simulador de feed</div>
+      <p class="regla">Así se verá el grid real de Instagram. Haz clic en una celda y luego en
+      otra para intercambiarlas. Doble clic para cargar una imagen en esa posición.
+      Recuerda: cada fila de 3 es una tripleta y se lee de derecha a izquierda
+      (el post más nuevo queda arriba a la izquierda).</p>
+      <div class="lbl">Cargar piezas</div>
+      <input type="file" id="gfiles" accept="image/*" multiple>
+      <div class="hint">Selecciona varias a la vez: se acomodan en orden de publicación
+      (la primera que elijas será el post más antiguo, abajo a la derecha).</div>
+      <button class="btn" id="gExport">Exportar vista del grid</button>
+      <button class="btn sec" id="gClear">Vaciar</button>
+    </div>
+  </div>
+</main>
+
+<!-- ============ BANCO ============ -->
+<main id="banco">
+  <div id="bwrap">
+    <div id="bfiltros">
+      <div class="grupo"><span class="glbl">Sede</span><span class="seg" id="bfSede"></span></div>
+      <div class="grupo"><span class="glbl">Orientación</span><span class="seg" id="bfOri">
+        <button data-v="" class="on">Todas</button><button data-v="h">Horizontal</button><button data-v="v">Vertical</button></span></div>
+      <div class="grupo"><span class="glbl">Luz</span><span class="seg" id="bfLuz">
+        <button data-v="" class="on">Todas</button><button data-v="gold">Dorada ●</button><button data-v="clara">Clara</button><button data-v="oscura">Nocturna</button></span></div>
+      <div class="grupo"><span class="glbl">Amenidad</span><select id="bfAmen">
+        <option value="">Todas</option><option value="alberca">Alberca</option><option value="gym">Gym</option>
+        <option value="coworking">Coworking</option><option value="coffee">Coffee bar</option>
+        <option value="terraza">Terraza / Rooftop</option><option value="eventos">Salón / Club room</option>
+        <option value="verde">Áreas verdes</option><option value="lobby">Lobby</option>
+        <option value="sin">Sin amenidad (depas, fachadas…)</option></select></div>
+      <div class="grupo"><span class="glbl">Gente</span><span class="seg" id="bfGente">
+        <button data-v="" class="on">Todas</button><button data-v="1">Con gente</button><button data-v="0">Sin gente</button></span></div>
+      <div class="grupo"><input type="text" id="bfTxt" placeholder="buscar carpeta o nombre…" style="width:210px"></div>
+      <div class="grupo"><span class="seg"><button id="btnFotoDir">🔗 Conectar carpeta de fotos</button></span></div>
+      <span id="bcount"></span>
+    </div>
+    <div id="bgal"></div>
+  </div>
+</main>
+
+<!-- ============ BÓVEDA ============ -->
+<main id="voz"><div id="vwrap"></div></main>
+
+<!-- ============ ESCÁNER QA ============ -->
+<main id="scan">
+  <div id="scPanel">
+    <div class="lbl">Qué escanear</div>
+    <div class="seg" style="flex-direction:column;align-items:stretch">
+      <button id="scDePieza">📐 La pieza que estoy editando</button>
+      <button id="scDeFoto" style="margin-top:6px">🖼 La foto del Compositor</button>
+    </div>
+    <div id="scDrop" style="border:1.5px dashed var(--line);padding:12px;text-align:center;color:var(--soft);cursor:pointer;font-size:11.5px;margin-top:8px">
+      …o arrastra aquí cualquier imagen<br>(también desde el Banco: botón "Enviar al Escáner")</div>
+    <input type="file" id="scFile" accept="image/*" hidden>
+    <div class="lbl">Memoria del escáner</div>
+    <div id="scHist"></div>
+    <div class="lbl">Buscar errores de</div>
+    <label class="scitem"><input type="checkbox" data-c="expo" checked>Exposición: zonas quemadas (rojo) y empastadas (azul)</label>
+    <label class="scitem"><input type="checkbox" data-c="nitidez" checked>Nitidez: zonas fuera de foco o movidas (ámbar)</label>
+    <label class="scitem"><input type="checkbox" data-c="horizonte" checked>Horizonte / verticales torcidas</label>
+    <label class="scitem"><input type="checkbox" data-c="contraste" checked>Contraste plano</label>
+    <label class="scitem"><input type="checkbox" data-c="color" checked>Dominante de color extraña</label>
+    <label class="scitem"><input type="checkbox" data-c="reso" checked>Resolución insuficiente</label>
+    <button class="btn" id="scGo" disabled>Escanear</button>
+    <button class="btn sec" id="scClaude" disabled>🔍 Escaneo profundo con Claude</button>
+    <div class="hint">El escaneo profundo (desgastes, manchas, cables, elementos feos — lo que
+    un ojo humano ve) lo hace Claude: el botón guarda la imagen en tu carpeta de guardado y
+    copia el mensaje listo para pegar en el chat.</div>
+  </div>
+  <div id="scMain">
+    <div id="scStage">
+      <div id="scEmpty">Elige qué escanear: la pieza en curso, la foto del Compositor,
+      una imagen arrastrada o cualquier foto del Banco con su botón "Enviar al Escáner".</div>
+      <div id="scWrap" style="display:none"><canvas id="scv"></canvas><div id="scLine"></div></div>
+    </div>
+    <div id="scRes" style="display:none"></div>
+  </div>
+</main>
+
+<!-- ============ CHECKLIST PAUTA ============ -->
+<main id="check"><div id="ckwrap">
+  <div id="ckhead">
+    <h3 style="font-weight:500;font-size:16px">Checklist de Pauta <span class="st" style="color:var(--terra)">RevoRE</span></h3>
+    <p class="regla" style="margin-top:6px">Las 76 buenas prácticas del checklist de marketing digital (VEQ · marzo 2026),
+    traducidas y organizadas por sección. Marca lo que ya está implementado — el avance se guarda solo en esta computadora.
+    Las reglas de <b>Diseño y Contenido</b> también se validan automáticamente en el QA de exportación cuando estás en mundo Pauta.</p>
+    <div id="ckbar"><div id="ckfill"></div></div>
+    <div id="ckpct" style="font-size:12px;color:var(--soft)"></div>
+  </div>
+  <div class="cksec" style="border-left:3px solid var(--terra)">
+    <h3>Analizar la pieza actual <span class="pc">toma el creativo del Compositor</span></h3>
+    <p class="regla">Reviso tu pieza en curso y marco solo los puntos que un creativo puede
+    demostrar (etiquetados <b>auto</b>: #1, #5, #7–#11). El resto del checklist es operación
+    de campaña — Ads Manager, CRM, presupuesto — y se marca a mano.</p>
+    <button class="btn" id="ckGo" style="margin-top:12px">🔎 Analizar pieza y marcar checks</button>
+    <div id="ckAnaRes"></div>
+  </div>
+  <div id="cklist"></div>
+</div></main>
+
+<!-- modal foto / QA -->
+<div id="modal"><div id="mbox"></div></div>
+<div id="toast"></div>
+
+<script>
+/* =================== DATOS DE MARCA (del Sistema Gran Ciudad) =================== */
+const SEDES = {
+  GCNP:{nombre:"Nuevo Polanco",acento:"#D7C724",bloques:false,handle:"granciudadnp",
+    linea:"Studios & apartments for rent. No guarantor required.",
+    tags:"#GranCiudad #GranCiudadNuevoPolanco #NuevoPolanco #CDMXRentals #SocialClubLiving #RentaSinAval",
+    info:"Minimalismo intencional: foto protagonista. Bloques sólidos PROHIBIDOS. Inglés primario. Lime con moderación extrema."},
+  GCNS:{nombre:"Nuevo Sur",acento:"#EEAF00",bloques:true,handle:"granciudadns",
+    linea:"Rent with ease — no guarantor required.",
+    tags:"#GranCiudad #GranCiudadNuevoSur #NuevoSurMTY #Monterrey #ResidentialClub #RentaSinAval",
+    info:"Sí lleva bloques sólidos alternados con foto. El Cerro de la Silla es el activo visual #1. 'Residential Club'."},
+  GCCH:{nombre:"Chapultepec",acento:"#B86748",bloques:false,handle:"granciudadch",
+    linea:"Studios & apartments for rent. No guarantor required.",
+    tags:"#GranCiudad #GranCiudadChapultepec #RomaNorte #CDMXRentals #LifestyleCDMX #RentaSinAval",
+    info:"Minimalismo bohemio: el barrio es parte del lifestyle. Bloques sólidos PROHIBIDOS. Acento Terracota."},
+  GCCR:{nombre:"City Rent",acento:"#FEFCF3",bloques:true,handle:"granciudadcr",
+    linea:"Renta fácil — sin aval.",
+    tags:"#GranCiudad #GranCiudadCityRent #NuevoPolanco #CDMXRentals #RentaSinAval #DepasEnRenta",
+    info:"Sí lleva bloques y es la sede del pattern lineal. ESPAÑOL primario. Energía joven sin bajar sofisticación."}
+};
+const ANCLA = ["Connect.","Enjoy.","Live.","Belong.","Thrive.","Arrive.","Unwind.","Gather.","Stay.","Create."];
+const ORO = {
+  GCNP:["Behind every great conversation is a space that made it possible.",
+        "Take a coffee break that feels like a getaway. At the Coffee Bar, neighbors meet, ideas flow, and coffee is always brewing.",
+        "One apartment, endless possibilities."],
+  GCNS:["Your living room. Monterrey's skyline. A pool just beyond the glass. At Gran Ciudad Nuevo Sur, every detail was designed to remind you — this is exactly where you want to be.",
+        "Some mornings, the only thing on your agenda is enjoying where you live.",
+        "A place where exclusive resident events build real community — and belonging starts the moment you move in."],
+  GCCH:["Some of life's best connections start unexpectedly. A new friendship. A new opportunity. Maybe something more.",
+        "Amazing views, good company, and moments worth sharing.",
+        "At Gran Ciudad Chapultepec, coworking at home starts with an amazing space like this."],
+  GCCR:["Hay departamentos donde simplemente vives. Y hay lugares que te cambian la forma de vivir. Gran Ciudad City Rent fue diseñado para ser lo segundo.",
+        "Los mejores espacios no solo se habitan. Se sienten.",
+        "Los detalles cambian todo."]
+};
+const FMTS = {cuadrado:[1080,1080],retrato:[1080,1350],story:[1080,1920]};
+const TIPOS = {
+  t1:{n:"Foto sola",foto:true,bloque:false},
+  t2:{n:"Foto + panel",foto:true,bloque:false},
+  t3:{n:"Foto + overlay",foto:true,bloque:false},
+  t4:{n:"Bloque",foto:false,bloque:true},
+  t5:{n:"Bloque + pattern",foto:false,bloque:true}
+};
+const MID="#0A2240"; let CREAM="#FEFCF3";
+/* SAFE ZONES de pauta — investigación 2026-07-15 (Meta Business Help / especificación
+   unificada Stories+Reels de marzo 2026 + Google Shorts). Valores en px sobre lienzo 1080:
+   - 9:16: UI arriba 270px, abajo 670px (Reels/CTA), lados 65px; derecha 120px (íconos Shorts).
+   - 4:5 y 1:1 (feed): la UI NO tapa la imagen — es padding editorial recomendado. */
+const SAFEZONES={
+  cuadrado:{t:100,b:100,l:100,r:100,dura:false},
+  retrato:{t:250,b:250,l:100,r:100,dura:false},
+  // 9:16: Meta pide 65px por lado; Google Shorts ocupa ~120px a la derecha. Usamos 120px
+  // en AMBOS lados para que la zona quede centrada y siga siendo válida en las dos plataformas.
+  story:{t:270,b:670,l:120,r:120,dura:true}};
+
+/* =================== ESTADO — independiente por mundo =================== */
+/* Orgánico y Pauta son espacios de trabajo separados: cada uno guarda su propia
+   pieza en curso (foto, textos, formato, logo, todo). Cambiar de mundo NO mezcla nada. */
+function nuevoEstado(m){ return {sede:"GCNP",fmt:m==="pauta"?"story":"cuadrado",tipo:"t2",
+         safe:m==="pauta",img:null,fotoName:null,fx:.5,fy:.5,zoom:1,
+         panelPos:"der",panelCol:"cream",sliver:false,logo:true,pattern:false,
+         tsize:86,bpos:.42,centro:false,acc:"auto",logoPos:"id",panW:null,panH:null,
+         logoImg:null,logoName:null,lsize:86,logoXY:null,panXY:null,ssize:22,titXY:null,subXY:null,
+         accOri:"h",accLen:64,accTh:6,accXY:null}; }
+const WSTATE={
+  org:{S:nuevoEstado("org"),tit:"The culture of a *Social Club.*",
+       sub:"Where every day feels like a private invitation."},
+  pauta:{S:nuevoEstado("pauta"),tit:"Studios & lofts en *Nuevo Polanco*",
+       sub:"Desde [[precio]] al mes · Sin aval · Agenda tu visita"}};
+let S = WSTATE.org.S;
+let logoRect=null, panelRect=null, titRect=null, subRect=null, accRect=null; // rects para arrastre/resize
+function accColor(fondo){ let c = S.acc==="auto" ? SEDES[S.sede].acento : S.acc;
+  // Si el acento coincide con el fondo (ej. GCCR auto=cream sobre bloque cream),
+  // usar el contraste de la paleta base para que nunca sea invisible.
+  if(fondo && c.toUpperCase()===fondo.toUpperCase()) c = (fondo.toUpperCase()===MID.toUpperCase()) ? CREAM : MID;
+  return c; }
+const $=q=>document.querySelector(q), $$=q=>document.querySelectorAll(q);
+const assets={};
+function loadImg(src){return new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.onerror=()=>r(null);i.src=src;});}
+
+/* =================== UI GENERAL =================== */
+$$("nav button[data-t]").forEach(b=>b.onclick=()=>{ $$("nav button[data-t]").forEach(x=>x.classList.remove("on"));b.classList.add("on");
+  $$("main").forEach(m=>m.classList.remove("on")); $("#"+b.dataset.t).classList.add("on");
+  if(b.dataset.t==="banco"&&!bancoListo) pintaBanco();
+  if(b.dataset.t==="check") pintaCheck(); });
+
+/* --- mundos: Orgánico (redes / parrilla) vs Pauta (publicidad) ---
+   Espacios de trabajo realmente separados: al cambiar de mundo se guarda la pieza
+   en curso y se restaura la del otro mundo, con su propia identidad visual. */
+let MUNDO="org", appReady=false;
+function syncCtl(){ // refleja TODO el estado S en los controles del panel
+  const setSeg=(sel,val)=>$$(sel+" button").forEach(b=>b.classList.toggle("on",b.dataset.v===String(val)));
+  setSeg("#selPanelPos",S.panelPos); setSeg("#selPanelCol",S.panelCol);
+  setSeg("#selAcc",S.acc); setSeg("#selAccOri",S.accOri); setSeg("#selLogoPos",S.logoPos);
+  $("#tgSafe").classList.toggle("on",!!S.safe);
+  $("#tgSliver").classList.toggle("on",S.sliver); $("#tgLogo").classList.toggle("on",S.logo);
+  $("#tgPattern").classList.toggle("on",S.pattern); $("#tgCentro").classList.toggle("on",S.centro);
+  $("#fx").value=S.fx*100; $("#fy").value=S.fy*100; $("#fz").value=(S.zoom||1)*100;
+  $("#tsize").value=S.tsize; $("#ssize").value=S.ssize; $("#bpos").value=S.bpos*100;
+  $("#accLen").value=S.accLen; $("#accTh").value=S.accTh; $("#lsize").value=S.lsize;
+  $("#panW").value=S.panW||""; $("#panH").value=S.panH||"";
+  const dr=$("#drop");
+  if(S.img){ dr.classList.add("hay"); dr.textContent=S.fotoName||"foto cargada"; }
+  else{ dr.classList.remove("hay"); dr.innerHTML="Arrastra aquí una foto desde Finder<br>(o haz clic para elegirla)"; }
+  const ld=$("#logoDrop");
+  if(S.logoImg){ ld.innerHTML="✓ "+(S.logoName||"logo cargado"); ld.style.borderColor="var(--acc)"; $("#logoClear").style.display="inline-block"; }
+  else{ ld.innerHTML="Subir logo PNG de la sede (clic o arrastrar)<br>· vacío = monograma GC automático ·"; ld.style.borderColor="var(--line)"; $("#logoClear").style.display="none"; } }
+function setMundo(m,guardar=true){
+  if(appReady){ WSTATE[MUNDO].tit=$("#titular").value; WSTATE[MUNDO].sub=$("#subtexto").value; }
+  MUNDO=m; S=WSTATE[m].S;
+  $("#titular").value=WSTATE[m].tit; $("#subtexto").value=WSTATE[m].sub;
+  document.body.classList.toggle("pauta",m==="pauta");
+  $$("#mundos button").forEach(b=>b.classList.toggle("on",b.dataset.m===m));
+  const esOrg = m==="org";
+  $('nav button[data-t="grid"]').style.display = esOrg ? "" : "none";
+  $('nav button[data-t="check"]').style.display = esOrg ? "none" : "";
+  const bg=$("#btnGrid"); if(bg) bg.style.display = esOrg ? "" : "none";
+  const bc=$("#btnCheck"); if(bc) bc.style.display = esOrg ? "none" : "";
+  $("#segSafe").style.display = esOrg ? "none" : "";
+  $("#safeHint").style.display = esOrg ? "none" : "";
+  $("#mundoBanner").textContent = esOrg ? "Orgánico · redes & parrilla" : "Pauta · publicidad";
+  // el Grid es solo de Orgánico y el Checklist solo de Pauta: al cambiar de mundo, volver al Compositor
+  if(!esOrg && $("#grid").classList.contains("on")) $('nav button[data-t="comp"]').click();
+  if(esOrg && $("#check").classList.contains("on")) $('nav button[data-t="comp"]').click();
+  if(guardar) kvSet("mundo",m).catch(()=>{});
+  pintaCtl(); syncCtl(); pintaVoz(); render(); }
+$$("#mundos button").forEach(b=>b.onclick=()=>setMundo(b.dataset.m));
+function toast(m){const t=$("#toast");t.textContent=m;t.style.display="block";setTimeout(()=>t.style.display="none",1800);}
+function seg(el,items,cur,fn){el.innerHTML="";items.forEach(([v,txt,dis])=>{const b=document.createElement("button");
+  b.textContent=txt;if(v===cur)b.classList.add("on");b.disabled=!!dis;
+  b.onclick=()=>{fn(v);[...el.children].forEach(c=>c.classList.remove("on"));b.classList.add("on");};el.appendChild(b);});}
+
+/* =================== COMPOSITOR =================== */
+function pintaCtl(){
+  seg($("#selSede"),Object.keys(SEDES).map(k=>[k,k]),S.sede,v=>{S.sede=v;validaTipo();pintaCtl();render();});
+  $("#sedeInfo").textContent=SEDES[S.sede].info;
+  seg($("#selFmt"),[["cuadrado","1080²"],["retrato","4:5"],["story","Story"]],S.fmt,v=>{S.fmt=v;S.titXY=S.subXY=S.panXY=S.accXY=null;render();});
+  const permiteBloques=SEDES[S.sede].bloques;
+  seg($("#selTipo"),Object.entries(TIPOS).map(([k,t])=>[k,t.n,t.bloque&&!permiteBloques]),S.tipo,v=>{S.tipo=v;S.titXY=S.subXY=S.panXY=S.accXY=null;render();});
+  $("#tipoInfo").textContent=permiteBloques?"Los 5 tipos son legales en esta sede.":"⛔ Bloques deshabilitados: esta sede es de minimalismo fotográfico (regla del sistema).";
+}
+function validaTipo(){ if(TIPOS[S.tipo].bloque&&!SEDES[S.sede].bloques) S.tipo="t2"; }
+$$("#selPanelPos button").forEach(b=>b.onclick=()=>{S.panelPos=b.dataset.v;S.panXY=null;$$("#selPanelPos button").forEach(x=>x.classList.remove("on"));b.classList.add("on");render();});
+$$("#selPanelCol button").forEach(b=>b.onclick=()=>{S.panelCol=b.dataset.v;$$("#selPanelCol button").forEach(x=>x.classList.remove("on"));b.classList.add("on");render();});
+$("#tgSafe").onclick=e=>{S.safe=!S.safe;e.target.classList.toggle("on");render();};
+$("#tgSliver").onclick=e=>{S.sliver=!S.sliver;e.target.classList.toggle("on");render();};
+$("#tgLogo").onclick=e=>{S.logo=!S.logo;e.target.classList.toggle("on");render();};
+$("#tgPattern").onclick=e=>{S.pattern=!S.pattern;e.target.classList.toggle("on");render();};
+$("#tgCentro").onclick=e=>{S.centro=!S.centro;e.target.classList.toggle("on");render();};
+$$("#selAcc button").forEach(b=>b.onclick=()=>{S.acc=b.dataset.v;
+  $$("#selAcc button").forEach(x=>x.classList.remove("on"));b.classList.add("on");
+  if(S.acc!=="auto" && !S.sliver){ S.sliver=true; $("#tgSliver").classList.add("on"); } // elegir un color enciende el sliver solo
+  render();});
+$$("#selAccOri button").forEach(b=>b.onclick=()=>{S.accOri=b.dataset.v;$$("#selAccOri button").forEach(x=>x.classList.remove("on"));b.classList.add("on");render();});
+$("#accLen").oninput=e=>{S.accLen=+e.target.value;render();};
+$("#accTh").oninput=e=>{S.accTh=+e.target.value;render();};
+$$("#selLogoPos button").forEach(b=>b.onclick=()=>{S.logoPos=b.dataset.v;S.logoXY=null;$$("#selLogoPos button").forEach(x=>x.classList.remove("on"));b.classList.add("on");render();});
+$("#lsize").oninput=e=>{S.lsize=+e.target.value;render();};
+const logoDrop=$("#logoDrop");
+logoDrop.onclick=()=>$("#logoIn").click();
+logoDrop.ondragover=e=>e.preventDefault();
+logoDrop.ondrop=e=>{e.preventDefault();cargaLogo(e.dataTransfer.files[0]);};
+$("#logoIn").onchange=e=>cargaLogo(e.target.files[0]);
+async function cargaLogo(f){ if(!f) return;
+  try{ S.logoImg=await createImageBitmap(f); }
+  catch(_){ S.logoImg=await loadImg(URL.createObjectURL(f)); }
+  S.logoName=f.name; logoDrop.innerHTML="✓ "+f.name; logoDrop.style.borderColor="var(--acc)";
+  $("#logoClear").style.display="inline-block";
+  if(!S.logo){S.logo=true;$("#tgLogo").classList.add("on");} render(); }
+$("#logoClear").onclick=()=>{ S.logoImg=null; S.logoName=null; $("#logoClear").style.display="none";
+  logoDrop.innerHTML="Subir logo PNG de la sede (clic o arrastrar)<br>· vacío = monograma GC automático ·";
+  logoDrop.style.borderColor="var(--line)"; render(); };
+$("#panW").oninput=e=>{const v=parseInt(e.target.value,10);S.panW=(v>=60&&v<=1920)?v:null;render();};
+$("#panH").oninput=e=>{const v=parseInt(e.target.value,10);S.panH=(v>=60&&v<=1920)?v:null;render();};
+$("#creamHex").oninput=e=>{const m=e.target.value.trim().match(/^#?([0-9a-fA-F]{6})$/);
+  if(m){CREAM="#"+m[1].toUpperCase();render();}};
+$("#bpos").oninput=e=>{S.bpos=e.target.value/100;render();};
+["titular","subtexto"].forEach(id=>$("#"+id).addEventListener("input",render));
+$("#tsize").oninput=e=>{S.tsize=+e.target.value;render();};
+$("#ssize").oninput=e=>{S.ssize=+e.target.value;render();};
+$("#fx").oninput=e=>{S.fx=e.target.value/100;render();};
+$("#fy").oninput=e=>{S.fy=e.target.value/100;render();};
+$("#fz").oninput=e=>{S.zoom=e.target.value/100;render();};
+
+/* foto: drag & drop o picker (así el canvas queda limpio y exportable) */
+const drop=$("#drop");
+drop.onclick=()=>$("#fileIn").click();
+$("#fileIn").onchange=e=>cargaFoto(e.target.files[0]);
+drop.ondragover=e=>{e.preventDefault();};
+drop.ondrop=e=>{e.preventDefault();
+  if(e.dataTransfer.files.length) cargaFoto(e.dataTransfer.files[0]);
+  else toast("Eso fue una miniatura del Banco — usa el botón 'Usar en el Compositor' de la foto, o arrastra el archivo desde Finder");};
+async function cargaFoto(f){ if(!f) return;
+  try{ S.img=await createImageBitmap(f,{imageOrientation:"from-image"}); }
+  catch(_){ const u=URL.createObjectURL(f); S.img=await loadImg(u); }
+  S.fotoName=f.name; drop.classList.add("hay"); drop.textContent=f.name; render(); }
+
+/* --- motor de dibujo --- */
+const cv=$("#cv"), ctx=cv.getContext("2d");
+function parseRich(t){ // *palabra* -> Stanley
+  const out=[];let re=/\*([^*]+)\*/g,last=0,m;
+  while((m=re.exec(t))){ if(m.index>last)out.push({t:t.slice(last,m.index),st:false});
+    out.push({t:m[1],st:true}); last=re.lastIndex; }
+  if(last<t.length)out.push({t:t.slice(last),st:false}); return out; }
+function fontFor(seg,size){ return seg.st?`italic ${size*1.02}px Stanley`:`500 ${size}px Maison`; }
+function wrapRich(segs,size,maxW){ // devuelve líneas [[{t,st}...]...]
+  const lines=[[]];let w=0;
+  segs.forEach(sg=>{ sg.t.split(/(\s+)/).forEach(tok=>{ if(!tok)return;
+    ctx.font=fontFor(sg,size); const tw=ctx.measureText(tok).width;
+    if(w+tw>maxW && tok.trim()){ lines.push([]); w=0; if(!tok.trim())return; }
+    if(tok==="\n"){lines.push([]);w=0;return;}
+    lines[lines.length-1].push({t:tok,st:sg.st}); w+=tw; }); });
+  return lines.filter(l=>l.some(s=>s.t.trim())); }
+function lineW(ln,size){ return ln.reduce((a,sg)=>{ctx.font=fontFor(sg,size);return a+ctx.measureText(sg.t).width;},0); }
+function drawRich(segs,x,y,size,maxW,color,center){ const lines=wrapRich(segs,size,maxW),lh=size*1.18;
+  let wMax=0;
+  lines.forEach((ln,i)=>{ const lw2=lineW(ln,size); wMax=Math.max(wMax,lw2);
+    let cx=center? x+(maxW-lw2)/2 : x;
+    ln.forEach(sg=>{ ctx.font=fontFor(sg,size); ctx.fillStyle=color;
+    ctx.fillText(sg.t,cx,y+i*lh); cx+=ctx.measureText(sg.t).width; }); });
+  return {h:lines.length*lh, w:wMax}; }
+function drawLight(t,x,y,size,maxW,color,center){ ctx.font=`300 ${size}px Maison`;ctx.fillStyle=color;
+  const words=t.split(/\s+/);let line="",yy=y,lh=size*1.5,wMax=0;
+  const put=l=>{ const lw2=ctx.measureText(l).width; wMax=Math.max(wMax,lw2);
+    const lx=center? x+(maxW-lw2)/2 : x; ctx.fillText(l,lx,yy); };
+  words.forEach(w=>{ const test=line?line+" "+w:w;
+    if(ctx.measureText(test).width>maxW){put(line);yy+=lh;line=w;}else line=test;});
+  if(line)put(line); return {h:yy-y+lh, w:wMax}; }
+let coverInfo=null; // para arrastrar la foto directamente sobre la pieza
+function cover(img,x,y,w,h){ const r=Math.max(w/img.width,h/img.height)*(S.zoom||1);
+  const sw=w/r, sh=h/r, sx=(img.width-sw)*S.fx, sy=(img.height-sh)*S.fy;
+  coverInfo={r,slackX:img.width-sw,slackY:img.height-sh};
+  ctx.drawImage(img,sx,sy,sw,sh,x,y,w,h); }
+
+async function render(handles=true){
+  const [W,H]=FMTS[S.fmt]; cv.width=W;cv.height=H;
+  if(S.tipo!=="t2") panelRect=null;
+  cv.style.aspectRatio=W+"/"+H;
+  $("#regla").textContent=`${MUNDO==="pauta"?"Pauta":"Orgánico"} · ${S.sede} · ${TIPOS[S.tipo].n} · ${W}×${H}`;
+  await document.fonts.ready;
+  const sede=SEDES[S.sede], k=W/1080, T=S.tsize*k, SS=S.ssize*k;
+  const titular=parseRich($("#titular").value), sub=$("#subtexto").value;
+  titRect=null; subRect=null;
+  // Título y subtexto como objetos independientes: posición default del tipo de pieza,
+  // o la posición a la que Mariana los haya arrastrado (S.titXY / S.subXY).
+  function drawTitAt(defX,defBase,size,maxW,color,center){
+    const x=S.titXY?S.titXY.x:defX, yb=S.titXY?(S.titXY.y+size):defBase;
+    const r=drawRich(titular,x,yb,size,maxW,color,center);
+    titRect={x,y:yb-size,w:Math.max(r.w,40),h:r.h+size*.12};
+    return titRect; }
+  function drawSubAt(defX,defTop,size,maxW,color,center,alpha){
+    if(!sub.trim()) return;
+    const x=S.subXY?S.subXY.x:defX, yt=S.subXY?S.subXY.y:defTop;
+    ctx.globalAlpha=alpha;
+    const r=drawLight(sub,x,yt+size,size,maxW,color,center);
+    ctx.globalAlpha=1;
+    subRect={x,y:yt,w:Math.max(r.w,40),h:r.h}; }
+  const pcol=S.panelCol==="cream"?CREAM:MID, ptxt=S.panelCol==="cream"?MID:CREAM;
+  ctx.textBaseline="alphabetic";
+  // fondo base
+  ctx.fillStyle=TIPOS[S.tipo].bloque?(S.panelCol==="cream"?CREAM:MID):"#1c2c49"; ctx.fillRect(0,0,W,H);
+
+  if(TIPOS[S.tipo].foto){
+    if(S.img) cover(S.img,0,0,W,H);
+    else{ ctx.fillStyle="#22385e";ctx.fillRect(0,0,W,H);ctx.fillStyle="#43598a";
+      ctx.font=`300 ${26*k}px Maison`;ctx.textAlign="center";
+      ctx.fillText("Arrastra una foto para empezar",W/2,H/2);ctx.textAlign="left"; }
+  }
+
+  if(S.tipo==="t2"){ // panel editorial
+    let px,py,pw,ph;
+    if(S.panelPos==="der"){pw=S.panW||W*.34;ph=S.panH||H*.62;px=W-pw;py=(H-ph)/2;}
+    else if(S.panelPos==="izq"){pw=S.panW||W*.34;ph=S.panH||H*.62;px=0;py=(H-ph)/2;}
+    else {pw=S.panW||W*.7;ph=S.panH||H*.30;px=0;py=H-ph;}
+    if(S.panXY){ px=S.panXY.x; py=S.panXY.y; }
+    panelRect={px,py,pw,ph};
+    ctx.fillStyle=pcol;ctx.fillRect(px,py,pw,ph);
+    const pad=56*k, tw=pw-pad*2;
+    const tr=drawTitAt(px+pad, py+pad+T*0.72, T*0.72, tw, ptxt, false);
+    drawSubAt(px+pad, tr.y+tr.h+22*k, SS, tw, ptxt, false, .86);
+  }
+
+  if(S.tipo==="t3"){ // overlay
+    const gh=H*.52; const g=ctx.createLinearGradient(0,H-gh,0,H);
+    g.addColorStop(0,"rgba(6,15,30,0)");g.addColorStop(1,"rgba(6,15,30,.72)");
+    ctx.fillStyle=g;ctx.fillRect(0,H-gh,W,gh);
+    const pad=72*k, tw=W-pad*2; const baseY=H-pad-(sub.trim()?110*k:30*k);
+    const lines=wrapRich(titular,T,tw); const hTit=lines.length*T*1.18;
+    drawTitAt(pad, baseY-hTit+T, T, tw, CREAM, false);
+    drawSubAt(pad, baseY+44*k-SS, SS, tw, CREAM, false, .85);
+  }
+
+  if(TIPOS[S.tipo].bloque){ // t4 / t5 — solo GCNS y GCCR
+    if(S.tipo==="t5"||S.pattern){ const pat=S.panelCol==="cream"?assets.patMid:assets.patCream;
+      if(pat){ ctx.globalAlpha=.14; const pw=W*.78;
+        ctx.drawImage(pat,W-pw*.62,H-pw*.62,pw,pw); ctx.globalAlpha=1; } }
+    const pad=96*k, tw=W-pad*2;
+    const tr=drawTitAt(pad, H*S.bpos, T*1.15, tw, ptxt, S.centro);
+    drawSubAt(pad, tr.y+tr.h+46*k, SS, tw, ptxt, S.centro, .8);
+  }
+
+  // Acento (sliver) — objeto libre: orientación, largo, grosor y posición de Mariana
+  if(S.sliver){
+    const th=S.accTh*k, ln=S.accLen*k;
+    const aw=S.accOri==="h"?ln:th, ah=S.accOri==="h"?th:ln;
+    let ax,ay;
+    if(S.accXY){ ax=S.accXY.x; ay=S.accXY.y; }
+    else if(titRect){ ax=S.centro?(W-aw)/2:titRect.x; ay=titRect.y+titRect.h+8*k; }
+    else { ax=72*k; ay=H-110*k; }
+    const fondo = TIPOS[S.tipo].bloque ? (S.panelCol==="cream"?CREAM:MID) : null;
+    ctx.fillStyle=accColor(fondo); ctx.fillRect(ax,ay,aw,ah);
+    accRect={x:ax,y:ay,w:aw,h:ah};
+  } else accRect=null;
+
+  if(S.logo){ // logo subido por sede, o monograma GC con contraste automático
+    const oscuro = TIPOS[S.tipo].bloque ? S.panelCol!=="cream" : true;
+    const lg = S.logoImg || (oscuro?assets.monoCream:assets.monoMid);
+    if(lg){ const lw=S.lsize*k, lh=lw*(lg.height/lg.width), mx=52*k, my=48*k;
+      let lx, ly;
+      if(S.logoXY){ lx=S.logoXY.x; ly=S.logoXY.y; }
+      else if(S.logoPos==="c"){ lx=(W-lw)/2; ly=(H-lh)/2; }
+      else{ lx = S.logoPos.endsWith("i") ? mx : W-lw-mx;
+            ly = S.logoPos.startsWith("s") ? my : H-lh-my; }
+      lx=Math.max(-lw*.4,Math.min(W-lw*.6,lx)); ly=Math.max(-lh*.4,Math.min(H-lh*.6,ly));
+      logoRect={lx,ly,lw,lh};
+      ctx.globalAlpha=.96; ctx.drawImage(lg,lx,ly,lw,lh); ctx.globalAlpha=1; }
+  } else logoRect=null;
+
+  // SAFE ZONES (solo en pantalla — nunca se exportan)
+  if(handles && MUNDO==="pauta" && S.safe){
+    const z=SAFEZONES[S.fmt], sx=z.l, sy=z.t, sw=W-z.l-z.r, sh=H-z.t-z.b;
+    ctx.save();
+    ctx.fillStyle="rgba(238,175,0,.16)"; ctx.fillRect(sx,sy,sw,sh);
+    ctx.setLineDash([18*k,12*k]); ctx.lineWidth=4*k; ctx.strokeStyle="rgba(238,175,0,.92)";
+    ctx.strokeRect(sx,sy,sw,sh); ctx.setLineDash([]);
+    ctx.fillStyle="rgba(238,175,0,.95)";
+    ctx.font=`500 ${26*k}px Maison`;
+    ctx.fillText("SAFE ZONE · textos, logos e info aquí",sx+18*k,sy+40*k);
+    ctx.font=`300 ${21*k}px Maison`;
+    if(z.dura){
+      ctx.fillText(`↑ UI Meta/Google · ${z.t}px — no poner nada importante`,sx+18*k,z.t-16*k);
+      ctx.fillText(`↓ UI Reels/CTA · ${z.b}px — el usuario no ve esta franja`,sx+18*k,H-z.b+34*k);
+      ctx.fillText(`→ íconos · ${z.r}px`,W-z.r-160*k,H*.5);
+    } else {
+      ctx.fillText(`Feed ${S.fmt==="retrato"?"4:5":"1:1"}: la UI no tapa la imagen — margen editorial recomendado`,sx+18*k,H-z.b+34*k);
+    }
+    ctx.restore();
+  }
+
+  // puntos de control del panel (solo en pantalla — nunca se exportan)
+  if(handles && S.tipo==="t2" && panelRect){
+    const {px,py,pw,ph}=panelRect, s=18*k;
+    ctx.save();
+    ctx.setLineDash([9*k,7*k]); ctx.lineWidth=1.6*k; ctx.strokeStyle="rgba(122,130,150,.85)";
+    ctx.strokeRect(px,py,pw,ph); ctx.setLineDash([]);
+    [[px,py],[px+pw,py],[px,py+ph],[px+pw,py+ph]].forEach(([cx2,cy2])=>{
+      ctx.fillStyle="#FFFFFF"; ctx.strokeStyle="#0A2240"; ctx.lineWidth=2.2*k;
+      ctx.fillRect(cx2-s/2,cy2-s/2,s,s); ctx.strokeRect(cx2-s/2,cy2-s/2,s,s); });
+    ctx.restore();
+  }
+}
+
+/* --- arrastre y resize sobre el lienzo (logo + panel) --- */
+let drag=null, rafPend=false;
+function cvCoords(e){ const r=cv.getBoundingClientRect();
+  return {x:(e.clientX-r.left)*cv.width/r.width, y:(e.clientY-r.top)*cv.height/r.height}; }
+function sobreLogo(p){ return logoRect && p.x>=logoRect.lx && p.x<=logoRect.lx+logoRect.lw
+  && p.y>=logoRect.ly && p.y<=logoRect.ly+logoRect.lh; }
+function sobrePanel(p){ return panelRect && S.tipo==="t2"
+  && p.x>=panelRect.px && p.x<=panelRect.px+panelRect.pw
+  && p.y>=panelRect.py && p.y<=panelRect.py+panelRect.ph; }
+function enRect(p,r){ return r && p.x>=r.x-14 && p.x<=r.x+r.w+14 && p.y>=r.y-8 && p.y<=r.y+r.h+8; }
+function esquinaEn(p){ if(!panelRect||S.tipo!=="t2") return null;
+  const tol=30*(cv.width/1080);
+  const cs={nw:[panelRect.px,panelRect.py], ne:[panelRect.px+panelRect.pw,panelRect.py],
+            sw:[panelRect.px,panelRect.py+panelRect.ph], se:[panelRect.px+panelRect.pw,panelRect.py+panelRect.ph]};
+  for(const c in cs) if(Math.abs(p.x-cs[c][0])<tol && Math.abs(p.y-cs[c][1])<tol) return c;
+  return null; }
+cv.addEventListener("mousedown",e=>{ const p=cvCoords(e); drag=null;
+  const c=esquinaEn(p);
+  if(c) drag={m:"resize",c, l:panelRect.px, t:panelRect.py,
+              r:panelRect.px+panelRect.pw, b:panelRect.py+panelRect.ph};
+  else if(enRect(p,accRect)) drag={m:"acc", dx:p.x-accRect.x, dy:p.y-accRect.y};
+  else if(sobreLogo(p)) drag={m:"logo", dx:p.x-logoRect.lx, dy:p.y-logoRect.ly};
+  else if(enRect(p,titRect)) drag={m:"tit", dx:p.x-titRect.x, dy:p.y-titRect.y};
+  else if(enRect(p,subRect)) drag={m:"sub", dx:p.x-subRect.x, dy:p.y-subRect.y};
+  else if(sobrePanel(p)) drag={m:"panel", dx:p.x-panelRect.px, dy:p.y-panelRect.py};
+  else if(TIPOS[S.tipo].foto && S.img) drag={m:"foto", x0:p.x, y0:p.y, fx0:S.fx, fy0:S.fy};
+  if(drag) e.preventDefault(); });
+window.addEventListener("mousemove",e=>{
+  if(drag){ const p=cvCoords(e);
+    if(drag.m==="logo") S.logoXY={x:p.x-drag.dx, y:p.y-drag.dy};
+    else if(drag.m==="acc") S.accXY={x:p.x-drag.dx, y:p.y-drag.dy};
+    else if(drag.m==="tit") S.titXY={x:p.x-drag.dx, y:p.y-drag.dy};
+    else if(drag.m==="sub") S.subXY={x:p.x-drag.dx, y:p.y-drag.dy};
+    else if(drag.m==="panel") S.panXY={x:p.x-drag.dx, y:p.y-drag.dy};
+    else if(drag.m==="foto"){ if(coverInfo){
+      if(coverInfo.slackX>1) S.fx=Math.max(0,Math.min(1,drag.fx0-(p.x-drag.x0)/coverInfo.r/coverInfo.slackX));
+      if(coverInfo.slackY>1) S.fy=Math.max(0,Math.min(1,drag.fy0-(p.y-drag.y0)/coverInfo.r/coverInfo.slackY));
+      $("#fx").value=S.fx*100; $("#fy").value=S.fy*100; } }
+    else{ let {l,t,r,b}=drag;
+      if(drag.c.includes("w")) l=Math.min(p.x,r-60); else r=Math.max(p.x,l+60);
+      if(drag.c.includes("n")) t=Math.min(p.y,b-60); else b=Math.max(p.y,t+60);
+      S.panXY={x:l,y:t}; S.panW=Math.round(r-l); S.panH=Math.round(b-t);
+      $("#panW").value=S.panW; $("#panH").value=S.panH; }
+    if(!rafPend){ rafPend=true; requestAnimationFrame(()=>{rafPend=false; render();}); } }
+  else{ const p=cvCoords(e); const c=esquinaEn(p);
+    cv.style.cursor = c ? ((c==="nw"||c==="se")?"nwse-resize":"nesw-resize")
+      : (sobreLogo(p)||enRect(p,titRect)||enRect(p,subRect)||enRect(p,accRect) ? "move"
+      : (sobrePanel(p) ? "grab" : (TIPOS[S.tipo].foto&&S.img ? "grab" : "default"))); } });
+window.addEventListener("mouseup",()=>{ drag=null; });
+
+/* --- guardado directo en carpeta (File System Access API) --- */
+function idbOpen(){return new Promise((res,rej)=>{const r=indexedDB.open("atelier",1);
+  r.onupgradeneeded=()=>r.result.createObjectStore("kv");
+  r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);});}
+async function kvSet(k,v){const d=await idbOpen();return new Promise((res,rej)=>{const t=d.transaction("kv","readwrite");
+  t.objectStore("kv").put(v,k);t.oncomplete=res;t.onerror=()=>rej(t.error);});}
+async function kvGet(k){const d=await idbOpen();return new Promise((res,rej)=>{const t=d.transaction("kv");
+  const q=t.objectStore("kv").get(k);q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error);});}
+let dirHandle=null;
+function pintaFolderBtn(){ $("#btnFolder").textContent = dirHandle
+  ? "📁 Guardando en: "+dirHandle.name : "📁 Elegir carpeta de guardado (Atelier GC)"; }
+async function initDir(){ try{ dirHandle=(await kvGet("dir"))||null; }catch(_){dirHandle=null;} pintaFolderBtn(); }
+$("#btnFolder").onclick=async()=>{
+  if(!window.showDirectoryPicker){ toast("Este navegador no lo permite — se usará Descargas"); return; }
+  try{ dirHandle=await showDirectoryPicker({mode:"readwrite"});
+    await kvSet("dir",dirHandle); pintaFolderBtn();
+    toast("Listo: todo se guardará en "+dirHandle.name); }catch(_){/*canceló*/} };
+async function saveBlob(blob,name){
+  if(dirHandle){ try{
+    let p=await dirHandle.queryPermission({mode:"readwrite"});
+    if(p!=="granted") p=await dirHandle.requestPermission({mode:"readwrite"});
+    if(p==="granted"){ const fh=await dirHandle.getFileHandle(name,{create:true});
+      const w=await fh.createWritable(); await w.write(blob); await w.close();
+      toast("Guardado en "+dirHandle.name+" · "+name); return; } }catch(e){} }
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;a.click();
+  toast("Exportado a Descargas"); }
+
+/* --- carpeta de fotos conectada: clic en el Banco → foto real y limpia al Compositor --- */
+let fotoDir=null;
+async function initFotoDir(){ try{ fotoDir=(await kvGet("fotosDir"))||null; }catch(_){fotoDir=null;} pintaFotoDirBtn(); }
+function pintaFotoDirBtn(){ const b=$("#btnFotoDir"); if(!b) return;
+  b.textContent = fotoDir? "🔗 Fotos conectadas: "+fotoDir.name : "🔗 Conectar carpeta de fotos"; }
+$("#btnFotoDir").onclick=async()=>{
+  if(!window.showDirectoryPicker){ toast("Este navegador no lo permite — arrastra desde Finder"); return; }
+  try{ fotoDir=await showDirectoryPicker({mode:"read"});
+    await kvSet("fotosDir",fotoDir); pintaFotoDirBtn();
+    toast("Conectada: "+fotoDir.name+" — ahora 'Usar en el Compositor' funciona con un clic"); }catch(_){}};
+async function archivoDesdeRel(rel){ // rel viene desde Documents; probar tal cual y sin el 1er segmento
+  if(!fotoDir) return null;
+  let p=await fotoDir.queryPermission({mode:"read"});
+  if(p!=="granted") p=await fotoDir.requestPermission({mode:"read"});
+  if(p!=="granted") return null;
+  for(const intento of [rel.split("/"), rel.split("/").slice(1), rel.split("/").slice(2)]){
+    if(!intento.length) continue;
+    try{ let d=fotoDir;
+      for(let i=0;i<intento.length-1;i++) d=await d.getDirectoryHandle(intento[i]);
+      const fh=await d.getFileHandle(intento[intento.length-1]);
+      return await fh.getFile();
+    }catch(_){/* probar siguiente */}
+  }
+  return null; }
+async function usarEnCompositor(f){
+  const file=await archivoDesdeRel(f.p);
+  if(file){ await cargaFoto(file);
+    document.querySelector('nav button[data-t="comp"]').click();
+    toast("Foto cargada en el Compositor"); }
+  else{ navigator.clipboard.writeText("/Users/mariana/Documents/"+f.p);
+    toast(fotoDir? "No encontré el archivo — ruta copiada, arrástralo desde Finder (⌘⇧G)"
+                 : "Conecta la carpeta de fotos (botón 🔗 arriba) o arrastra desde Finder — ruta copiada"); } }
+
+/* --- QA + export ---
+   Veredicto automático: la app identifica si la pieza cumple, dice QUÉ falla y CÓMO
+   arreglarlo. Sin checklist para leer. Lo que es corregible en el texto, se corrige solo. */
+function qaTexto(){ const errs=[];
+  const t=$("#titular").value, s=$("#subtexto").value, todo=t+"\n"+s;
+  if(/ {2,}/.test(todo)) errs.push({lv:"fail",msg:"Hay dobles espacios en el texto",fix:"usa el botón «Corregir texto» y lo arreglo yo",auto:true});
+  if(((t.match(/\*/g)||[]).length)%2) errs.push({lv:"fail",msg:"Asterisco sin cerrar en el titular",fix:"cierra el par: *palabra* = Stanley Italic"});
+  if(/\[\[|\]\]/.test(todo)) errs.push({lv:"fail",msg:"Queda un [[dato a confirmar]] sin resolver",fix:MUNDO==="pauta"?("reemplázalo con el dato verificado de la Bóveda — p. ej. "+(PAUTA_COPY[S.sede]?PAUTA_COPY[S.sede].datos[0]:"")):"reemplázalo con el dato confirmado del brief"});
+  if(/\s[,.;:!?]/.test(todo)) errs.push({lv:"fail",msg:"Espacio antes de un signo de puntuación",fix:"usa el botón «Corregir texto» y lo arreglo yo",auto:true});
+  if(/\b(\p{L}+)\s+\1\b/iu.test(todo)) errs.push({lv:"fail",msg:"Palabra repetida seguida",fix:"borra la repetición en el titular/subtexto"});
+  return errs; }
+function autoFixTexto(){ ["titular","subtexto"].forEach(id=>{ const el=$("#"+id);
+  el.value=el.value.replace(/ {2,}/g," ").replace(/\s+([,.;:!?])/g,"$1").replace(/^\s+|\s+$/g,""); });
+  render(); }
+function qaFoto(){ const out=[]; const [W,H]=FMTS[S.fmt];
+  if(!TIPOS[S.tipo].foto) return out;
+  if(!S.img){ out.push({lv:"fail",msg:"El tipo de pieza lleva foto y no hay foto cargada",fix:"ve al Banco, filtra por amenidad y usa «Usar en el Compositor»"}); return out; }
+  const r=Math.max(W/S.img.width, H/S.img.height)*(S.zoom||1);
+  if(r>1.35) out.push({lv:"fail",msg:`Resolución insuficiente: la foto (${S.img.width}×${S.img.height}) se amplía ${Math.round(r*100)}% — se verá pixelada`,fix:S.zoom>1?"baja el zoom de la foto, o busca una versión más grande en el Banco":"busca una versión más grande en el Banco o cambia a formato 1:1/4:5"});
+  else if(r>1.02) out.push({lv:"warn",msg:`La foto va ligeramente ampliada (${Math.round(r*100)}%) — revisa nitidez al 100%`});
+  else out.push({lv:"ok",msg:`Resolución correcta: ${S.img.width}×${S.img.height} px`});
+  try{ const t2=document.createElement("canvas"); t2.width=60; t2.height=60;
+    const x2=t2.getContext("2d",{willReadFrequently:true});
+    x2.drawImage(cv,0,0,60,60);
+    const d=x2.getImageData(0,0,60,60).data; let lum=0;
+    for(let i=0;i<d.length;i+=4) lum+=.299*d[i]+.587*d[i+1]+.114*d[i+2];
+    lum/=(d.length/4);
+    if(lum<34) out.push({lv:"warn",msg:"La pieza queda muy oscura en promedio — cuida que texto y logo respiren"});
+    else if(lum>232) out.push({lv:"warn",msg:"La pieza queda muy clara — cuida el contraste del texto"});
+  }catch(_){}
+  return out; }
+const escHTML=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+/* Reglas de pieza del checklist de pauta RevoRE (sección Diseño y Contenido).
+   Son avisos (no bloquean): el dato puede ir en el copy del anuncio y no en el arte. */
+const ZONA_KW={GCNP:["polanco","cdmx"],GCNS:["nuevo sur","monterrey","mty"],
+  GCCH:["chapultepec","roma","condesa","cdmx"],GCCR:["polanco","cdmx"]};
+function qaPauta(){ if(MUNDO!=="pauta") return [];
+  const txt=($("#titular").value+" "+$("#subtexto").value).toLowerCase();
+  const out=[]; const PC=PAUTA_COPY[S.sede];
+  if(!/\$\s?\d|\bdesde\b|\bmxn\b|al mes|\/mes|mensual/i.test(txt))
+    out.push({lv:"warn",msg:"Pauta #7 · no veo precio en el arte",fix:"agrégalo o asegúralo en el copy del ad — dato verificado: "+(PC?PC.datos[0]:"ver Bóveda")});
+  if(!(ZONA_KW[S.sede]||[]).some(k=>txt.includes(k)))
+    out.push({lv:"warn",msg:"Pauta #8 · no veo la ubicación (zona/colonia)",fix:`nombra la zona — p. ej. "${SEDES[S.sede].nombre}"`});
+  if(!/rec[áa]mara|studio|estudio|loft|m²|\bm2\b|bedroom|\b[12]r\b/i.test(txt))
+    out.push({lv:"warn",msg:"Pauta #9 · no veo tipología/recámaras",fix:"menciona studio / 1R / 2R en arte o copy"});
+  if(!/agenda|conoce|visita|escr[íi]benos|aplica|renta hoy|renta ya|cotiza|descubre|book|schedule|tour/i.test(txt))
+    out.push({lv:"warn",msg:"Pauta #10 · no veo un CTA directo",fix:"añade «Agenda tu visita» o «Conoce precios», o confía el CTA al botón del ad"});
+  // Safe zones: en 9:16 la UI tapa lo que quede fuera de la zona segura
+  const z=SAFEZONES[S.fmt];
+  if(z&&z.dura){ const [W,H]=FMTS[S.fmt];
+    const dentro=r=>r && r.x>=z.l-4 && r.x+r.w<=W-z.r+4 && r.y>=z.t-4 && r.y+r.h<=H-z.b+4;
+    [["titular",titRect],["subtexto",subRect],["logo",logoRect?{x:logoRect.lx,y:logoRect.ly,w:logoRect.lw,h:logoRect.lh}:null],["acento",accRect]]
+      .forEach(([n,r])=>{ if(r&&!dentro(r))
+        out.push({lv:"fail",msg:`Safe zone · el ${n} queda bajo la interfaz de Meta/Google (9:16)`,fix:"arrástralo dentro de la zona amarilla (enciende ⚠ SAFE ZONES para verla)"}); }); }
+  return out; }
+$("#btnExport").onclick=async()=>{
+  await render(false); // estado limpio para analizar la pieza real
+  const checks=[...qaFoto(), ...qaTexto(), ...qaPauta()];
+  render();
+  const fails=checks.filter(c=>c.lv==="fail"), warns=checks.filter(c=>c.lv==="warn");
+  const hayAuto=fails.some(c=>c.auto);
+  const lang = S.sede==="GCCR" ? "es" : "en";
+  const box=$("#mbox");
+  const veredicto = fails.length
+    ? `<div style="font-size:20px;font-weight:500;color:#ff8d7a;margin:6px 0 2px">✕ Aún no cumple</div>
+       <div class="regla">Encontré ${fails.length} problema${fails.length>1?"s":""}. Esto es lo que hay que corregir:</div>`
+    : warns.length
+    ? `<div style="font-size:20px;font-weight:500;color:var(--amar);margin:6px 0 2px">⚠ Cumple, con observaciones</div>
+       <div class="regla">Puedes exportar. Si quieres dejarla perfecta, revisa esto:</div>`
+    : `<div style="font-size:20px;font-weight:500;color:#9fd6a8;margin:6px 0 2px">✓ Cumple — lista para exportar</div>
+       <div class="regla">Revisé foto, texto${MUNDO==="pauta"?", reglas de pauta y safe zones":""} y no encontré problemas.</div>`;
+  box.innerHTML=`<h3 style='font-weight:500;margin-bottom:2px'>Veredicto del QA</h3>
+    <div style='font-size:12px;color:var(--soft)'>${MUNDO==="pauta"?"Pauta":"Orgánico"} · ${S.sede} · ${TIPOS[S.tipo].n} · ${FMTS[S.fmt][0]}×${FMTS[S.fmt][1]}</div>
+    ${veredicto}
+    ${fails.map(a=>`<div class="qauto fail">✕ ${a.msg}${a.fix?`<br><span style="color:var(--cream);font-weight:300">→ ${a.fix}</span>`:""}</div>`).join("")}
+    ${warns.map(a=>`<div class="qauto warn">⚠ ${a.msg}${a.fix?` <span style="color:var(--soft)">· ${a.fix}</span>`:""}</div>`).join("")}
+    ${hayAuto?`<button class='btn sec' id='qaFix' style='margin-top:14px'>✦ Corregir texto automáticamente</button>`:""}
+    <button class='btn' id='qaGo' ${fails.length?"disabled":""}>Exportar PNG</button>
+    <details style='margin-top:12px'><summary style='cursor:pointer;font-size:12px;color:var(--soft)'>Revisar ortografía a mano (el navegador subraya errores)</summary>
+      <div class="spell" id="spTit" contenteditable="true" spellcheck="true" lang="${lang}" style="margin-top:8px">${escHTML($("#titular").value)}</div>
+      <div class="spell" id="spSub" contenteditable="true" spellcheck="true" lang="${lang}">${escHTML($("#subtexto").value)}</div>
+      <div class="hint">Lo que corrijas aquí se aplica directo a la pieza (corrector en ${lang==="es"?"español":"inglés"}, sede ${S.sede}).</div>
+    </details>
+    <div class="hint" style="margin-top:10px">Lo que no puedo ver por ti: desgastes, manchas o cables en la foto —
+    para eso usa el <b>escaneo profundo</b> y me la revisas conmigo en el chat.</div>
+    <button class='btn sec' id='qaDeep'>🔍 Escaneo profundo con Claude</button>
+    <button class='btn sec' id='qaX'>Cancelar</button>`;
+  $("#modal").classList.add("on");
+  const reeval=()=>$("#btnExport").onclick();
+  if(hayAuto) $("#qaFix").onclick=()=>{ autoFixTexto(); toast("Texto corregido"); reeval(); };
+  const sync=()=>{ $("#titular").value=$("#spTit").innerText.replace(/\n+$/,"");
+    $("#subtexto").value=$("#spSub").innerText.replace(/\n+$/,""); render(); };
+  let syncT; const syncDeb=()=>{clearTimeout(syncT);syncT=setTimeout(sync,400);};
+  $("#spTit").oninput=syncDeb; $("#spSub").oninput=syncDeb;
+  $("#spTit").onblur=()=>{sync();reeval();}; $("#spSub").onblur=()=>{sync();reeval();};
+  $("#qaDeep").onclick=async()=>{ try{ await render(false);
+    const bmp=await createImageBitmap(cv); render();
+    scSet(bmp,`Pieza ${S.sede} · ${MUNDO==="pauta"?"Pauta":"Orgánico"}`);
+    $("#scClaude").click(); }catch(e){ render(); toast("No pude preparar el escaneo"); } };
+  $("#qaX").onclick=()=>$("#modal").classList.remove("on");
+  $("#qaGo").onclick=async()=>{ $("#modal").classList.remove("on");
+    try{
+    await render(false); // sin guías ni puntos de control en el PNG
+    cv.toBlob(b=>{ saveBlob(b,`${MUNDO==="pauta"?"PAUTA":"ORG"}_${S.sede}_${TIPOS[S.tipo].n.replace(/\W+/g,"-")}_${FMTS[S.fmt][0]}x${FMTS[S.fmt][1]}_${new Date().toISOString().slice(0,10)}.png`); render(); },"image/png");
+    }catch(e){ toast("No pude exportar — recarga la página (⌘R) e intenta de nuevo"); render(); } };
+};
+$("#btnPrompt").onclick=()=>{
+  const sede=SEDES[S.sede],[W,H]=FMTS[S.fmt];
+  const p=`Diseña un post para Gran Ciudad ${sede.nombre} siguiendo estas reglas NO negociables:
+- Canvas ${W}x${H}. ${TIPOS[S.tipo].foto?"Foto adjunta como protagonista, a sangre.":"Bloque tipográfico "+(S.panelCol==="cream"?"Cream #FEFCF3":"Midnight #0A2240")+"."}
+- ${S.tipo==="t2"?`Panel editorial ${S.panelCol==="cream"?"Cream #FEFCF3":"Midnight #0A2240"} en ${S.panelPos==="inf"?"franja inferior ~30%":"franja lateral ~34%"}, solapado a la foto.`:""}${S.tipo==="t3"?"Texto Cream sobre degradado sutil en la parte baja de la foto.":""}
+- Titular: "${$("#titular").value.replace(/\*/g,"")}" en Maison Neue Medium, con la(s) palabra(s) marcadas entre asteriscos en Stanley Italic: ${$("#titular").value}.
+- Subtexto en Maison Neue Light: "${$("#subtexto").value}"
+- ${S.sliver?`Sliver de acento ${accColor()} de ~10px en el borde del panel.`:"Sin elementos decorativos extra."}
+- Monograma Gran Ciudad pequeño en esquina inferior derecha, sin efectos.
+- Composición editorial de retícula modular, aire generoso, nada centrado por defecto. Referencia: Soho House.
+Prohibido: sombras, degradados decorativos, más de 2 pesos tipográficos, texto sobre zonas ocupadas de la foto${sede.bloques?"":", bloques sólidos completos (sede minimalista)"}.`;
+  navigator.clipboard.writeText(p); toast("Prompt copiado — pégalo en Claude Design"); };
+
+/* =================== GRID =================== */
+let gImgs=Array(9).fill(null), gSel=-1;
+function pintaGrid(){ const pg=$("#pgrid"); pg.innerHTML="";
+  $("#ghandle").textContent=SEDES[S.sede].handle;
+  gImgs.forEach((im,i)=>{ const c=document.createElement("div");c.className="celda"+(i===gSel?" sel":"");
+    if(im){const t=document.createElement("img");t.src=im;c.appendChild(t);}
+    const n=document.createElement("span");n.className="n";n.textContent=i+1;c.appendChild(n);
+    c.onclick=()=>{ if(gSel<0){gSel=i;}else if(gSel===i){gSel=-1;}
+      else{[gImgs[gSel],gImgs[i]]=[gImgs[i],gImgs[gSel]];gSel=-1;} pintaGrid(); };
+    c.ondblclick=()=>{ const inp=document.createElement("input");inp.type="file";inp.accept="image/*";
+      inp.onchange=e=>{const r=new FileReader();r.onload=()=>{gImgs[i]=r.result;pintaGrid();};r.readAsDataURL(e.target.files[0]);};inp.click(); };
+    pg.appendChild(c); }); }
+$("#gfiles").onchange=e=>{ const fs=[...e.target.files];
+  Promise.all(fs.map(f=>new Promise(r=>{const rd=new FileReader();rd.onload=()=>r(rd.result);rd.readAsDataURL(f);})))
+  .then(ds=>{ // primera elegida = post más antiguo → llena desde el final
+    ds.reverse().forEach((d,ix)=>{ if(ix<9) gImgs[ix]=d; }); gImgs=gImgs.slice(0,9); pintaGrid(); }); };
+$("#gClear").onclick=()=>{gImgs=Array(9).fill(null);pintaGrid();};
+$("#gExport").onclick=async()=>{ const c=document.createElement("canvas");const cell=360,gap=3;
+  c.width=cell*3+gap*2;c.height=cell*3+gap*2;const x=c.getContext("2d");
+  x.fillStyle="#fff";x.fillRect(0,0,c.width,c.height);
+  for(let i=0;i<9;i++){ if(!gImgs[i])continue; const im=await loadImg(gImgs[i]);
+    const col=i%3,row=(i/3)|0, r=Math.max(cell/im.width,cell/im.height),
+    sw=cell/r,sh=cell/r,sx=(im.width-sw)/2,sy=(im.height-sh)/2;
+    x.drawImage(im,sx,sy,sw,sh,col*(cell+gap),row*(cell+gap),cell,cell); }
+  c.toBlob(b=>saveBlob(b,`${S.sede}_grid_preview.png`)); };
+$("#btnGrid").onclick=async()=>{ try{ await render(false); const d=cv.toDataURL(); render();
+  const ix=gImgs.findIndex(x=>!x);
+  gImgs[ix<0?8:ix]=d; pintaGrid(); toast("Pieza enviada al Grid — pestaña Grid"); }
+  catch(e){ render(); toast("No pude leer el lienzo — recarga la página (⌘R) e intenta de nuevo"); } };
+$("#btnCheck").onclick=()=>$('nav button[data-t="check"]').click();
+
+/* =================== BANCO =================== */
+let bancoListo=false, bf={sede:"GCNP",ori:"",luz:"",txt:"",amen:"",gente:""};
+const AMEN_LBL={alberca:"Alberca",gym:"Gym",coworking:"Coworking",coffee:"Coffee bar",
+  terraza:"Terraza / Rooftop",eventos:"Salón / Club room",verde:"Áreas verdes",lobby:"Lobby"};
+function pintaBanco(){ bancoListo=true;
+  // guardia anti-caché: si el navegador cargó un índice viejo sin clasificación, avisar
+  if((window.FOTOS||[]).length && !("a" in window.FOTOS[0]))
+    toast("El navegador cargó el índice viejo — recarga con ⌘⇧R (recarga forzada)");
+  seg($("#bfSede"),Object.keys(SEDES).map(k=>[k,k]),bf.sede,v=>{bf.sede=v;pintaGal();});
+  $$("#bfOri button").forEach(b=>b.onclick=()=>{bf.ori=b.dataset.v;$$("#bfOri button").forEach(x=>x.classList.remove("on"));b.classList.add("on");pintaGal();});
+  $$("#bfLuz button").forEach(b=>b.onclick=()=>{bf.luz=b.dataset.v;$$("#bfLuz button").forEach(x=>x.classList.remove("on"));b.classList.add("on");pintaGal();});
+  $$("#bfGente button").forEach(b=>b.onclick=()=>{bf.gente=b.dataset.v;$$("#bfGente button").forEach(x=>x.classList.remove("on"));b.classList.add("on");pintaGal();});
+  $("#bfAmen").onchange=e=>{bf.amen=e.target.value;pintaGal();};
+  $("#bfTxt").oninput=e=>{bf.txt=e.target.value.toLowerCase();pintaGal();};
+  pintaGal(); }
+function pintaGal(){ const g=$("#bgal"); g.innerHTML="";
+  let fs=(window.FOTOS||[]).filter(f=>f.s===bf.sede);
+  if(bf.ori==="h")fs=fs.filter(f=>f.w>f.h*1.05); if(bf.ori==="v")fs=fs.filter(f=>f.h>f.w*1.05);
+  if(bf.luz==="gold")fs=fs.filter(f=>f.wa>=18&&f.br>=80);
+  if(bf.luz==="clara")fs=fs.filter(f=>f.br>=150); if(bf.luz==="oscura")fs=fs.filter(f=>f.br<90);
+  if(bf.amen==="sin")fs=fs.filter(f=>!f.a); else if(bf.amen)fs=fs.filter(f=>f.a===bf.amen);
+  if(bf.gente!=="")fs=fs.filter(f=>(f.g||0)===+bf.gente);
+  if(bf.txt)fs=fs.filter(f=>f.p.toLowerCase().includes(bf.txt));
+  if(bf.luz==="gold")fs.sort((a,b)=>b.wa-a.wa);
+  $("#bcount").textContent=fs.length+" fotos"+(fs.length>240?" · mostrando 240":"");
+  fs.slice(0,240).forEach(f=>{ const d=document.createElement("div");d.className="thumb";
+    const i=document.createElement("img");i.loading="lazy";
+    i.src=f.t?encodeURI(f.t):"../../"+encodeURI(f.p);
+    d.appendChild(i);
+    if(f.wa>=18&&f.br>=80){const o=document.createElement("span");o.className="gold";o.title="luz dorada";d.appendChild(o);}
+    const t=document.createElement("span");t.className="tag";
+    t.textContent=(f.a?AMEN_LBL[f.a]+(f.g?" · gente":""):(f.d||"raíz")+(f.g?" · gente":""));d.appendChild(t);
+    d.onclick=()=>abreFoto(f); g.appendChild(d); }); }
+function abreFoto(f){ const abs="/Users/mariana/Documents/"+f.p;
+  $("#mbox").innerHTML=`<img src="${f.t?encodeURI(f.t):'../../'+encodeURI(f.p)}">
+  <div id="mmeta"><b>${f.p.split("/").pop()}</b><br>${f.s} · ${f.d||"raíz"} · ${f.w}×${f.h}px ·
+  calidez ${f.wa} · brillo ${f.br}${f.wa>=18?" · <span style='color:var(--lime)'>● luz dorada</span>":""}<br>
+  Amenidad: <b>${f.a?AMEN_LBL[f.a]:"—"}</b> · ${f.g?"con gente":"sin gente"} <span style='color:var(--soft)'>(clasificado por Claude — avísame si ves errores)</span><br>${abs}</div>
+  <button class="btn" id="mUsar">▶ Usar en el Compositor</button>
+  <button class="btn sec" id="mScan">🔎 Enviar al Escáner QA</button>
+  <button class="btn sec" id="mCopy">Copiar ruta (⌘⇧G en Finder para llegar a ella)</button>
+  <button class="btn sec" id="mX">Cerrar</button>
+  <p class="hint" style="margin-top:10px">Antes de diseñar, pásale el QA: desgastes, manchas,
+  cables, reflejos, horizonte torcido. Si "Usar en el Compositor" no encuentra el archivo,
+  conecta la carpeta con el botón 🔗 de arriba (una sola vez).</p>`;
+  $("#modal").classList.add("on");
+  $("#mUsar").onclick=()=>{ $("#modal").classList.remove("on"); usarEnCompositor(f); };
+  $("#mScan").onclick=()=>{ $("#modal").classList.remove("on"); usarEnEscaner(f); };
+  $("#mCopy").onclick=()=>{navigator.clipboard.writeText(abs);toast("Ruta copiada");};
+  $("#mX").onclick=()=>$("#modal").classList.remove("on"); }
+$("#modal").onclick=e=>{ if(e.target.id==="modal")$("#modal").classList.remove("on"); };
+
+/* =================== BÓVEDA =================== */
+/* La Bóveda es distinta por mundo: Orgánico = voz editorial; Pauta = banco comercial
+   con datos verificados de los sitios oficiales (2026-07-15) + copys listos para ads.
+   REGLA: los precios vienen de los sitios web (fuente de verdad). GCCH no se pudo
+   verificar (sitio con JavaScript) → [[dato a confirmar]]. Los "top performers" por
+   data real de Meta Ads quedan pendientes hasta conectar el export de resultados. */
+const PAUTA_COPY={
+ GCNP:{web:"gcnuevopolanco.com",verif:"2026-07-15",
+  datos:["Studio desde $28,000 MXN","1 recámara desde $34,000 MXN ($30,500 en unidad A103)","2 recámaras desde $36,500 MXN","WhatsApp +52 56 6218 5049"],
+  usps:["Sin aval","Aprobación rápida","Mantenimiento en sitio incluido","Pet friendly","Social Club piso 22 (Sky Lounge, Speakeasy, Grill, Social Terrace, Co-Working)","Coffee Bar con barista en PB","Cambio de unidad a los 6 meses","Acceso digital inteligente"],
+  copys:[
+   ["Studios from $28,000 MXN in Nuevo Polanco. No guarantor required. Schedule your tour.","hook precio+zona (EN)"],
+   ["Your apartment + a Social Club on the 22nd floor. 1BR from $34,000 MXN. Book a visit.","hook amenidad+precio (EN)"],
+   ["Rent in Nuevo Polanco without a guarantor. Studios, 1 & 2BR from $28,000 MXN. Fast approval.","hook fricción cero (EN)"],
+   ["Studios desde $28,000 en Nuevo Polanco. Sin aval. Agenda tu visita.","hook precio+zona (ES)"]]},
+ GCNS:{web:"gcnuevosur.com",verif:"2026-07-15",
+  datos:["1 recámara desde $29,100 MXN","2 recámaras desde $37,600 MXN","3 recámaras: no disponible (julio 2026)","Tel. +52 81 2513 6948"],
+  usps:["Sin aval","Mantenimiento incluido","Pet friendly + Dog Park","El Lago (alberca/jacuzzi)","El Estadio (gym)","El Mirador y Zócalo Terrace","Asadores","Dentro del centro comercial Nuevo Sur","Cerca del Tec de Monterrey"],
+  copys:[
+   ["Departamentos de 1 y 2 recámaras desde $29,100 en Nuevo Sur, Monterrey. Sin aval. Agenda tu visita.","hook precio+zona"],
+   ["Vive con alberca, gym y dog park frente a la ciudad. 2 recámaras desde $37,600. Conoce precios.","hook amenidades+precio"],
+   ["Renta sin aval en Monterrey: mantenimiento incluido y aprobación rápida. Desde $29,100. Agenda hoy.","hook fricción cero"]]},
+ GCCH:{web:"gcchapultepec.com",verif:"pendiente — sitio no verificable automáticamente",
+  datos:["Studios, 1 y 2 recámaras · 99 unidades de 38–75 m²","Precios: [[confirmar en gcchapultepec.com]]","Roma Norte, CDMX"],
+  usps:["Sin aval","Mantenimiento incluido","Pet friendly","Rooftop con firepit","Coworking + Flex Studio","Grill y pizza oven","Patio central","El barrio: Roma Norte como amenidad"],
+  copys:[
+   ["Studios y departamentos en Roma Norte desde [[precio]]. Sin aval. Agenda tu visita.","hook precio+zona (ES)"],
+   ["Vive la Roma: departamentos de 38 a 75 m² con rooftop y coworking. Desde [[precio]]. Conoce disponibilidad.","hook barrio+producto (ES)"],
+   ["Rent in Roma Norte. Studios & 1BR, no guarantor required. From [[price]]. Book your tour.","hook fricción cero (EN)"]]},
+ GCCR:{web:"cityrent.mx",verif:"2026-07-15",
+  datos:["Loft desde $20,000 MXN","1 recámara desde $25,000 MXN","2 recámaras desde $35,000 MXN","3 recámaras desde $43,000 MXN","WhatsApp +52 56 6233 9112"],
+  usps:["Sin aval","Renta fácil, aprobación rápida","Mantenimiento incluido","Pet friendly + Pet Zone","Coffee Lounge","Gym y Business Center","Salón de fiestas y Social Room","Acceso directo a Parques Polanco"],
+  copys:[
+   ["Lofts desde $20,000 en Nuevo Polanco. Renta fácil, sin aval. Agenda tu visita.","hook precio+zona"],
+   ["Tu primer depa sin aval: lofts y 1 recámara desde $20,000, junto a Parques Polanco. Conoce precios.","hook primer depa"],
+   ["2 recámaras desde $35,000 con coffee lounge, gym y pet zone. Sin aval. Agenda hoy.","hook familia/roomies"]]}};
+function pintaVozPauta(){ const w=$("#vwrap"); let h="";
+  h+=`<div class="vcard"><h3>Banco de pauta <span>· por sede, desde la data</span></h3>
+  <p class="regla">Precios y argumentos verificados en los sitios oficiales (fuente de verdad
+  del sistema) el <b>15 · julio · 2026</b>. Los copys son borradores construidos con la fórmula
+  del checklist RevoRE: <b>precio + zona + tipología + CTA</b>. Clic en cualquier elemento para
+  copiarlo. ⚠ Antes de usar un precio, confírmalo — los sitios cambian.</p></div>`;
+  Object.entries(PAUTA_COPY).forEach(([k,s])=>{
+    const sede=SEDES[k];
+    h+=`<div class="vcard"><h3>${k} · ${sede.nombre} <span>${s.web} · verificado: ${s.verif}</span></h3>
+    <div class="lbl" style="margin-top:10px">Datos duros (para el arte o el copy)</div>`+
+    s.datos.map(d=>`<span class="chip" onclick="navigator.clipboard.writeText(this.textContent.replace('📋 ',''));toast('Dato copiado')">📋 ${d}</span>`).join("")+
+    `<div class="lbl">Argumentos / USPs verificados</div>`+
+    s.usps.map(u=>`<span class="chip" onclick="navigator.clipboard.writeText(this.textContent);toast('USP copiado')">${u}</span>`).join("")+
+    `<div class="lbl">Copy in para pauta (borradores desde la data)</div>`+
+    s.copys.map(([c,n])=>`<div class="oro" onclick="navigator.clipboard.writeText('${c.replace(/'/g,"\\'")}');toast('Copy copiado')">${c}<br><span style="font-size:11px;color:var(--soft)">${n}</span></div>`).join("")+
+    `<div class="lbl">Top performers (data real de Meta Ads)</div>
+    <p class="regla">[[pendiente]] — para marcar aquí los copys ganadores necesito el export de
+    resultados de Meta Ads (o el Excel "Pauta" de la sede). Pídele el archivo a tu equipo,
+    déjalo en la carpeta del sistema y Claude lo cruza: CPV/CPL por anuncio → los mejores
+    quedan fijados aquí como canon.</p></div>`; });
+  w.innerHTML=h; }
+function pintaVoz(){ if(MUNDO==="pauta"){ pintaVozPauta(); return; } const w=$("#vwrap"); let h="";
+  h+=`<div class="vcard"><h3>Palabras ancla <span>(Stanley Italic — clic para copiar)</span></h3>`+
+     ANCLA.map(a=>`<span class="chip st" onclick="navigator.clipboard.writeText('${a}');toast('Copiada')">${a}</span>`).join("")+`</div>`;
+  Object.entries(SEDES).forEach(([k,s])=>{
+    h+=`<div class="vcard"><h3>${k} · ${s.nombre} <span>@${s.handle}</span></h3>
+    <p class="regla" style="margin-bottom:10px">${s.info}</p>
+    <span class="chip" onclick="navigator.clipboard.writeText('${s.linea}');toast('Línea comercial copiada')">📋 ${s.linea}</span>
+    <span class="chip" onclick="navigator.clipboard.writeText('${s.tags}');toast('Hashtags copiados')"># hashtags</span>`+
+    ORO[k].map(o=>`<div class="oro" onclick="navigator.clipboard.writeText(this.textContent.trim());toast('Ejemplo de oro copiado')">${o}</div>`).join("")+`</div>`; });
+  h+=`<div class="vcard"><h3>Recordatorios del sistema</h3><p class="regla">
+  · El concepto del mes debe derivar de un TEXTO literal del master graphic (tagline, manifiesto o palabra ancla).<br>
+  · GCNP y GCCH: nunca bloques sólidos — foto protagonista.<br>
+  · Nunca inventar precios ni promociones; ante la duda, [[dato a confirmar]].<br>
+  · Estructura de caption: hook → desarrollo → línea comercial de la sede → hashtags.<br>
+  · Cada corrección de la directora se cuenta a Claude para que quede en la memoria del sistema.</p></div>`;
+  w.innerHTML=h; }
+
+/* =================== ESCÁNER QA =================== */
+/* Escáner de fotografías/piezas: análisis real de píxeles en el navegador (exposición,
+   nitidez, horizonte, contraste, color, resolución) con zonas marcadas sobre la imagen.
+   Lo semántico (desgastes, manchas, cables) se delega a Claude vía "escaneo profundo". */
+let SC={img:null,name:null,natW:0,natH:0}, scHist=[];
+function scThumb(img){ const c=document.createElement("canvas");
+  const r=Math.max(104/img.width,104/img.height); c.width=104;c.height=104;
+  const x=c.getContext("2d"); x.drawImage(img,(104-img.width*r)/2,(104-img.height*r)/2,img.width*r,img.height*r);
+  return c.toDataURL("image/jpeg",.7); }
+function drawSC(){ const c=$("#scv"),x=c.getContext("2d");
+  const r=Math.min(1,1400/SC.img.width,1000/SC.img.height);
+  c.width=Math.round(SC.img.width*r); c.height=Math.round(SC.img.height*r);
+  x.drawImage(SC.img,0,0,c.width,c.height); }
+function scSet(img,name,natW,natH){ if(!img) return;
+  SC={img,name:name||"imagen",natW:natW||img.width,natH:natH||img.height};
+  $("#scEmpty").style.display="none"; $("#scWrap").style.display="block";
+  $("#scRes").style.display="none"; drawSC();
+  $("#scGo").disabled=false; $("#scClaude").disabled=false;
+  scHist=scHist.filter(h=>h.name!==SC.name);
+  scHist.unshift({img,name:SC.name,natW:SC.natW,natH:SC.natH,t:scThumb(img)});
+  scHist=scHist.slice(0,8);
+  $("#scHist").innerHTML=scHist.map((h,i)=>`<img src="${h.t}" title="${h.name}" data-i="${i}">`).join("");
+  $$("#scHist img").forEach(el=>el.onclick=()=>{const h=scHist[+el.dataset.i];scSet(h.img,h.name,h.natW,h.natH);}); }
+$("#scDePieza").onclick=async()=>{ try{ await render(false);
+  const bmp=await createImageBitmap(cv); render();
+  scSet(bmp,`Pieza ${S.sede} · ${MUNDO==="pauta"?"Pauta":"Orgánico"}`); }
+  catch(e){ render(); toast("No pude capturar la pieza"); } };
+$("#scDeFoto").onclick=()=>{ if(!S.img){ toast("No hay foto cargada en el Compositor"); return; }
+  scSet(S.img,S.fotoName||"Foto del Compositor"); };
+$("#scDrop").onclick=()=>$("#scFile").click();
+$("#scDrop").ondragover=e=>e.preventDefault();
+$("#scDrop").ondrop=async e=>{ e.preventDefault();
+  const f=e.dataTransfer.files[0]; if(!f) return;
+  try{ scSet(await createImageBitmap(f),f.name); }catch(_){ toast("No pude leer esa imagen"); } };
+$("#scFile").onchange=async e=>{ const f=e.target.files[0]; if(!f) return;
+  try{ scSet(await createImageBitmap(f),f.name); }catch(_){ toast("No pude leer esa imagen"); } };
+async function usarEnEscaner(f){
+  let img=null,low=false; const name=f.p.split("/").pop();
+  const file=await archivoDesdeRel(f.p);
+  if(file){ try{ img=await createImageBitmap(file); }catch(_){img=null;} }
+  if(!img){ img=await loadImg(f.t?encodeURI(f.t):"../../"+encodeURI(f.p)); low=true; }
+  if(!img){ toast("No pude cargar la foto — conecta la carpeta 🔗 del Banco"); return; }
+  scSet(img,name+(low?" · miniatura":""),f.w,f.h);
+  document.querySelector('nav button[data-t="scan"]').click();
+  if(low) toast("Estoy escaneando la miniatura — conecta la carpeta de fotos para alta resolución"); }
+function scan(){
+  if(!SC.img) return;
+  const wrap=$("#scWrap"); wrap.classList.remove("scanning"); void wrap.offsetWidth; wrap.classList.add("scanning");
+  drawSC();
+  const opts={}; $$("#scPanel .scitem input").forEach(c=>opts[c.dataset.c]=c.checked);
+  const res=[];
+  // lienzo de análisis (máx 900 px)
+  const r0=Math.min(1,900/SC.img.width), aw=Math.round(SC.img.width*r0), ah=Math.round(SC.img.height*r0);
+  const ac=document.createElement("canvas"); ac.width=aw; ac.height=ah;
+  const ax=ac.getContext("2d",{willReadFrequently:true}); ax.drawImage(SC.img,0,0,aw,ah);
+  const D=ax.getImageData(0,0,aw,ah).data, N=aw*ah;
+  const gray=new Float32Array(N);
+  for(let i=0;i<N;i++){ gray[i]=.299*D[i*4]+.587*D[i*4+1]+.114*D[i*4+2]; }
+  const ov=document.createElement("canvas"); ov.width=aw; ov.height=ah;
+  const ox=ov.getContext("2d"); const oD=ox.createImageData(aw,ah);
+  let hayOverlay=false;
+  if(opts.expo){ let q=0,e2=0;
+    for(let i=0;i<N;i++){ const R=D[i*4],G=D[i*4+1],B=D[i*4+2];
+      if(R>=250&&G>=250&&B>=245){ q++; oD.data[i*4]=255;oD.data[i*4+3]=150; }
+      else if(gray[i]<6){ e2++; oD.data[i*4+2]=255;oD.data[i*4+3]=130; } }
+    const pq=q/N*100, pe=e2/N*100;
+    if(pq>8) res.push({lv:"fail",msg:`Exposición: ${pq.toFixed(1)}% de la imagen está quemada (zonas rojas) — sin información recuperable`});
+    else if(pq>2.5) res.push({lv:"warn",msg:`Exposición: ${pq.toFixed(1)}% de zonas quemadas (rojas) — normal si es cielo; grave si es interior o piel`});
+    if(pe>10) res.push({lv:"warn",msg:`Exposición: ${pe.toFixed(1)}% en negro absoluto (zonas azules) — sombras empastadas`});
+    if(pq<=2.5&&pe<=10) res.push({lv:"ok",msg:"Exposición dentro de rango"});
+    if(pq>2.5||pe>10) hayOverlay=true;
+    ox.putImageData(oD,0,0); } // marcas de exposición primero; las vectoriales van encima
+  if(opts.contraste){ const hist=new Array(256).fill(0);
+    for(let i=0;i<N;i++) hist[gray[i]|0]++;
+    let acc=0,p5=0,p95=255;
+    for(let v=0;v<256;v++){ acc+=hist[v]; if(acc<N*.05)p5=v; if(acc<N*.95)p95=v; }
+    const rng=p95-p5;
+    if(rng<70) res.push({lv:"warn",msg:`Contraste plano: el 90% de los tonos vive en un rango de solo ${rng} niveles — la pieza puede verse lavada`});
+    else res.push({lv:"ok",msg:`Contraste correcto (rango tonal ${rng})`}); }
+  if(opts.color){ let sr=0,sg=0,sb=0,n2=0;
+    for(let i=0;i<N;i+=4){ const l=gray[i]; if(l>40&&l<220){ sr+=D[i*4];sg+=D[i*4+1];sb+=D[i*4+2];n2++; } }
+    if(n2){ sr/=n2;sg/=n2;sb/=n2; const m=(sr+sg+sb)/3;
+      const dr=sr-m,dg=sg-m,db=sb-m; const mx=Math.max(Math.abs(dr),Math.abs(dg),Math.abs(db));
+      if(mx>16){ const dom=dr===mx?"cálida/rojiza":(db===mx?"fría/azulada":(dg===mx?"verdosa":(db===-mx?"ámbar":"magenta")));
+        res.push({lv:"warn",msg:`Dominante de color ${dom} marcada — verifica el balance de blancos contra la paleta de la sede`}); }
+      else res.push({lv:"ok",msg:"Sin dominante de color extraña"}); } }
+  if(opts.nitidez){ const TX=12,TY=9,tsc=new Float32Array(TX*TY);
+    for(let y=1;y<ah-1;y++) for(let x=1;x<aw-1;x++){
+      const i=y*aw+x, l=4*gray[i]-gray[i-1]-gray[i+1]-gray[i-aw]-gray[i+aw];
+      tsc[Math.min(TY-1,(y/ah*TY)|0)*TX+Math.min(TX-1,(x/aw*TX)|0)]+=l*l; }
+    const per=(aw/TX)*(ah/TY); for(let t=0;t<tsc.length;t++) tsc[t]/=per;
+    const sorted=[...tsc].sort((a,b)=>b-a);
+    const top=sorted.slice(0,Math.max(3,tsc.length*.25|0));
+    const sharp=top.reduce((a,b)=>a+b,0)/top.length;
+    if(sharp<45){ res.push({lv:"fail",msg:`Nitidez: incluso las zonas más definidas se ven suaves (índice ${sharp.toFixed(0)}) — posible foto movida o fuera de foco`});
+      ox.fillStyle="rgba(238,175,0,.30)";
+      for(let t=0;t<tsc.length;t++) if(tsc[t]<sharp*.5) ox.fillRect((t%TX)*(aw/TX),((t/TX)|0)*(ah/TY),aw/TX,ah/TY);
+      hayOverlay=true; }
+    else res.push({lv:"ok",msg:`Nitidez adecuada (índice ${sharp.toFixed(0)})`}); }
+  if(opts.horizonte){ const bins=new Float32Array(81); let wsum=0; // -20..20 en 0.5°
+    for(let y=2;y<ah-2;y+=2) for(let x=2;x<aw-2;x+=2){ const i=y*aw+x;
+      const gx=gray[i+1]-gray[i-1], gy=gray[i+aw]-gray[i-aw];
+      const mag=Math.hypot(gx,gy); if(mag<45) continue;
+      let dir=Math.atan2(gy,gx)*180/Math.PI-90; // dirección de la línea
+      while(dir<-90)dir+=180; while(dir>90)dir-=180;
+      if(Math.abs(dir)<=20){ bins[Math.round((dir+20)*2)]+=mag; wsum+=mag; } }
+    if(wsum>2500){ let bi=0; for(let b=1;b<81;b++) if(bins[b]>bins[bi]) bi=b;
+      const tilt=bi/2-20;
+      if(Math.abs(tilt)>=0.8&&Math.abs(tilt)<=15){
+        res.push({lv:"warn",msg:`Horizonte / líneas dominantes inclinadas ~${tilt.toFixed(1)}° — endereza antes de usar (la línea punteada muestra la inclinación detectada)`});
+        ox.save(); ox.translate(aw/2,ah/2); ox.rotate(tilt*Math.PI/180);
+        ox.setLineDash([14,10]); ox.strokeStyle="rgba(215,199,36,.95)"; ox.lineWidth=3;
+        ox.beginPath(); ox.moveTo(-aw,0); ox.lineTo(aw,0); ox.stroke(); ox.restore();
+        hayOverlay=true; }
+      else res.push({lv:"ok",msg:"Horizonte razonablemente recto"}); } }
+  if(opts.reso){ const corto=Math.min(SC.natW,SC.natH);
+    if(SC.name&&SC.name.includes("miniatura")) res.push({lv:"warn",msg:"Estás escaneando la miniatura — la resolución real es la del archivo original ("+SC.natW+"×"+SC.natH+")"});
+    else if(corto<900) res.push({lv:"fail",msg:`Resolución: ${SC.natW}×${SC.natH} px — el lado corto (${corto}) no alcanza los 1080 del feed; se verá pixelada`});
+    else if(corto<1080) res.push({lv:"warn",msg:`Resolución justa: ${SC.natW}×${SC.natH} px — alcanza para 1080 con recorte mínimo`});
+    else res.push({lv:"ok",msg:`Resolución correcta: ${SC.natW}×${SC.natH} px`}); }
+  // resultados tras la pasada de la línea del escáner
+  setTimeout(()=>{ wrap.classList.remove("scanning");
+    if(hayOverlay){ const c=$("#scv"); c.getContext("2d").drawImage(ov,0,0,c.width,c.height); }
+    const box=$("#scRes"); box.style.display="block";
+    box.innerHTML=`<div class="lbl" style="margin-top:0">Resultados · ${SC.name}</div>`+
+      res.map(a=>`<div class="qauto ${a.lv}">${a.lv==="ok"?"✓":a.lv==="warn"?"⚠":"✕"} ${a.msg}</div>`).join("")+
+      `<div class="hint" style="margin-top:8px">Este escáner ve píxeles: exposición, foco, geometría. Desgastes,
+      manchas, cables o elementos feos los ve Claude — usa el <b>escaneo profundo</b>.</div>`; },1450); }
+$("#scGo").onclick=scan;
+$("#scClaude").onclick=async()=>{ if(!SC.img) return;
+  const c=document.createElement("canvas");
+  const rr=Math.min(1,2400/SC.img.width,2400/SC.img.height);
+  c.width=Math.round(SC.img.width*rr); c.height=Math.round(SC.img.height*rr);
+  c.getContext("2d").drawImage(SC.img,0,0,c.width,c.height);
+  const name=`scan_${(SC.name||"imagen").replace(/\W+/g,"-").slice(0,36)}.png`;
+  c.toBlob(async b=>{ await saveBlob(b,name);
+    const sel=[...$$("#scPanel .scitem input")].filter(x=>x.checked).map(x=>x.parentElement.textContent.trim().split(":")[0]);
+    const prompt=`QA fotográfico Gran Ciudad — escanea la imagen "${name}" que está en mi carpeta de guardado del Atelier`+
+      (dirHandle?` (carpeta "${dirHandle.name}")`:" (revisa mi carpeta de Descargas si no está en el sistema)")+
+      `. Busca como lo haría un director de arte: desgastes, manchas, cables, reflejos indeseados, elementos rotos o feos, basura, plantas secas, pantallas apagadas, personal en cuadro${sel.length?", y además: "+sel.join(", ").toLowerCase():""}. `+
+      `Dame: (1) veredicto general (aprobada / corregir / descartar), (2) cada hallazgo con su zona en la imagen, (3) si es corregible, cómo.`;
+    navigator.clipboard.writeText(prompt);
+    toast("Imagen guardada y mensaje copiado — pégalo en el chat de Claude"); },"image/png"); };
+
+/* =================== CHECKLIST PAUTA (RevoRE · VEQ marzo 2026) =================== */
+/* Traducción digerible del Excel "RevoRE_Checklist_Marketing_VEQ.xlsx". 76 puntos. */
+const PAUTA_CHECK=[
+ ["Filosofía",[
+  [1,"Mensaje claro del proyecto: zona, precio y recámaras visibles desde el primer vistazo","alta"],
+  [2,"Marketing simple e informativo: fuera frases aspiracionales vacías — lifestyle y aspiracionalidad REAL","alta"],
+  [3,"Encontrabilidad: el proyecto aparece fácil cuando alguien busca zona + presupuesto + recámaras","alta"],
+  [4,"Cultura de datos: ninguna decisión de marketing sin respaldo en CRM o métricas","media"]]],
+ ["Diseño y Contenido",[
+  [5,"Render / foto hero de alta calidad como protagonista: claro, limpio, sin adornos","alta"],
+  [6,"Videos de 15–30 s del producto (recorrido, vistas). Sin música dramática","alta"],
+  [7,"Precio (o rango) visible en CADA publicación — en el copy o en el arte","alta"],
+  [8,"Ubicación clara: zona, colonia o puntos de referencia","alta"],
+  [9,"Recámaras y tipologías visibles en el contenido","alta"],
+  [10,"CTA directo en cada post: 'Agenda tu visita', 'Conoce precios'. Nada genérico","alta"],
+  [11,"Máximo 1 logo pequeño. Sin marcos, bordes ni adornos decorativos","media"],
+  [12,"Regla de oro: la claridad del mensaje manda sobre el diseño","media"]]],
+ ["Segmentación",[
+  [13,"Segmentación amplia: solo zona geográfica — el mensaje filtra solo","alta"],
+  [14,"Excluir en CRM a quienes ya compraron o están en proceso avanzado","alta"],
+  [15,"Sin targeting ultra-detallado por demografía: dejar que el algoritmo aprenda","media"]]],
+ ["Formularios",[
+  [16,"Pregunta '¿En qué zona buscas?' — solo zonas con proyecto, sin 'Otra zona'","alta"],
+  [17,"Pregunta de presupuesto — solo rangos reales del inventario, sin 'Otros'","alta"],
+  [18,"Pregunta de recámaras — solo configuraciones que existen","alta"],
+  [19,"Pregunta de timeframe: 1–3, 3–6, 6–12, +12 meses","alta"],
+  [20,"Contacto completo obligatorio: nombre, teléfono y email","alta"],
+  [21,"Nunca la opción 'Otros' en calificación — arruina la retroalimentación al algoritmo","alta"],
+  [22,"Desactivar auto-rellenado de Facebook: el algoritmo no aprende con forms pre-llenados","alta"],
+  [23,"Todo ad lleva formulario — nunca directo a WhatsApp sin calificar","alta"]]],
+ ["Métricas",[
+  [24,"CPV (costo por visita) como métrica operativa principal: inversión ÷ visitas efectivas","alta"],
+  [25,"CPS (costo por venta) cuando haya trazabilidad completa ad→CRM","alta"],
+  [26,"Dejar de optimizar a CPL — es una métrica engañosa en inmobiliario","alta"],
+  [27,"Contactabilidad mínima 65% para evaluar un ad con justicia","alta"],
+  [28,"Entender el caso Post A vs Post B: CPL bajo ≠ mejor performance","media"]]],
+ ["Trazabilidad",[
+  [29,"Meta Ads integrado al CRM: auto-tag de fuente, campaña, ad set y anuncio por lead","alta"],
+  [30,"Google Ads integrado al CRM con el mismo nivel de trazabilidad","alta"],
+  [31,"Campo 'Fuente' por lead (Meta, Google, TikTok…)","alta"],
+  [32,"Campo 'Campaña' por lead (ej. Q1_2026_Polanco_Awareness)","alta"],
+  [33,"Campo 'Ad Set' por lead (ej. Broad_CDMX_25-55)","alta"],
+  [34,"Campo 'Ad/Post' específico por lead (ej. Video_Render_3Rec_V2)","alta"],
+  [35,"Respuestas del formulario guardadas en el CRM (presupuesto, recámaras, timeframe)","alta"],
+  [36,"Timestamp automático de ingreso del lead — mide velocidad de atención","media"],
+  [37,"Etapa del funnel por lead: Nuevo, Contactado, Visita agendada, Realizada, Apartado…","media"]]],
+ ["Algoritmos",[
+  [38,"No cambiar más del 25% de los materiales por semana (solo el 25% inferior, tras 1 mes de datos)","alta"],
+  [39,"No cambiar más del 25% del presupuesto por semana — los brincos reinician el aprendizaje","alta"],
+  [40,"NUNCA apagar campañas: reducir presupuesto gradualmente","alta"],
+  [41,"Esperar mínimo 1 mes antes de evaluar un material (salvo volumen cero o CPL fuera de control)","alta"],
+  [42,"Nueva campaña en vez de cambiar el objetivo de una existente","media"],
+  [43,"Cambiar segmentación solo con evidencia clara, nunca por intuición","media"]]],
+ ["Ventas-Marketing",[
+  [44,"Reunión ventas-marketing cada 15 días, solo con datos del CRM: 'si no está en el CRM, no pasó'","alta"],
+  [45,"Revisar CPV, volumen y contactabilidad por ad en cada reunión","alta"],
+  [46,"Identificar Top 5 y Bottom 5 de ads: qué funciona, qué no y por qué","alta"],
+  [47,"Insights de ventas con datos del CRM, no 'sensaciones'","alta"],
+  [48,"Plan de contenido basado en performance, no en creatividad","media"],
+  [49,"Redistribución de presupuesto entre canales basada en CPV","media"]]],
+ ["Presupuesto",[
+  [50,"Presupuesto total: 1.5%–2.5% de las ventas esperadas","alta"],
+  [51,"Mínimo 60% del presupuesto a marketing digital","alta"],
+  [52,"Meta (IG+FB): ~60% del presupuesto digital, en varios formatos","alta"],
+  [53,"Google (Search + PMax): ~40% del digital — captura intención activa","alta"],
+  [54,"Presupuesto offline definido (señalización, mamposterías, eventos)","media"],
+  [55,"Presupuesto para brokers definido (comisiones, eventos, materiales)","media"],
+  [56,"Presupuesto operacional definido (agencia, herramientas, CRM, licencias)","media"]]],
+ ["Contenido con Datos",[
+  [57,"Probar renders: vista exterior vs interior — el CPV decide","alta"],
+  [58,"Probar headlines: precio+zona vs amenidades+lifestyle","alta"],
+  [59,"Probar formatos: video 15 s vs imagen. Jerarquía Meta: video > imagen > carrusel","alta"],
+  [60,"Probar CTAs: 'Agenda tu visita' vs 'Conoce precios' — medir por CPV","media"],
+  [61,"El brief creativo empieza con datos de performance, no con 'inspiración'","alta"],
+  [62,"Reemplazar solo el bottom 25% de materiales al mes — lo que funciona se queda","alta"]]],
+ ["Landing Pages",[
+  [63,"Render/foto hero visible sin hacer scroll","alta"],
+  [64,"Mapa de ubicación en la landing (interactivo o imagen clara)","alta"],
+  [65,"Precios claros en la landing — sin tener que llamar a preguntar","alta"],
+  [66,"Formulario visible above the fold, no escondido al final","alta"],
+  [67,"Carga en menos de 3 segundos (medir con PageSpeed)","alta"],
+  [68,"Evaluar formularios nativos de Meta como alternativa a la landing","media"]]],
+ ["Velocidad de Lead",[
+  [69,"Notificación inmediata al recibir lead: email + push al asesor","alta"],
+  [70,"Regla de los 5 minutos: contactar en <5 min (a los 30 min la probabilidad se desploma)","alta"],
+  [71,"Medir y reportar % de leads contactados en <5 min. Meta: >65%","alta"],
+  [72,"Tarea automática 'Contactar en 5 min' en el CRM al entrar el lead","alta"]]],
+ ["Remarketing",[
+  [73,"Audiencia 'llenó formulario pero no visitó' → 'Tu departamento ideal te espera…'","alta"],
+  [74,"Audiencia 'visitó pero no apartó' → siguiente paso + condiciones especiales o urgencia","alta"],
+  [75,"Audiencia 'interactuó pero no llenó form' → contenido adicional del proyecto","media"],
+  [76,"10–15% del presupuesto digital a remarketing: CPL más bajo, conversión más alta","alta"]]]
+];
+let ckEstado={};
+const CK_AUTO=new Set([1,5,7,8,9,10,11]); // puntos que una pieza puede demostrar
+async function ckAnalizar(){
+  await render(false); // pieza limpia + rects frescos
+  const txt=($("#titular").value+" "+$("#subtexto").value).toLowerCase();
+  const precio=/\$\s?\d|\bdesde\b|\bmxn\b|al mes|\/mes|mensual/i.test(txt);
+  const zona=(ZONA_KW[S.sede]||[]).some(k=>txt.includes(k));
+  const tipol=/rec[áa]mara|studio|estudio|loft|m²|\bm2\b|bedroom|\b[12]r\b/i.test(txt);
+  const cta=/agenda|conoce|visita|escr[íi]benos|aplica|renta hoy|renta ya|cotiza|descubre|book|schedule|tour/i.test(txt);
+  const fotoChecks=qaFoto(), fotoFails=fotoChecks.filter(c=>c.lv==="fail");
+  const conFoto=TIPOS[S.tipo].foto;
+  const logoOk=!S.logo||S.lsize<=220;
+  const PC=PAUTA_COPY[S.sede];
+  const res=[
+    {id:7,ok:precio,msg:precio?"Precio visible en el arte":"Falta el precio — dato verificado: "+(PC?PC.datos[0]:"ver Bóveda")},
+    {id:8,ok:zona,msg:zona?"Ubicación presente":`Falta la zona — nómbrala: «${SEDES[S.sede].nombre}»`},
+    {id:9,ok:tipol,msg:tipol?"Tipología/recámaras mencionadas":"Falta la tipología — menciona studio / 1R / 2R"},
+    {id:10,ok:cta,msg:cta?"CTA directo presente":"Falta el CTA — «Agenda tu visita» o «Conoce precios»"},
+    {id:11,ok:logoOk,msg:logoOk?(S.logo?"Un solo logo, tamaño discreto":"Sin logo (0–1 permitido)"):`El logo se ve grande (${S.lsize}px) — redúcelo o quítalo`}];
+  if(conFoto) res.push({id:5,ok:!fotoFails.length,
+    msg:!fotoFails.length?"Foto protagonista con resolución correcta":"La foto no pasa: "+fotoFails.map(c=>c.msg).join(" · ")});
+  res.push({id:1,ok:precio&&zona&&tipol,
+    msg:(precio&&zona&&tipol)?"Zona, precio y recámaras al primer vistazo":"Para el mensaje claro faltan: "+[!precio&&"precio",!zona&&"zona",!tipol&&"tipología"].filter(Boolean).join(", ")});
+  const sz=qaPauta().filter(c=>c.lv==="fail"&&/Safe zone/.test(c.msg));
+  render();
+  res.forEach(r=>{ ckEstado[r.id]=r.ok?1:0; });
+  try{ await kvSet("pautaCheck",ckEstado); }catch(_){}
+  const okN=res.filter(r=>r.ok).length;
+  $("#ckAnaRes").innerHTML=
+    `<div class="lbl">Resultado · ${S.sede} · ${TIPOS[S.tipo].n} · ${FMTS[S.fmt][0]}×${FMTS[S.fmt][1]} — ${okN}/${res.length} auto-checks cumplidos</div>`+
+    res.sort((a,b)=>a.id-b.id).map(r=>`<div class="qauto ${r.ok?"ok":"fail"}">${r.ok?"✓":"✕"} #${r.id} · ${r.msg}</div>`).join("")+
+    sz.map(c=>`<div class="qauto fail">✕ ${c.msg}<br><span style="color:var(--cream);font-weight:300">→ ${c.fix}</span></div>`).join("")+
+    `<div class="hint" style="margin-top:8px">Los checks de arriba quedaron marcados/desmarcados en la lista.
+    Corrige en el Compositor y vuelve a analizar — los datos faltantes están copiables en la Bóveda (mundo Pauta).</div>`;
+  pintaCheck(); }
+async function pintaCheck(){
+  try{ ckEstado=(await kvGet("pautaCheck"))||{}; }catch(_){ ckEstado={}; }
+  const w=$("#cklist"); let h="";
+  PAUTA_CHECK.forEach(([sec,items],si)=>{
+    const done=items.filter(([id])=>ckEstado[id]).length;
+    h+=`<div class="cksec"><h3>${sec} <span class="pc">${done}/${items.length}</span></h3>`+
+      items.map(([id,txt,pri])=>`<label class="ckit${ckEstado[id]?" done":""}">
+        <input type="checkbox" data-id="${id}" ${ckEstado[id]?"checked":""}>
+        <span class="pri ${pri}">${pri}</span>${CK_AUTO.has(id)?'<span class="pri" style="color:#9fd6a8;border-color:#9fd6a855">auto</span>':""}<span>#${id} · ${txt}</span></label>`).join("")+`</div>`; });
+  w.innerHTML=h;
+  w.querySelectorAll("input").forEach(c=>c.onchange=async()=>{
+    ckEstado[c.dataset.id]=c.checked?1:0;
+    try{ await kvSet("pautaCheck",ckEstado); }catch(_){}
+    pintaCheck(); });
+  const tot=PAUTA_CHECK.reduce((a,[,its])=>a+its.length,0);
+  const dn=Object.values(ckEstado).filter(Boolean).length;
+  $("#ckfill").style.width=(dn/tot*100)+"%";
+  $("#ckpct").textContent=`${dn} de ${tot} implementadas · ${Math.round(dn/tot*100)}%`;
+}
+$("#ckGo").onclick=ckAnalizar;
+
+/* =================== ARRANQUE =================== */
+(async function(){
+  // Los assets van incrustados (data URI) para que el lienzo nunca quede "sellado"
+  // por seguridad del navegador y la exportación funcione siempre.
+  const E = window.EMB||{};
+  assets.monoCream=await loadImg(E.monoCream||"assets/monogram_cream.png");
+  assets.monoMid=await loadImg(E.monoMid||"assets/monogram_midnight.png");
+  assets.patCream=await loadImg(E.patCream||"assets/pattern_cream.png");
+  assets.patMid=await loadImg(E.patMid||"assets/pattern_midnight.png");
+  await Promise.all([document.fonts.load("500 40px Maison"),document.fonts.load("300 40px Maison"),document.fonts.load("italic 40px Stanley")]);
+  try{ const m=await kvGet("mundo"); if(m==="org"||m==="pauta") MUNDO=m; }catch(_){}
+  pintaGrid(); pintaVoz(); initDir(); initFotoDir();
+  setMundo(MUNDO,false); // pinta controles, sincroniza estado del mundo y renderiza
+  appReady=true;
+})();
+</script>
+</body>
+</html>

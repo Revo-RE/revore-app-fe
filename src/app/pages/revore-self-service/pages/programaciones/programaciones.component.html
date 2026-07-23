@@ -5,7 +5,7 @@
       <h1 class="ss-programaciones__title">Programaciones</h1>
       <p class="ss-programaciones__subtitle">Gestiona los envíos automáticos de reportes</p>
     </div>
-    <button class="ss-btn ss-btn--primary" (click)="openCreate()">+ Nueva programación</button>
+    <button class="ss-btn ss-btn--primary" (click)="openCreate()">Nueva programación</button>
   </header>
 
   @if (isLoading) {
@@ -55,8 +55,8 @@
                 </button>
               </td>
               <td class="ss-actions">
-                <button class="ss-btn ss-btn--sm ss-btn--outline" (click)="openEdit(s)">Editar</button>
-                <button class="ss-btn ss-btn--sm ss-btn--danger" (click)="requestDelete(s.id)">Eliminar</button>
+                <button class="action-link" (click)="openEdit(s)">Editar</button>
+                <button class="action-link action-link-danger" (click)="requestDelete(s.id)">Eliminar</button>
               </td>
             </tr>
           }
@@ -85,7 +85,7 @@
       <div class="ss-modal" (click)="$event.stopPropagation()">
         <div class="ss-modal__header">
           <h2>{{ isEditing ? 'Editar programación' : 'Nueva programación' }}</h2>
-          <button class="ss-modal__close" (click)="closeModal()">✕</button>
+          <button class="ss-modal__close" (click)="closeModal()" aria-label="Cerrar">&times;</button>
         </div>
 
         <form [formGroup]="form" class="ss-form ss-modal__body">

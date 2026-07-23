@@ -50,7 +50,7 @@
     <div class="ss-card">
       <div class="ss-card__header">
         <h2 class="ss-card__title">Actividad reciente</h2>
-        <a class="ss-link" routerLink="/dashboard/sales-tools/historial">Ver todo →</a>
+        <a class="action-link" routerLink="/dashboard/sales-tools/historial">Ver todo</a>
       </div>
 
       @if (isLoading) {
@@ -95,22 +95,22 @@
       <h2 class="ss-card__title">Acceso rápido</h2>
       <div class="ss-quick__grid">
         <a class="quick-card" routerLink="/dashboard/sales-tools/generar">
-          <span class="quick-card__icon">📄</span>
+          <span class="quick-card__index">01</span>
           <span class="quick-card__label">Generar reporte</span>
           <span class="quick-card__desc">Puntual o programado</span>
         </a>
         <a class="quick-card" routerLink="/dashboard/sales-tools/programaciones">
-          <span class="quick-card__icon">🔁</span>
+          <span class="quick-card__index">02</span>
           <span class="quick-card__label">Programaciones</span>
           <span class="quick-card__desc">Envíos automáticos activos</span>
         </a>
         <a class="quick-card" routerLink="/dashboard/sales-tools/historial">
-          <span class="quick-card__icon">📋</span>
+          <span class="quick-card__index">03</span>
           <span class="quick-card__label">Historial</span>
           <span class="quick-card__desc">Estado de todas las ejecuciones</span>
         </a>
         <a class="quick-card" routerLink="/dashboard/sales-tools/configuracion">
-          <span class="quick-card__icon">⚙️</span>
+          <span class="quick-card__index">04</span>
           <span class="quick-card__label">Configuración</span>
           <span class="quick-card__desc">Metas mensuales por proyecto</span>
         </a>

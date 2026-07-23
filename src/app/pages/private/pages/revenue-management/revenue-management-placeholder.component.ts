@@ -9,7 +9,7 @@ import { IHeader } from '@private/shared/interfaces/header.interface';
 		<app-header [data]="headerData" />
 		<section class="content">
 			<div class="placeholder">
-				<h2>📊 Revenue Management</h2>
+				<h2>Revenue Management</h2>
 				<p>Esta sección está en desarrollo.</p>
 				<p>Aquí podrás gestionar el modelo financiero de tus proyectos:</p>
 				<ul>

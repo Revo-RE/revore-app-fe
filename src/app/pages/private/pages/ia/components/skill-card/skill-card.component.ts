@@ -20,7 +20,7 @@ import { SkillsService } from '../../services/skills.service';
           <div class="skill-card__name-row">
             <span class="skill-card__name">{{ skill.name }}</span>
             @if (isNew) {
-              <span class="badge badge--new" aria-label="Skill nuevo">🆕 Nuevo</span>
+              <span class="badge badge--new" aria-label="Skill nuevo">Nuevo</span>
             }
           </div>
           <span class="pill pill--area">{{ skill.area }}</span>
@@ -59,7 +59,7 @@ import { SkillsService } from '../../services/skills.service';
     .skill-card {
       display: flex;
       background: white;
-      border-radius: 10px;
+      border-radius: 8px;
       box-shadow: 0 2px 10px rgba(0,0,0,0.07);
       overflow: hidden;
       transition: box-shadow 0.2s ease, transform 0.15s ease;
@@ -126,9 +126,9 @@ import { SkillsService } from '../../services/skills.service';
     }
     .skill-card__meta-item {
       font-size: 11px;
-      color: #9ca3af;
+      color: #657A9B;
     }
-    .skill-card__sep { color: #d1d5db; font-size: 11px; }
+    .skill-card__sep { color: #D5D5DD; font-size: 11px; }
     .skill-card__actions {
       display: flex;
       gap: 8px;
@@ -137,20 +137,20 @@ import { SkillsService } from '../../services/skills.service';
       display: inline-flex;
       align-items: center;
       padding: 2px 8px;
-      border-radius: 20px;
+      border-radius: 4px;
       font-size: 11px;
       font-weight: 600;
     }
     .badge--new {
-      background: #FEF0E7;
-      color: #DD7244;
-      border: 1px solid #f5c6a8;
+      background: #EEF1F6;
+      color: #2E3C59;
+      border: 1px solid #D5D5DD;
     }
     .pill {
       display: inline-flex;
       align-items: center;
       padding: 2px 10px;
-      border-radius: 20px;
+      border-radius: 4px;
       font-size: 11px;
       font-weight: 500;
       white-space: nowrap;
@@ -162,7 +162,7 @@ import { SkillsService } from '../../services/skills.service';
     }
     .btn-outline {
       padding: 6px 14px;
-      border-radius: 6px;
+      border-radius: 4px;
       border: 1px solid #D5D5DD;
       background: white;
       color: #2E3C59;
@@ -178,9 +178,9 @@ import { SkillsService } from '../../services/skills.service';
     }
     .btn-primary {
       padding: 6px 14px;
-      border-radius: 6px;
+      border-radius: 4px;
       border: none;
-      background: #DD7244;
+      background: #2E3C59;
       color: white;
       font-size: 12px;
       font-weight: 500;

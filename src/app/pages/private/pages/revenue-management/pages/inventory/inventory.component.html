@@ -1,0 +1,171 @@
+<section class="inv">
+
+  <header class="inv__header">
+    <p class="inv__eyebrow">Revenue Management</p>
+    <h1 class="inv__title">Inventory Management</h1>
+    <p class="inv__subtitle">Registra apartados, ventas, rentas y cancelaciones sobre el inventario</p>
+  </header>
+
+  @if (error()) {
+    <div class="inv__error">{{ error() }}</div>
+  }
+
+  <div class="inv__grid">
+
+    <!-- ── Formulario: registrar operación ── -->
+    <div class="inv-card">
+      <h2 class="inv-card__title">Registrar operación</h2>
+      <p class="inv-card__hint">Apartados, ventas, rentas y cancelaciones sobre unidades del inventario</p>
+
+      <div class="fld">
+        <label class="fld__label">Desarrollador</label>
+        <select class="fld__control" [(ngModel)]="developer_id" (ngModelChange)="onDeveloperChange()">
+          <option value="" disabled>Selecciona un desarrollador</option>
+          @for (d of catalog()?.developers ?? []; track d.id) {
+            <option [value]="d.id">{{ d.name }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="fld">
+        <label class="fld__label">Proyecto</label>
+        <select class="fld__control" [(ngModel)]="project_id" (ngModelChange)="onProjectChange()" [disabled]="!developer_id">
+          <option value="" disabled>{{ developer_id ? 'Selecciona un proyecto' : 'Primero elige desarrollador' }}</option>
+          @for (p of developerProjects; track p.id) {
+            <option [value]="p.id" [disabled]="p.units_count === 0">
+              {{ p.name }}{{ p.units_count === 0 ? ' — sin unidades' : ' (' + p.units_count + ' unidades)' }}
+            </option>
+          }
+        </select>
+      </div>
+
+      <div class="fld">
+        <label class="fld__label">Unidad</label>
+        <select class="fld__control" [(ngModel)]="unit_id" (ngModelChange)="onUnitChange()" [disabled]="!project_id || loadingUnits()">
+          <option value="" disabled>
+            {{ !project_id ? 'Primero elige proyecto' : (loadingUnits() ? 'Cargando unidades…' : 'Selecciona una unidad') }}
+          </option>
+          @for (u of units(); track u.id) {
+            <option [value]="u.id">{{ unitLabel(u) }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="fld fld--row">
+        <div class="fld__half">
+          <label class="fld__label">Tipo de negocio</label>
+          <select class="fld__control" [(ngModel)]="form.negocio">
+            <option value="" disabled>Venta o renta</option>
+            @for (n of negocioOptions; track n) {
+              <option [value]="n">{{ negocioLabels[n] }}</option>
+            }
+          </select>
+        </div>
+        <div class="fld__half">
+          <label class="fld__label">Operación</label>
+          <select class="fld__control" [(ngModel)]="form.operacion">
+            <option value="" disabled>Selecciona el movimiento</option>
+            @for (o of operacionOptions; track o) {
+              <option [value]="o">{{ operacionLabels[o] }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div class="fld fld--row">
+        <div class="fld__half">
+          <label class="fld__label">Fecha</label>
+          <input class="fld__control" type="date" [(ngModel)]="form.fecha" />
+        </div>
+        <div class="fld__half">
+          <label class="fld__label">Precio (MXN)</label>
+          <input class="fld__control" type="number" min="0" step="1000"
+                 placeholder="$ 0" [(ngModel)]="form.amount" />
+        </div>
+      </div>
+
+      <div class="fld">
+        <label class="fld__label">Asesor</label>
+        <select class="fld__control" [(ngModel)]="form.advisor_id" (ngModelChange)="onAdvisorChange()">
+          <option value="">Sin asesor</option>
+          @for (a of projectAdvisors; track a.id) {
+            <option [value]="a.id">{{ a.name }}</option>
+          }
+          <option value="__manual__">＋ Agregar manualmente</option>
+        </select>
+      </div>
+
+      @if (form.advisor_id === '__manual__') {
+        <div class="fld">
+          <label class="fld__label">Nombre del asesor</label>
+          <input class="fld__control" type="text" placeholder="Nombre y apellido"
+                 [(ngModel)]="form.advisor_name" />
+        </div>
+      }
+
+      <div class="inv-card__actions">
+        <button class="inv-btn inv-btn--ghost" (click)="resetForm()">Limpiar</button>
+        <button class="inv-btn inv-btn--primary" [disabled]="!formValid || saving()" (click)="submit()">
+          {{ saving() ? 'Guardando…' : 'Registrar operación' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- ── Operaciones registradas ── -->
+    <div class="inv-card inv-card--table">
+      <h2 class="inv-card__title">Operaciones registradas</h2>
+      @if (operations().length === 0) {
+        <p class="inv-card__hint" style="margin:0;">Aún no hay operaciones registradas. Usa el formulario para capturar la primera.</p>
+      } @else {
+        <div class="inv-table-wrap">
+          <table class="inv-table">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Proyecto</th>
+                <th>Unidad</th>
+                <th>Tipo</th>
+                <th>Operación</th>
+                <th class="num">Precio</th>
+                <th>Asesor</th>
+                <th>Estatus unidad</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (op of operations(); track op.id) {
+                <tr>
+                  <td>{{ op.fecha | date:'dd/MM/yy' }}</td>
+                  <td class="inv-table__main">{{ op.project_name || '—' }}</td>
+                  <td>{{ op.unit_number || '—' }}</td>
+                  <td>{{ op.negocio ? negocioLabels[op.negocio] : (typeLabels[op.type] || '—') }}</td>
+                  <td><span class="st" [ngClass]="statusClass(op.operacion === 'cierre' ? op.type : op.operacion)">{{ op.operacion ? operacionLabels[op.operacion] : '—' }}</span></td>
+                  <td class="num">{{ op.amount != null ? (op.amount | currency:'MXN':'symbol-narrow':'1.0-0') : '—' }}</td>
+                  <td>{{ op.advisor_name || '—' }}</td>
+                  <td><span class="st" [ngClass]="statusClass(op.unit_status)">{{ op.unit_status || '—' }}</span></td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+
+  </div>
+
+  <!-- ── Modal de éxito ── -->
+  @if (successOp(); as op) {
+    <div class="inv-modal__overlay" (click)="closeSuccess()">
+      <div class="inv-modal" (click)="$event.stopPropagation()">
+        <h3>Operación registrada</h3>
+        <p>
+          Se registró el movimiento de <strong>{{ typeLabels[op.type] || op.type }}</strong>.
+          La unidad cambió a estatus <strong>{{ op.unit_new_status || '—' }}</strong>.
+        </p>
+        <div class="inv-modal__actions">
+          <button class="inv-btn inv-btn--primary" (click)="closeSuccess()">Entendido</button>
+        </div>
+      </div>
+    </div>
+  }
+
+</section>

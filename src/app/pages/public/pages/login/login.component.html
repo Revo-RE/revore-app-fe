@@ -16,8 +16,8 @@
     <div class="form__inputcont">
       <input class="form__input form__input-last" type="password" name="password" formControlName="password"
         placeholder="Escribe tu contraseña" #pass />
-      <button class="btn-oninput" type="button" (click)="seePassword(!passHidden, pass)">
-        <img src="/assets/icons/eye-slash.svg" alt="Eye">
+      <button class="action-link form__toggle-pass" type="button" (click)="seePassword(!passHidden, pass)">
+        {{ passHidden ? 'Mostrar' : 'Ocultar' }}
       </button>
     </div>
     @if (formLogin.get('password')?.touched && formLogin.get('password')?.errors ) {
@@ -29,9 +29,7 @@
     <button class="form__submit">
       Ingresar
       @if(isLoading){
-          <img class="loading-icon" src="/assets/icons/loading.svg" alt="Cargando">
-        }@else {
-          <img src="/assets/icons/login.svg" alt="Icono Login">
+        <span class="spinner spinner-light"></span>
       }
     </button>
   </form>
@@ -41,7 +39,7 @@
   </div>
   <button class="login__google" type="button" (click)="signInWithGoogle()" [disabled]="isGoogleLoading">
     @if (isGoogleLoading) {
-      <img class="loading-icon" src="/assets/icons/loading.svg" alt="Cargando">
+      <span class="spinner"></span>
     } @else {
       <img src="/assets/icons/google.svg" alt="Google">
     }

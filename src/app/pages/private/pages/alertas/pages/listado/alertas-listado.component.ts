@@ -61,17 +61,9 @@ import {
                                 </td>
                                 <td>
                                     <div class="actions-cell">
-                                        <button class="icon-btn" (click)="disparar(alerta)" title="Disparar ahora">
-                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-                                        </button>
-                                        <a [routerLink]="['/dashboard/alertas/editar', alerta.id]" class="icon-btn" title="Editar">
-                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
-                                            </svg>
-                                        </a>
-                                        <button class="icon-btn icon-btn--danger" (click)="eliminar(alerta)" title="Eliminar">
-                                            <img src="assets/icons/trash.svg" alt="Eliminar" width="16" height="16" />
-                                        </button>
+                                        <button class="action-link" (click)="disparar(alerta)" title="Disparar ahora">Disparar</button>
+                                        <a [routerLink]="['/dashboard/alertas/editar', alerta.id]" class="action-link" title="Editar">Editar</a>
+                                        <button class="action-link action-link-danger" (click)="eliminar(alerta)" title="Eliminar">Eliminar</button>
                                     </div>
                                 </td>
                             </tr>
@@ -106,41 +98,38 @@ import {
         .content { padding: 20px; }
         .toolbar { display: flex; justify-content: flex-end; margin-bottom: 16px; }
         .btn-primary {
-            background: #ec6e3c; color: white; padding: 10px 18px;
-            border-radius: 6px; text-decoration: none; font-weight: 500;
+            background: #2E3C59; color: white; padding: 10px 18px;
+            border-radius: 4px; text-decoration: none; font-weight: 600;
         }
+        .btn-primary:hover { background: #111B30; }
         .empty {
             background: white; padding: 40px; border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08); text-align: center; color: #6b7280;
+            border: 1px solid #E8E9ED; text-align: center; color: #657A9B;
         }
         .alertas-table {
             width: 100%; border-collapse: collapse; background: white;
-            border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border-radius: 8px; overflow: hidden; border: 1px solid #E8E9ED;
         }
         .alertas-table th, .alertas-table td {
-            padding: 12px 16px; text-align: left; border-bottom: 1px solid #f1f2f4;
+            padding: 12px 16px; text-align: left; border-bottom: 1px solid #E8E9ED;
             font-size: 14px;
         }
-        .alertas-table th { background: #f9fafb; color: #374151; font-weight: 600; }
-        .alertas-table tr.inactive td { color: #9ca3af; }
-
-        .actions-cell { display: flex; gap: 6px; align-items: center; }
-        .icon-btn {
-            display: inline-flex; align-items: center; justify-content: center;
-            width: 32px; height: 32px; border-radius: 6px;
-            background: transparent; border: none; cursor: pointer;
-            color: #6b7280; text-decoration: none;
-            transition: background 0.15s ease, color 0.15s ease;
+        .alertas-table th {
+            background: #2E3C59; color: #fff; font-weight: 600;
+            font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+            border-bottom: none;
         }
-        .icon-btn:hover { background: #f3f4f6; color: #374151; }
-        .icon-btn--danger:hover { background: #fee2e2; color: #dc2626; }
+        .alertas-table tbody tr:nth-child(even) td { background: #F7F8FA; }
+        .alertas-table tr.inactive td { color: #657A9B; }
+
+        .actions-cell { display: flex; gap: 12px; align-items: center; }
 
         .ss-toggle {
             width: 44px; height: 24px; border-radius: 12px;
-            background: #d1d5db; border: none; cursor: pointer;
+            background: #D5D5DD; border: none; cursor: pointer;
             position: relative; transition: background 0.2s ease; padding: 0;
         }
-        .ss-toggle--on { background: #1d9d61; }
+        .ss-toggle--on { background: #2E3C59; }
         .ss-toggle__knob {
             position: absolute; top: 3px; left: 3px;
             width: 18px; height: 18px; border-radius: 50%;
@@ -164,17 +153,18 @@ import {
             margin: 0 0 12px; font-size: 18px; color: #111B30; font-weight: 700;
         }
         .modal-dialog p {
-            margin: 0 0 24px; font-size: 14px; color: #4b5563; line-height: 1.5;
+            margin: 0 0 24px; font-size: 14px; color: #3E5170; line-height: 1.5;
         }
         .modal-actions { display: flex; justify-content: flex-end; gap: 10px; }
         .modal-actions .btn-primary {
-            background: #ec6e3c; color: white; border: none; padding: 10px 20px;
-            border-radius: 6px; font-weight: 500; cursor: pointer;
+            background: #2E3C59; color: white; border: none; padding: 10px 20px;
+            border-radius: 4px; font-weight: 600; cursor: pointer;
         }
-        .modal-actions .btn-primary.btn-danger { background: #dc2626; }
+        .modal-actions .btn-primary:hover { background: #111B30; }
+        .modal-actions .btn-primary.btn-danger { background: #C0394B; }
         .modal-actions .btn-secondary {
-            background: white; color: #374151; border: 1px solid #d1d5db;
-            padding: 10px 18px; border-radius: 6px; font-weight: 500; cursor: pointer;
+            background: white; color: #3E5170; border: 1px solid #D5D5DD;
+            padding: 10px 18px; border-radius: 4px; font-weight: 500; cursor: pointer;
         }
     `]
 })

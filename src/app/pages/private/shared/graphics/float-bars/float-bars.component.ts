@@ -37,21 +37,21 @@ export class FloatBarsComponent {
       legend: { position: 'none' },
       tooltip: {isHtml: true},
       candlestick: {
-        fallingColor: { strokeWidth: 0, fill: '#D5D8DE' },
+        fallingColor: { strokeWidth: 0, fill: '#D5D5DD' },
         risingColor: { strokeWidth: 0, fill: '#2E3C59' },
       },
       vAxis: {
         textStyle: {
           fontSize: 10,
-          color: '#58637A',
+          color: '#3E5170',
         },
       },
       hAxis: {
         slantedText: false,
-        color: '#58637A',
+        color: '#3E5170',
         textStyle: {
           fontSize: 10,
-          color: '#58637A',
+          color: '#3E5170',
         },
       },
       chartArea: { left: 50, top: 20, width: '100%', height: '250' },

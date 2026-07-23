@@ -22,7 +22,7 @@ export interface SkillRelease {
 
 export const NIVEL_COLORS: Record<SkillNivel, string> = {
   Compartido: '#5C8D5C',
-  Especializado: '#DD7244',
+  Especializado: '#2E3C59',
   Auxiliar: '#2E3C59',
 };
 

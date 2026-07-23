@@ -1,0 +1,292 @@
+@use "sass:map";
+@use "theme" as t;
+
+// Dashboard de Revenue Management — inventario REVO vs. ventas.
+// Sistema de diseño del brand guideline (la barra naranja del título
+// la aporta la regla global h1[class*="__title"]::before).
+
+.rvd {
+    padding: 32px 40px;
+    max-width: 1200px;
+    text-align: left;
+
+    &__header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 28px;
+    }
+
+    &__eyebrow {
+        font-family: "Inter", sans-serif;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: map.get(t.$primary-color, 300);
+        margin: 0 0 6px;
+    }
+
+    &__title {
+        font-size: 28px;
+        color: map.get(t.$primary-color, 700);
+        margin: 0 0 4px;
+    }
+
+    &__subtitle {
+        font-family: "Inter", sans-serif;
+        font-size: 14px;
+        color: map.get(t.$primary-color, 400);
+        margin: 0;
+    }
+
+    &__section-title {
+        font-family: "Inter", sans-serif;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: map.get(t.$primary-color, 300);
+        margin-bottom: 14px;
+    }
+
+    &__kpis {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 14px;
+        margin-bottom: 32px;
+
+        &--3 { grid-template-columns: repeat(3, 1fr); }
+
+        @media (max-width: 1100px) { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    &__error {
+        background: rgba(map.get(t.$aux-color, error), 0.06);
+        border: 1px solid rgba(map.get(t.$aux-color, error), 0.35);
+        border-radius: t.$radius-control;
+        color: map.get(t.$aux-color, error);
+        font-size: 13px;
+        padding: 10px 14px;
+        margin-bottom: 16px;
+    }
+
+    &__loading {
+        font-size: 13px;
+        color: map.get(t.$primary-color, 300);
+        margin-bottom: 24px;
+    }
+}
+
+// Cabecera de la sección Ventas con rango de fechas
+.rvd__sales-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+}
+
+.rvd__range {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    &-label {
+        font-family: "Inter", sans-serif;
+        font-size: 10.5px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: map.get(t.$primary-color, 300);
+    }
+
+    &-input {
+        font-family: "Inter", sans-serif;
+        font-size: 13px;
+        color: map.get(t.$primary-color, 700);
+        background: white;
+        border: 1px solid map.get(t.$primary-color, 250);
+        border-radius: t.$radius-control;
+        padding: 7px 10px;
+
+        &:focus {
+            outline: none;
+            border-color: map.get(t.$primary-color, 500);
+        }
+    }
+
+    &-clear {
+        font-family: "Inter", sans-serif;
+        font-size: 12px;
+        font-weight: 600;
+        color: map.get(t.$primary-color, 400);
+        background: transparent;
+        border: none;
+        border-bottom: 1px solid map.get(t.$primary-color, 400);
+        padding: 0 0 1px;
+        cursor: pointer;
+
+        &:hover { color: map.get(t.$primary-color, 700); border-color: map.get(t.$primary-color, 700); }
+    }
+}
+
+.rvd__sales-note {
+    font-family: "Inter", sans-serif;
+    font-size: 12px;
+    color: map.get(t.$primary-color, 300);
+    margin: -20px 0 32px;
+}
+
+.rvd__sales-warn {
+    color: map.get(t.$aux-color, warning);
+    font-weight: 600;
+}
+
+.kpi-card {
+    background: white;
+    border-radius: t.$radius-surface;
+    padding: 20px 18px;
+    border: 1px solid map.get(t.$primary-color, 200);
+    border-top: 3px solid map.get(t.$primary-color, 500);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    &__value {
+        font-family: "Inter", sans-serif;
+        font-size: 26px;
+        font-weight: 800;
+        color: map.get(t.$primary-color, 700);
+        line-height: 1;
+        white-space: nowrap;
+    }
+
+    &__label {
+        font-family: "Inter", sans-serif;
+        font-size: 10.5px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: map.get(t.$primary-color, 300);
+    }
+
+    &--success { border-top-color: map.get(t.$aux-color, success); .kpi-card__value { color: map.get(t.$aux-color, success); } }
+    &--progress { border-top-color: map.get(t.$aux-color, warning); .kpi-card__value { color: map.get(t.$aux-color, warning); } }
+}
+
+.rvd-card {
+    background: white;
+    border-radius: t.$radius-surface;
+    border: 1px solid map.get(t.$primary-color, 200);
+    padding: 24px;
+
+    &__title {
+        font-size: 17px;
+        color: map.get(t.$primary-color, 700);
+        margin: 0 0 16px;
+    }
+
+    &__hint {
+        font-family: "Inter", sans-serif;
+        font-size: 12.5px;
+        color: map.get(t.$primary-color, 300);
+        margin: 0;
+    }
+}
+
+.rvd-btn {
+    font-family: "Inter", sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: t.$radius-control;
+    padding: 11px 18px;
+    cursor: pointer;
+    text-decoration: none;
+    white-space: nowrap;
+
+    &--primary {
+        background: map.get(t.$primary-color, 500);
+        border: 1px solid map.get(t.$primary-color, 500);
+        color: white;
+        transition: background 0.15s ease;
+
+        &:hover { background: map.get(t.$primary-color, 700); }
+    }
+}
+
+.rvd-table-wrap {
+    overflow-x: auto;
+    border: 1px solid map.get(t.$primary-color, 200);
+    border-radius: t.$radius-control;
+}
+
+.rvd-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: "Inter", sans-serif;
+    font-size: 13px;
+
+    th {
+        text-align: left;
+        padding: 11px 14px;
+        font-size: 10.5px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #fff;
+        background: map.get(t.$primary-color, 500);
+        white-space: nowrap;
+
+        &.num { text-align: right; }
+    }
+
+    td {
+        padding: 12px 14px;
+        color: map.get(t.$primary-color, 500);
+        border-bottom: 1px solid map.get(t.$primary-color, 200);
+        white-space: nowrap;
+
+        &.num { text-align: right; font-variant-numeric: tabular-nums; }
+    }
+
+    &__main { font-weight: 600; color: map.get(t.$primary-color, 700); }
+
+    tbody tr:nth-child(even) td { background: map.get(t.$primary-color, 100); }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover td { background: #EFF1F5; }
+}
+
+// Barra de avance comercial (vendidas + apartadas / total)
+.prog {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 140px;
+
+    &__bar {
+        flex: 1;
+        height: 6px;
+        background: map.get(t.$primary-color, 200);
+        border-radius: 3px;
+        overflow: hidden;
+    }
+
+    &__fill {
+        display: block;
+        height: 100%;
+        background: map.get(t.$primary-color, 500);
+        border-radius: 3px;
+    }
+
+    &__pct {
+        font-size: 11.5px;
+        font-weight: 600;
+        color: map.get(t.$primary-color, 400);
+        min-width: 42px;
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+    }
+}

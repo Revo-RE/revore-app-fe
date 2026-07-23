@@ -29,11 +29,11 @@ import { AgentsService } from '../../services/agents.service';
       @if (loading()) { <p class="muted">Cargando agentes…</p> }
       @if (error()) { <p class="error">{{ error() }}</p> }
 
-      @for (a of agents(); track a.id) {
+      @for (a of agents(); track a.id; let i = $index) {
         <div class="card" [class.paused]="!a.activo">
           <div class="card__head">
             <div class="card__title">
-              <div class="avatar">💸</div>
+              <div class="avatar" aria-hidden="true">{{ indexLabel(i) }}</div>
               <div>
                 <h3>{{ a.nombre }}<span class="dev">· {{ a.developer_name }}</span></h3>
                 <p class="sched">{{ periodicidad(a) }} · correo a {{ (a.destinatarios.to ?? []).join(', ') || '—' }}</p>
@@ -61,7 +61,7 @@ import { AgentsService } from '../../services/agents.service';
             </div>
             @if (ex.status === 'sent' && ex.resultado?.detalle_hallazgos?.length) {
               <ul class="hallazgos">
-                @for (h of ex.resultado?.detalle_hallazgos; track h) { <li>⚠ {{ h }}</li> }
+                @for (h of ex.resultado?.detalle_hallazgos; track h) { <li>{{ h }}</li> }
               </ul>
             }
           } @else {
@@ -70,7 +70,7 @@ import { AgentsService } from '../../services/agents.service';
 
           <div class="actions">
             <button class="primary" (click)="runNow(a)" [disabled]="running() === a.id">
-              {{ running() === a.id ? 'Corriendo…' : '▶ Correr ahora' }}
+              {{ running() === a.id ? 'Corriendo…' : 'Correr ahora' }}
             </button>
             <button (click)="toggle(a)">{{ a.activo ? 'Pausar' : 'Activar' }}</button>
             <button (click)="verHistorial(a)">{{ historialDe() === a.id ? 'Ocultar historial' : 'Historial' }}</button>
@@ -97,32 +97,33 @@ import { AgentsService } from '../../services/agents.service';
   styles: [`
     .content { padding: 20px; max-width: 880px; margin: 0 auto; text-align: left; }
     .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; margin-bottom: 16px; }
-    .breadcrumb__back { display: inline-flex; align-items: center; gap: 6px; color: #DD7244; text-decoration: none;
-      font-weight: 600; font-size: 13px; padding: 5px 10px 5px 8px; border-radius: 6px; border: 1.5px solid #f5c6a8;
-      background: #fff8f5; }
-    .breadcrumb__back:hover { background: #FEF0E7; border-color: #DD7244; }
-    .breadcrumb__sep { color: #d1d5db; }
-    .breadcrumb__current { color: #6b7280; font-size: 13px; }
+    .breadcrumb__back { display: inline-flex; align-items: center; gap: 6px; color: #2E3C59; text-decoration: none;
+      font-weight: 600; font-size: 13px; padding: 5px 10px 5px 8px; border-radius: 4px; border: 1.5px solid #D5D5DD;
+      background: #ffffff; }
+    .breadcrumb__back:hover { background: #EEF1F6; border-color: #2E3C59; }
+    .breadcrumb__sep { color: #D5D5DD; }
+    .breadcrumb__current { color: #657A9B; font-size: 13px; }
     .intro { color: #657A9B; font-size: 13.5px; margin: 0 0 16px; max-width: 640px; }
     .card { background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,.1); padding: 20px 24px; margin-bottom: 16px; }
     .card.paused { opacity: .7; }
     .card__head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
     .card__title { display: flex; gap: 12px; align-items: center; }
-    .avatar { width: 40px; height: 40px; border-radius: 50%; background: #FEF0E7; display: flex; align-items: center; justify-content: center; font-size: 19px; }
+    .avatar { width: 40px; height: 40px; border-radius: 4px; background: #F7F8FA; display: flex; align-items: center; justify-content: center;
+      font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.12em; color: #657A9B; }
     h3 { color: #2E3C59; margin: 0; font-size: 15px; }
     .dev { color: #98A5BA; font-weight: 400; font-size: 13px; margin-left: 6px; }
     .sched { color: #657A9B; font-size: 12px; margin: 2px 0 0; }
-    .pill { font-size: 12px; padding: 4px 12px; border-radius: 12px; font-weight: 600; white-space: nowrap; }
+    .pill { font-size: 12px; padding: 4px 12px; border-radius: 4px; font-weight: 600; white-space: nowrap; }
     .pill.on { background: #e8f5e9; color: #1e8e3e; }
     .pill.off { background: #F7F8FA; color: #98A5BA; }
     .desc { color: #657A9B; font-size: 13px; line-height: 1.5; margin: 12px 0; }
-    .last { font-size: 13px; color: #2E3C59; background: #F7F8FA; border-radius: 6px; padding: 10px 12px; margin: 0 0 10px; }
+    .last { font-size: 13px; color: #2E3C59; background: #F7F8FA; border-radius: 4px; padding: 10px 12px; margin: 0 0 10px; }
     .hallazgos { margin: 0 0 10px; padding-left: 4px; list-style: none; }
     .hallazgos li { color: #b9770e; font-size: 12.5px; line-height: 1.5; margin: 4px 0; }
     .muted { color: #98A5BA; font-size: 13px; }
     .error { color: #c0392b; font-size: 13px; }
     .actions { display: flex; gap: 8px; margin-top: 6px; }
-    button { background: #fff; color: #2E3C59; border: 1px solid #D5D5DD; border-radius: 6px; padding: 8px 16px; font-size: 13px; cursor: pointer; }
+    button { background: #fff; color: #2E3C59; border: 1px solid #D5D5DD; border-radius: 4px; padding: 8px 16px; font-size: 13px; cursor: pointer; }
     button.primary { background: #2E3C59; color: #fff; border-color: #2E3C59; }
     button:disabled { opacity: .5; cursor: not-allowed; }
     .hist { width: 100%; border-collapse: collapse; font-size: 12.5px; margin-top: 12px; }
@@ -176,7 +177,13 @@ export class IaAgentesComponent implements OnInit, OnDestroy {
   }
 
   toggle(a: Agent): void {
-    this.svc.toggle(a.id, !a.activo).subscribe({ next: () => this.load() });
+    this.error.set(null);
+    this.svc.toggle(a.id, !a.activo).subscribe({
+      next: () => this.load(),
+      error: () => this.error.set(
+        `No se pudo ${a.activo ? 'pausar' : 'activar'} el agente. Intenta de nuevo.`
+      ),
+    });
   }
 
   verHistorial(a: Agent): void {
@@ -186,11 +193,13 @@ export class IaAgentesComponent implements OnInit, OnDestroy {
     this.svc.executions(a.id).subscribe({ next: h => this.historial.set(h) });
   }
 
+  indexLabel(i: number): string { return String(i + 1).padStart(2, '0'); }
+
   periodicidad(a: Agent): string { return periodicidadLabel(a.periodicidad); }
   describe(a: Agent): string { return AGENT_DESCRIPTIONS[a.tipo] ?? ''; }
 
   estadoLabel(ex: AgentExecution): string {
-    return { queued: 'En cola', running: 'Corriendo', sent: 'Enviado ✓', failed: 'Falló ✗' }[ex.status] ?? ex.status;
+    return { queued: 'En cola', running: 'Corriendo', sent: 'Enviado', failed: 'Falló' }[ex.status] ?? ex.status;
   }
 
   resumen(ex: AgentExecution): string {

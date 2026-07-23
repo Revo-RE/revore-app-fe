@@ -27,6 +27,12 @@
         &__submit {
             margin-bottom: 30px;
         }
+        &__toggle-pass {
+            position: absolute;
+            right: 12px;
+            top: 24px;
+            transform: translateY(-50%);
+        }
     }
     &__outro {
         margin-bottom: 34px;

@@ -1,0 +1,131 @@
+<section class="rvd">
+
+  <header class="rvd__header">
+    <div>
+      <p class="rvd__eyebrow">Revenue Management</p>
+      <h1 class="rvd__title">Resumen del portafolio</h1>
+      <p class="rvd__subtitle">Inventario REVO frente a las ventas de todos los proyectos</p>
+    </div>
+    <a class="rvd-btn rvd-btn--primary" routerLink="/dashboard/revenue-management/inventory">Registrar operación</a>
+  </header>
+
+  @if (error()) {
+    <div class="rvd__error">{{ error() }}</div>
+  }
+
+  @if (loading()) {
+    <p class="rvd__loading">Cargando resumen…</p>
+  }
+
+  @if (summary(); as s) {
+
+    <!-- ── KPIs REVO ── -->
+    <div class="rvd__section-title">Inventario REVO</div>
+    <div class="rvd__kpis">
+      <div class="kpi-card">
+        <span class="kpi-card__value">{{ s.proyectos }}</span>
+        <span class="kpi-card__label">Proyectos</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-card__value">{{ s.unidades_total | number }}</span>
+        <span class="kpi-card__label">Unidades inventario</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-card__value">{{ s.por_estatus['DISPONIBLE'] || 0 | number }}</span>
+        <span class="kpi-card__label">Disponibles</span>
+      </div>
+      <div class="kpi-card kpi-card--success">
+        <span class="kpi-card__value">{{ s.por_estatus['VENDIDO'] || 0 | number }}</span>
+        <span class="kpi-card__label">Vendidas</span>
+      </div>
+      <div class="kpi-card kpi-card--progress">
+        <span class="kpi-card__value">{{ s.por_estatus['APARTADO'] || 0 | number }}</span>
+        <span class="kpi-card__label">Apartadas</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-card__value">{{ s.valor_inventario_disponible | currency:'MXN':'symbol-narrow':'1.0-0' }}</span>
+        <span class="kpi-card__label">Valor inventario disponible</span>
+      </div>
+    </div>
+
+    <!-- ── Ventas (todas las fuentes) ── -->
+    <div class="rvd__sales-head">
+      <div class="rvd__section-title" style="margin-bottom:0;">Ventas</div>
+      <div class="rvd__range">
+        <label class="rvd__range-label">Desde</label>
+        <input class="rvd__range-input" type="date" [(ngModel)]="range.from" (change)="loadSales()" />
+        <label class="rvd__range-label">Hasta</label>
+        <input class="rvd__range-input" type="date" [(ngModel)]="range.to" (change)="loadSales()" />
+        @if (range.from || range.to) {
+          <button class="rvd__range-clear" (click)="clearRange()">Todo el histórico</button>
+        }
+      </div>
+    </div>
+    @if (sales(); as v) {
+      <div class="rvd__kpis rvd__kpis--3">
+        <div class="kpi-card kpi-card--success">
+          <span class="kpi-card__value">{{ v.unidades_vendidas | number }}</span>
+          <span class="kpi-card__label">Unidades vendidas</span>
+        </div>
+        <div class="kpi-card kpi-card--success">
+          <span class="kpi-card__value">{{ v.monto_vendido | currency:'MXN':'symbol-narrow':'1.0-0' }}</span>
+          <span class="kpi-card__label">Monto vendido (MXN)</span>
+        </div>
+        <div class="kpi-card kpi-card--progress">
+          <span class="kpi-card__value">{{ v.apartados | number }}</span>
+          <span class="kpi-card__label">Apartados</span>
+        </div>
+      </div>
+      <p class="rvd__sales-note">
+        {{ v.ventas_plataforma | number }} capturada{{ v.ventas_plataforma === 1 ? '' : 's' }} manualmente en la plataforma
+        · {{ v.ventas_base_datos | number }} ya cargada{{ v.ventas_base_datos === 1 ? '' : 's' }} en la base de datos.
+        @if (v.vendidas_sin_precio > 0) {
+          <span class="rvd__sales-warn">{{ v.vendidas_sin_precio }} unidades vendidas no tienen precio en la base y suman $0 al monto.</span>
+        }
+      </p>
+    }
+
+    <!-- ── Inventario vs ventas por proyecto ── -->
+    <div class="rvd-card">
+      <h2 class="rvd-card__title">Inventario vs. ventas por proyecto</h2>
+      @if (s.por_proyecto.length === 0) {
+        <p class="rvd-card__hint">Sin unidades registradas en el inventario.</p>
+      } @else {
+        <div class="rvd-table-wrap">
+          <table class="rvd-table">
+            <thead>
+              <tr>
+                <th>Proyecto</th>
+                <th class="num">Unidades</th>
+                <th class="num">Disponibles</th>
+                <th class="num">Apartadas</th>
+                <th class="num">Vendidas</th>
+                <th>Avance comercial</th>
+                <th class="num">Ventas (MXN)</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (p of s.por_proyecto; track p.project_id) {
+                <tr>
+                  <td class="rvd-table__main">{{ p.project_name || 'Sin nombre' }}</td>
+                  <td class="num">{{ p.total | number }}</td>
+                  <td class="num">{{ p.disponibles | number }}</td>
+                  <td class="num">{{ p.apartadas | number }}</td>
+                  <td class="num">{{ p.vendidas | number }}</td>
+                  <td>
+                    <div class="prog">
+                      <div class="prog__bar"><span class="prog__fill" [style.width.%]="p.avance_pct"></span></div>
+                      <span class="prog__pct">{{ p.avance_pct }}%</span>
+                    </div>
+                  </td>
+                  <td class="num">{{ p.ventas_monto ? (p.ventas_monto | currency:'MXN':'symbol-narrow':'1.0-0') : '—' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  }
+
+</section>

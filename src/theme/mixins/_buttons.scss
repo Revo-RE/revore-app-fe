@@ -1,20 +1,24 @@
-@mixin primaryButton($bgColor: #2e3c59, $txtColor: #fff, $hBgColor: #253047, $border: #2e3c59) {
+@import 'theme';
+
+@mixin primaryButton($bgColor: #2E3C59, $txtColor: #fff, $hBgColor: #111B30, $border: #2E3C59) {
   align-items: center;
   background-color: $bgColor;
-  border-radius: 16px;
-  border: 2px solid $border;
+  border-radius: 4px;
+  border: 1px solid $border;
   box-sizing: border-box;
   color: $txtColor;
   display: flex;
-  font-family: "g-medium", sans-serif;
-  font-size: 18px;
+  font-family: "Inter", sans-serif;
+  font-size: 15px;
   font-style: normal;
-  font-weight: 400;
+  font-weight: 500;
   gap: 10px;
   justify-content: center;
+  letter-spacing: 0.01em;
   line-height: normal;
-  padding: 16px 24px;
+  padding: 14px 24px;
   position: relative;
+  transition: background-color 0.15s ease-out, border-color 0.15s ease-out;
   width: 100%;
   z-index: 2;
   &:hover {
@@ -24,22 +28,25 @@
 
   &-light {
     background-color: transparent;
-    color: map-get($primary-color, 500);
+    border-color: map-get($primary-color, 200);
+    color: map-get($primary-color, 700);
 
     & img {
       filter: invert(19%) sepia(27%) saturate(999%) hue-rotate(182deg) brightness(95%) contrast(86%) !important;
     }
     &:hover {
       background-color: map-get($primary-color, 100);
+      border-color: map-get($primary-color, 300);
     }
   }
 
   &-warning {
     background-color: map-get($secondary-color, 500);
-    border: 2px solid map-get($secondary-color, 500);
+    border: 1px solid map-get($secondary-color, 500);
 
     &:hover {
-      background-color: map-get($secondary-color, 400);
+      background-color: map-get($secondary-color, 600);
+      border-color: map-get($secondary-color, 600);
     }
   }
 
@@ -47,23 +54,25 @@
 
 @mixin googleButton() {
   align-items: center;
-  background-color: #e9f1ff;
-  border-radius: 9px;
-  border: none;
+  background-color: transparent;
+  border-radius: 4px;
+  border: 1px solid map-get($primary-color, 200);
   box-sizing: border-box;
-  color: #4285f4;
+  color: map-get($primary-color, 500);
   display: flex;
-  font-family: "g-medium", sans-serif;
-  font-size: 16px;
+  font-family: "Inter", sans-serif;
+  font-size: 15px;
   font-style: normal;
-  font-weight: 400;
+  font-weight: 500;
   gap: 10px;
   justify-content: center;
   line-height: normal;
-  padding: 16px 24px;
+  padding: 14px 24px;
+  transition: background-color 0.15s ease-out;
   width: 100%;
 
   &:hover {
+    background-color: map-get($primary-color, 100);
     cursor: pointer;
   }
 }
@@ -98,7 +107,7 @@
   &>label {
     width: 40px;
     height: 20px;
-    background-color: #e5e5e5;
+    background-color: #D5D5DD;
     position: absolute;
     top: 10px;
     left: 0;
@@ -129,7 +138,7 @@
   }
 
   .look:checked+label {
-    background-color: #2e3c59;
+    background-color: #2E3C59;
   }
 
   .look:checked+label:after {

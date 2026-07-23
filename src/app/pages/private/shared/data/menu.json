@@ -7,13 +7,6 @@
     "children": []
   },
   {
-    "name": "Revenue Management",
-    "icon": "diagram.svg",
-    "link": "/dashboard/revenue-management",
-    "active": true,
-    "children": []
-  },
-  {
     "name": "Sales Tools",
     "icon": "moneys.svg",
     "link": "/dashboard/sales-tools",

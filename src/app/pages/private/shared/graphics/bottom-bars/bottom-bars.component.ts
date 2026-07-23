@@ -49,18 +49,18 @@ export class BottomBarsComponent implements AfterViewInit, OnChanges, OnDestroy 
         format: this.data.formatData ? this.data.formatData : "#'%'",
         textStyle: {
           fontSize: 10,
-          color: '#58637A',
+          color: '#3E5170',
           
         },
       },
       hAxis: {
         textStyle: {
           fontSize: 10,
-          color: '#58637A',
+          color: '#3E5170',
         },
       },
       tooltip: {
-        color: '#58637A',
+        color: '#3E5170',
         fontSize: 10,
         
       },

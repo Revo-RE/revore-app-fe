@@ -1,18 +1,76 @@
+// Tipografía institucional — RevoRE Brand Guidelines
+// Inter para todo: títulos (ExtraBold 800), subtítulos (Bold 700),
+// cuerpo (Regular 400), labels y encabezados de tabla (SemiBold 600).
+// El brand guideline prohíbe fuentes serif o decorativas.
+//
+// Los alias "g-*" son herencia de Gilroy: cientos de reglas los referencian,
+// por lo que se conservan como nombres pero cargan Inter en el peso
+// equivalente. Código nuevo debe usar "Inter".
+
+@font-face {
+    font-family: "Inter";
+    src: url("../assets/fonts/inter/Inter-Regular.ttf") format("truetype");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: "Inter";
+    src: url("../assets/fonts/inter/Inter-Medium.ttf") format("truetype");
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: "Inter";
+    src: url("../assets/fonts/inter/Inter-SemiBold.ttf") format("truetype");
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: "Inter";
+    src: url("../assets/fonts/inter/Inter-Bold.ttf") format("truetype");
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: "Inter";
+    src: url("../assets/fonts/inter/Inter-ExtraBold.woff2") format("woff2");
+    font-weight: 800;
+    font-style: normal;
+    font-display: swap;
+}
+
+// Alias legacy (antes Gilroy)
+@font-face {
+    font-family: "g-regular";
+    src: url("../assets/fonts/inter/Inter-Regular.ttf") format("truetype");
+    font-style: normal;
+    font-display: swap;
+}
 @font-face {
     font-family: "g-medium";
-    src: url("../assets/fonts/gilroy/Gilroy-Medium.ttf") format("truetype");
+    src: url("../assets/fonts/inter/Inter-Medium.ttf") format("truetype");
     font-style: normal;
     font-display: swap;
 }
 @font-face {
     font-family: "g-semi";
-    src: url("../assets/fonts/gilroy/Gilroy-SemiBold.ttf") format("truetype");
+    src: url("../assets/fonts/inter/Inter-SemiBold.ttf") format("truetype");
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: "g-semibold";
+    src: url("../assets/fonts/inter/Inter-SemiBold.ttf") format("truetype");
     font-style: normal;
     font-display: swap;
 }
 @font-face {
     font-family: "g-bold";
-    src: url("../assets/fonts/gilroy/Gilroy-Bold.ttf") format("truetype");
+    src: url("../assets/fonts/inter/Inter-Bold.ttf") format("truetype");
     font-style: normal;
     font-display: swap;
 }

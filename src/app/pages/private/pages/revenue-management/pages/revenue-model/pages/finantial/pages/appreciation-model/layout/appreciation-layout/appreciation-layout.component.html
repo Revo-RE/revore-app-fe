@@ -3,12 +3,12 @@
   <section class="buttonstoolbar">
     <div class="buttonstoolbar__separator"></div>
     <div class="buttonstoolbar__separator">
-      <app-button icon="/assets/icons/add.svg" theme="primary" [isLoading]="false"
+      <app-button theme="primary" [isLoading]="false"
         name="Asignar columnas" (onClickButton)="showApreccationCalculation = true" />
       @if (tableBody.length > 0) {
-      <app-button icon="/assets/icons/document-download.svg" theme="light" [isLoading]="isDownloadFile"
+      <app-button theme="light" [isLoading]="isDownloadFile"
         name="Descargar Tabla" (onClickButton)="downloadFile()" />
-      <app-button icon="/assets/icons/document-download.svg" theme="light" [isLoading]="isDownloadFileModel" name="Descargar Modelo"
+      <app-button theme="light" [isLoading]="isDownloadFileModel" name="Descargar Modelo"
         (onClickButton)="downloadAppreciationModel()" />
       }
     </div>
@@ -26,7 +26,6 @@
       @for (row of tableHeader; track row.key) {
       <div class="table__row table__row-header">
         {{ row.name }}
-        <img src="/assets/icons/arrow-down.svg" alt="Flecha abajo" />
       </div>
       }
       @if (tableBody.length > 0 && !isLoading) {
@@ -46,7 +45,7 @@
 
       @if(tableBody.length == 0 && isLoading) {
       <div class="table__row table__row-body table__row-loading">
-        <img class="loading-icon" src="/assets/icons/loading.svg" alt="Cargando">
+        <span class="spinner"></span>
       </div>
       }
     </div>

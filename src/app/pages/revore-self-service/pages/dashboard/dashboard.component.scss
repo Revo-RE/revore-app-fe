@@ -13,23 +13,25 @@
     }
 
     &__title {
-        font-family: "g-bold", sans-serif;
         font-size: 28px;
-        color: map.get(t.$primary-color, 500);
+        color: map.get(t.$primary-color, 700);
         margin: 0 0 4px;
     }
 
     &__subtitle {
-        font-family: "g-medium", sans-serif;
+        font-family: "Inter", sans-serif;
         font-size: 14px;
-        color: map.get(t.$primary-color, 300);
+        color: map.get(t.$primary-color, 400);
         margin: 0;
     }
 
     &__section-title {
-        font-family: "g-bold", sans-serif;
-        font-size: 15px;
-        color: map.get(t.$primary-color, 400);
+        font-family: "Inter", sans-serif;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: map.get(t.$primary-color, 300);
         margin-bottom: 14px;
     }
 
@@ -61,67 +63,66 @@
     align-items: center;
     justify-content: center;
     padding: 28px 16px;
-    border-radius: 12px;
-    border: 2px solid map.get(t.$primary-color, 100);
+    border-radius: t.$radius-surface;
+    border: 1px solid map.get(t.$primary-color, 200);
     background: white;
     text-decoration: none;
-    transition: all 0.2s ease;
+    transition: border-color 0.2s ease, background 0.2s ease;
     cursor: pointer;
 
     &:hover {
-        border-color: map.get(t.$secondary-color, 500);
-        background: map.get(t.$secondary-color, 100);
-        transform: translateY(-2px);
-        box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+        border-color: map.get(t.$primary-color, 700);
+        background: map.get(t.$primary-color, 100);
     }
 
     &__label {
-        font-family: "g-bold", sans-serif;
-        font-size: 16px;
-        color: map.get(t.$primary-color, 500);
+        font-family: "Inter", sans-serif;
+        font-size: 15px;
+        font-weight: 600;
+        color: map.get(t.$primary-color, 700);
         text-align: center;
-    }
-
-    &:hover &__label {
-        color: map.get(t.$secondary-color, 700);
     }
 }
 
-// KPI Cards
+// KPI Cards — regla superior semántica (propuesta) y cifras Inter ExtraBold
 .kpi-card {
     background: white;
-    border-radius: 12px;
+    border-radius: t.$radius-surface;
     padding: 24px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    border-left: 4px solid map.get(t.$primary-color, 200);
+    border: 1px solid map.get(t.$primary-color, 200);
+    border-top: 3px solid map.get(t.$primary-color, 500);
     display: flex;
     flex-direction: column;
     gap: 8px;
 
     &__value {
-        font-family: "g-bold", sans-serif;
+        font-family: "Inter", sans-serif;
         font-size: 36px;
-        color: map.get(t.$primary-color, 500);
+        font-weight: 800;
+        color: map.get(t.$primary-color, 700);
         line-height: 1;
     }
 
     &__label {
-        font-family: "g-medium", sans-serif;
-        font-size: 13px;
+        font-family: "Inter", sans-serif;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
         color: map.get(t.$primary-color, 300);
     }
 
-    &--success { border-left-color: map.get(t.$aux-color, success); .kpi-card__value { color: map.get(t.$aux-color, success); } }
-    &--progress { border-left-color: map.get(t.$aux-color, warning); .kpi-card__value { color: map.get(t.$aux-color, warning); } }
-    &--error   { border-left-color: map.get(t.$aux-color, error);   .kpi-card__value { color: map.get(t.$aux-color, error); } }
+    &--success { border-top-color: map.get(t.$aux-color, success); .kpi-card__value { color: map.get(t.$aux-color, success); } }
+    &--progress { border-top-color: map.get(t.$aux-color, warning); .kpi-card__value { color: map.get(t.$aux-color, warning); } }
+    &--error   { border-top-color: map.get(t.$aux-color, error);   .kpi-card__value { color: map.get(t.$aux-color, error); } }
 }
 
 // Shared card
 .ss-card {
     background: white;
-    border-radius: 12px;
+    border-radius: t.$radius-surface;
     padding: 24px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    border: 1px solid map.get(t.$primary-color, 200);
 
     &__header {
         display: flex;
@@ -131,9 +132,8 @@
     }
 
     &__title {
-        font-family: "g-bold", sans-serif;
-        font-size: 16px;
-        color: map.get(t.$primary-color, 500);
+        font-size: 18px;
+        color: map.get(t.$primary-color, 700);
         margin: 0;
     }
 }
@@ -141,9 +141,9 @@
 // Quick access
 .ss-quick {
     background: white;
-    border-radius: 12px;
+    border-radius: t.$radius-surface;
     padding: 24px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    border: 1px solid map.get(t.$primary-color, 200);
 
     &__grid {
         display: flex;
@@ -158,27 +158,35 @@
     flex-direction: column;
     gap: 4px;
     padding: 16px;
-    border-radius: 10px;
-    border: 1.5px solid map.get(t.$primary-color, 100);
+    border-radius: t.$radius-surface;
+    border: 1px solid map.get(t.$primary-color, 200);
     text-decoration: none;
-    transition: all 0.2s ease;
+    transition: border-color 0.2s ease, background 0.2s ease;
     cursor: pointer;
 
     &:hover {
-        border-color: map.get(t.$secondary-color, 500);
-        background: map.get(t.$secondary-color, 100);
+        border-color: map.get(t.$primary-color, 700);
+        background: map.get(t.$primary-color, 100);
     }
 
-    &__icon { font-size: 20px; }
+    &__index {
+        font-family: "Inter", sans-serif;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        color: map.get(t.$primary-color, 300);
+        margin-bottom: 2px;
+    }
 
     &__label {
-        font-family: "g-bold", sans-serif;
+        font-family: "Inter", sans-serif;
         font-size: 14px;
-        color: map.get(t.$primary-color, 500);
+        font-weight: 600;
+        color: map.get(t.$primary-color, 700);
     }
 
     &__desc {
-        font-family: "g-medium", sans-serif;
+        font-family: "Inter", sans-serif;
         font-size: 12px;
         color: map.get(t.$primary-color, 300);
     }
@@ -188,16 +196,19 @@
 .ss-table {
     width: 100%;
     border-collapse: collapse;
-    font-family: "g-medium", sans-serif;
+    font-family: "Inter", sans-serif;
     font-size: 13px;
 
     th {
         text-align: left;
         padding: 10px 12px;
-        font-family: "g-bold", sans-serif;
-        font-size: 12px;
-        color: map.get(t.$primary-color, 300);
-        border-bottom: 1.5px solid map.get(t.$primary-color, 100);
+        font-family: "Inter", sans-serif;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #fff;
+        background: map.get(t.$primary-color, 500);
         white-space: nowrap;
     }
 
@@ -210,7 +221,7 @@
 
     tbody tr:last-child td { border-bottom: none; }
 
-    tbody tr:hover td { background: rgba(0,0,0,0.02); }
+    tbody tr:hover td { background: map.get(t.$primary-color, 100); }
 }
 
 // Badges
@@ -218,17 +229,19 @@
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    padding: 3px 10px;
-    border-radius: 20px;
-    font-family: "g-medium", sans-serif;
+    padding: 3px 8px;
+    border-radius: t.$radius-control;
+    font-family: "Inter", sans-serif;
     font-size: 11px;
     font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
     white-space: nowrap;
 
     &--queued   { background: map.get(t.$primary-color, 100); color: map.get(t.$primary-color, 400); }
-    &--progress { background: #dbeafe; color: #1d4ed8; }
-    &--success  { background: #d1fae5; color: #065f46; }
-    &--error    { background: #fee2e2; color: #991b1b; }
+    &--progress { background: rgba(217, 119, 6, 0.1);  color: map.get(t.$aux-color, warning); }
+    &--success  { background: rgba(29, 157, 97, 0.1);  color: map.get(t.$aux-color, success); }
+    &--error    { background: rgba(192, 57, 75, 0.1);  color: map.get(t.$aux-color, error); }
 }
 
 // Shared buttons
@@ -237,27 +250,28 @@
     align-items: center;
     gap: 8px;
     padding: 10px 20px;
-    border-radius: 8px;
-    font-family: "g-medium", sans-serif;
+    border-radius: t.$radius-control;
+    font-family: "Inter", sans-serif;
     font-size: 14px;
+    font-weight: 500;
     cursor: pointer;
     border: none;
     text-decoration: none;
-    transition: all 0.2s ease;
+    transition: background 0.2s ease, border-color 0.2s ease;
     white-space: nowrap;
 
     &--primary {
-        background: map.get(t.$secondary-color, 500);
+        background: map.get(t.$primary-color, 700);
         color: white;
-        &:hover { background: map.get(t.$secondary-color, 600); }
+        &:hover { background: map.get(t.$primary-color, 500); }
         &:disabled { opacity: 0.5; cursor: not-allowed; }
     }
 
     &--outline {
         background: transparent;
-        color: map.get(t.$primary-color, 500);
-        border: 1.5px solid map.get(t.$primary-color, 200);
-        &:hover { border-color: map.get(t.$primary-color, 500); }
+        color: map.get(t.$primary-color, 700);
+        border: 1px solid map.get(t.$primary-color, 200);
+        &:hover { border-color: map.get(t.$primary-color, 700); }
     }
 
     &--danger {
@@ -269,21 +283,12 @@
     &--sm { padding: 6px 12px; font-size: 12px; }
 }
 
-// Link
-.ss-link {
-    font-family: "g-medium", sans-serif;
-    font-size: 13px;
-    color: map.get(t.$secondary-color, 500);
-    text-decoration: none;
-    &:hover { text-decoration: underline; }
-}
-
 // Utilities
 .ss-loading {
     padding: 24px;
     text-align: center;
     color: map.get(t.$primary-color, 300);
-    font-family: "g-medium", sans-serif;
+    font-family: "Inter", sans-serif;
     font-size: 14px;
 }
 
@@ -291,7 +296,7 @@
     padding: 40px 24px;
     text-align: center;
     color: map.get(t.$primary-color, 300);
-    font-family: "g-medium", sans-serif;
+    font-family: "Inter", sans-serif;
     font-size: 14px;
     display: flex;
     flex-direction: column;

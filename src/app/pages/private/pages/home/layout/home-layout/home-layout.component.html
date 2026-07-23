@@ -8,17 +8,17 @@
     </div>
   }
   <div class="home__buttons">
-    <app-button icon="/assets/icons/refresh-circle.svg" theme="primary" [isLoading]="isLoading"
+    <app-button theme="primary" [isLoading]="isLoading"
       name="Seleccionar Proyecto" (onClickButton)="viewSelectProjectModal = true" />
-    <app-button icon="/assets/icons/add.svg" theme="primary" [isLoading]="isLoading" name="Crear Proyecto"
+    <app-button theme="primary" [isLoading]="isLoading" name="Crear Proyecto"
       (onClickButton)="viewCreatedProjectModal = true" />
   </div>
   <div class="home__cards">
     @if (isLoading) {
-      <img class="loading-icon home__loading" src="/assets/icons/loading.svg" alt="Cargando">
+      <span class="spinner home__loading" aria-label="Cargando"></span>
     } @else {
       @for(card of cards; track $index){
-        <app-home-cards [cardInfo]="card" />
+        <app-home-cards [cardInfo]="card" [index]="$index" />
       }
     }
   </div>

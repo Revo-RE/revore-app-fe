@@ -6,22 +6,27 @@
 }
 @mixin basicInput() {
     background: #fff;
-    border-radius: 12px;
-    border: 2px solid map-get($primary-color, 200 );
+    border-radius: 4px;
+    border: 1px solid map-get($primary-color, 200 );
     box-sizing: border-box;
     color: map-get($text-color, 500 );
-    font-family: 'g-medium', sans-serif;
+    font-family: "Inter", sans-serif;
     font-size: 14px;
-    height: 49px;
+    height: 48px;
     line-height: 14px;
     margin-bottom: 28px;
-    padding: 22px 29px;
+    padding: 14px 16px;
+    transition: border-color 0.15s ease-out, box-shadow 0.15s ease-out;
     width: 100%;
+    &::placeholder {
+        color: map-get($primary-color, 300 );
+    }
     &:invalid{
-        border: 2px solid map-get($secondary-color, 500 );
+        border: 1px solid map-get($aux-color, error );
     }
     &:focus{
         outline: none;
-        border: 2px solid map-get($primary-color, 500 );
+        border: 1px solid map-get($primary-color, 700 );
+        box-shadow: 0 0 0 3px rgba(17, 27, 48, 0.08);
     }
 }

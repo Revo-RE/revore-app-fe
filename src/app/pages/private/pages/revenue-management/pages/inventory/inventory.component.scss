@@ -1,0 +1,366 @@
+@use "sass:map";
+@use "theme" as t;
+
+// Inventory Management — sigue el sistema de diseño del brand guideline:
+// azul marino dominante, Inter, tablas con header navy, naranja solo en la
+// barra del título (la aporta la regla global h1[class*="__title"]::before).
+
+.inv {
+    padding: 32px 40px;
+    max-width: 1200px;
+    text-align: left;
+
+    &__header {
+        margin-bottom: 28px;
+    }
+
+    &__eyebrow {
+        font-family: "Inter", sans-serif;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: map.get(t.$primary-color, 300);
+        margin: 0 0 6px;
+    }
+
+    &__title {
+        font-size: 28px;
+        color: map.get(t.$primary-color, 700);
+        margin: 0 0 4px;
+    }
+
+    &__subtitle {
+        font-family: "Inter", sans-serif;
+        font-size: 14px;
+        color: map.get(t.$primary-color, 400);
+        margin: 0;
+    }
+
+    &__section-title {
+        font-family: "Inter", sans-serif;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: map.get(t.$primary-color, 300);
+        margin-bottom: 14px;
+    }
+
+    &__kpis {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 14px;
+        margin-bottom: 32px;
+
+        @media (max-width: 1100px) { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    &__grid {
+        display: grid;
+        grid-template-columns: 420px 1fr;
+        gap: 24px;
+        align-items: start;
+
+        @media (max-width: 1000px) { grid-template-columns: 1fr; }
+    }
+
+    &__filters {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    &__filter {
+        width: 280px;
+    }
+
+    &__error {
+        background: rgba(map.get(t.$aux-color, error), 0.06);
+        border: 1px solid rgba(map.get(t.$aux-color, error), 0.35);
+        border-radius: t.$radius-control;
+        color: map.get(t.$aux-color, error);
+        font-size: 13px;
+        padding: 10px 14px;
+        margin-bottom: 16px;
+    }
+
+    &__loading {
+        font-size: 13px;
+        color: map.get(t.$primary-color, 300);
+        margin-bottom: 24px;
+    }
+}
+
+// KPI cards — mismo patrón que Sales Tools
+.kpi-card {
+    background: white;
+    border-radius: t.$radius-surface;
+    padding: 20px 18px;
+    border: 1px solid map.get(t.$primary-color, 200);
+    border-top: 3px solid map.get(t.$primary-color, 500);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    &__value {
+        font-family: "Inter", sans-serif;
+        font-size: 26px;
+        font-weight: 800;
+        color: map.get(t.$primary-color, 700);
+        line-height: 1;
+        white-space: nowrap;
+    }
+
+    &__label {
+        font-family: "Inter", sans-serif;
+        font-size: 10.5px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: map.get(t.$primary-color, 300);
+    }
+
+    &--success { border-top-color: map.get(t.$aux-color, success); .kpi-card__value { color: map.get(t.$aux-color, success); } }
+    &--progress { border-top-color: map.get(t.$aux-color, warning); .kpi-card__value { color: map.get(t.$aux-color, warning); } }
+}
+
+// Tarjetas
+.inv-card {
+    background: white;
+    border-radius: t.$radius-surface;
+    border: 1px solid map.get(t.$primary-color, 200);
+    padding: 24px;
+
+    &__head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 12px;
+    }
+
+    &__title {
+        font-size: 17px;
+        color: map.get(t.$primary-color, 700);
+        margin: 0 0 16px;
+    }
+
+    &__loading {
+        font-family: "Inter", sans-serif;
+        font-size: 12px;
+        color: map.get(t.$primary-color, 300);
+    }
+
+    &__hint {
+        font-family: "Inter", sans-serif;
+        font-size: 12.5px;
+        color: map.get(t.$primary-color, 300);
+        margin: 0 0 18px;
+    }
+
+    &__actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    &--table { overflow: hidden; }
+}
+
+// Enlace de acción por fila (sin recuadro, estilo tipográfico)
+.inv-link {
+    font-family: "Inter", sans-serif;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: map.get(t.$primary-color, 500);
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid map.get(t.$primary-color, 250);
+    padding: 0 0 1px;
+    cursor: pointer;
+    white-space: nowrap;
+
+    &:hover { color: map.get(t.$primary-color, 700); border-color: map.get(t.$primary-color, 700); }
+}
+
+// Campos del formulario
+.fld {
+    margin-bottom: 14px;
+
+    &--row {
+        display: flex;
+        gap: 12px;
+    }
+
+    &__half { flex: 1; }
+
+    &__label {
+        display: block;
+        font-family: "Inter", sans-serif;
+        font-size: 10.5px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: map.get(t.$primary-color, 300);
+        margin-bottom: 6px;
+    }
+
+    &__control {
+        width: 100%;
+        box-sizing: border-box;
+        font-family: "Inter", sans-serif;
+        font-size: 14px;
+        color: map.get(t.$primary-color, 700);
+        background: white;
+        border: 1px solid map.get(t.$primary-color, 250);
+        border-radius: t.$radius-control;
+        padding: 10px 12px;
+        transition: border-color 0.15s ease;
+
+        &:focus {
+            outline: none;
+            border-color: map.get(t.$primary-color, 500);
+        }
+
+        &:disabled {
+            background: map.get(t.$primary-color, 100);
+            color: map.get(t.$primary-color, 300);
+        }
+    }
+}
+
+// Botones
+.inv-btn {
+    font-family: "Inter", sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: t.$radius-control;
+    padding: 10px 18px;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+
+    &--primary {
+        background: map.get(t.$primary-color, 500);
+        border: 1px solid map.get(t.$primary-color, 500);
+        color: white;
+
+        &:hover:not(:disabled) { background: map.get(t.$primary-color, 700); }
+        &:disabled { opacity: 0.45; cursor: not-allowed; }
+    }
+
+    &--ghost {
+        background: transparent;
+        border: 1px solid map.get(t.$primary-color, 250);
+        color: map.get(t.$primary-color, 400);
+
+        &:hover { background: map.get(t.$primary-color, 100); }
+    }
+}
+
+// Tabla — header azul marino, filas alternadas (brand guideline)
+.inv-table-wrap {
+    overflow-x: auto;
+    border: 1px solid map.get(t.$primary-color, 200);
+    border-radius: t.$radius-control;
+}
+
+.inv-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: "Inter", sans-serif;
+    font-size: 13px;
+
+    th {
+        text-align: left;
+        padding: 11px 14px;
+        font-size: 10.5px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #fff;
+        background: map.get(t.$primary-color, 500);
+        white-space: nowrap;
+
+        &.num { text-align: right; }
+    }
+
+    td {
+        padding: 12px 14px;
+        color: map.get(t.$primary-color, 500);
+        border-bottom: 1px solid map.get(t.$primary-color, 200);
+        white-space: nowrap;
+
+        &.num { text-align: right; font-variant-numeric: tabular-nums; }
+    }
+
+    &__action { text-align: right; }
+
+    &__main { font-weight: 600; color: map.get(t.$primary-color, 700); }
+
+    tbody tr:nth-child(even) td { background: map.get(t.$primary-color, 100); }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover td { background: #EFF1F5; }
+}
+
+// Estados tipográficos
+.st {
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+
+    &--ok { color: map.get(t.$aux-color, success); }
+    &--warn { color: map.get(t.$aux-color, warning); }
+    &--err { color: map.get(t.$aux-color, error); }
+    &--ink { color: map.get(t.$primary-color, 500); }
+    &--mut { color: map.get(t.$primary-color, 300); }
+}
+
+// Modal de confirmación
+.inv-modal__overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(17, 27, 48, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(2px);
+}
+
+.inv-modal {
+    background: white;
+    border-radius: t.$radius-surface;
+    padding: 28px 32px;
+    width: 420px;
+    max-width: 90vw;
+    text-align: left;
+
+    h3 {
+        margin: 0 0 12px;
+        font-size: 18px;
+        color: map.get(t.$primary-color, 700);
+    }
+
+    p {
+        margin: 0 0 24px;
+        font-family: "Inter", sans-serif;
+        font-size: 14px;
+        color: map.get(t.$primary-color, 400);
+        line-height: 1.5;
+    }
+
+    &__context {
+        font-size: 13px !important;
+        margin-bottom: 18px !important;
+    }
+
+    &__actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+}

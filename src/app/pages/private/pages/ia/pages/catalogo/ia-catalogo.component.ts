@@ -27,7 +27,7 @@ type FilterOption = typeof FILTER_OPTIONS[number];
             class="release-pill"
             (click)="showReleases()"
             aria-label="Ver releases recientes">
-            🔔 {{ latestRelease()!.version }} disponible
+            {{ latestRelease()!.version }} disponible
           </button>
         </div>
       }
@@ -73,7 +73,6 @@ type FilterOption = typeof FILTER_OPTIONS[number];
       @if (!loading()) {
         @if (filteredSkills().length === 0) {
           <div class="empty-state">
-            <div class="empty-state__icon">🤖</div>
             <p class="empty-state__text">Ningún skill coincide con tu búsqueda.</p>
             <button class="btn-link" (click)="resetFilters()">Limpiar filtros</button>
           </div>
@@ -112,11 +111,11 @@ type FilterOption = typeof FILTER_OPTIONS[number];
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background: #DD7244;
+      background: #2E3C59;
       color: white;
       border: none;
       padding: 7px 16px;
-      border-radius: 20px;
+      border-radius: 4px;
       font-size: 13px;
       font-weight: 600;
       cursor: pointer;
@@ -144,7 +143,7 @@ type FilterOption = typeof FILTER_OPTIONS[number];
     }
     .filter-chip {
       padding: 6px 16px;
-      border-radius: 20px;
+      border-radius: 4px;
       border: 1.5px solid #D5D5DD;
       background: white;
       color: #4b5563;
@@ -165,13 +164,13 @@ type FilterOption = typeof FILTER_OPTIONS[number];
       gap: 10px;
       background: white;
       border: 1.5px solid #D5D5DD;
-      border-radius: 8px;
+      border-radius: 4px;
       padding: 7px 14px;
       min-width: 240px;
       transition: border-color 0.15s ease;
     }
     .search-wrapper:focus-within { border-color: #2E3C59; }
-    .search-icon { color: #9ca3af; flex-shrink: 0; }
+    .search-icon { color: #657A9B; flex-shrink: 0; }
     .search-input {
       border: none;
       outline: none;
@@ -180,7 +179,7 @@ type FilterOption = typeof FILTER_OPTIONS[number];
       background: transparent;
       width: 100%;
     }
-    .search-input::placeholder { color: #9ca3af; }
+    .search-input::placeholder { color: #657A9B; }
 
     /* ── Grid ── */
     .skills-grid {
@@ -197,7 +196,7 @@ type FilterOption = typeof FILTER_OPTIONS[number];
     }
     .skeleton-card {
       height: 200px;
-      border-radius: 10px;
+      border-radius: 8px;
       background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
       background-size: 200% 100%;
       animation: shimmer 1.4s infinite;
@@ -212,16 +211,15 @@ type FilterOption = typeof FILTER_OPTIONS[number];
       text-align: center;
       padding: 60px 20px;
     }
-    .empty-state__icon { font-size: 48px; margin-bottom: 12px; }
     .empty-state__text {
       font-size: 15px;
-      color: #6b7280;
+      color: #657A9B;
       margin: 0 0 16px;
     }
     .btn-link {
       background: none;
       border: none;
-      color: #DD7244;
+      color: #2E3C59;
       font-size: 14px;
       font-weight: 500;
       cursor: pointer;
@@ -231,7 +229,7 @@ type FilterOption = typeof FILTER_OPTIONS[number];
     .count-label {
       margin-top: 16px;
       font-size: 12px;
-      color: #9ca3af;
+      color: #657A9B;
       text-align: right;
     }
   `]

@@ -9,7 +9,7 @@ import { IHeader } from '@private/shared/interfaces/header.interface';
 		<app-header [data]="headerData" />
 		<section class="content">
 			<div class="placeholder">
-				<h2>🛠️ Sales Tools</h2>
+				<h2>Sales Tools</h2>
 				<p>Esta sección está en desarrollo.</p>
 				<p>Aquí estarán las herramientas de ventas para:</p>
 				<ul>

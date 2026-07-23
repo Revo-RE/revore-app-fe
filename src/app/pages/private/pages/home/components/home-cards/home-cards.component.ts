@@ -10,5 +10,9 @@ import { RouterLink } from '@angular/router';
 })
 export class HomeCardsComponent {
   @Input({ required:true} ) cardInfo!: IHomeCard;
+  @Input() index = 0;
 
+  get indexLabel(): string {
+    return String(this.index + 1).padStart(2, '0');
+  }
 }

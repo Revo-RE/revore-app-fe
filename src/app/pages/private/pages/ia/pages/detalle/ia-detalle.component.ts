@@ -42,7 +42,7 @@ function stripFrontmatter(md: string): string {
       @if (!loading() && error()) {
         <div class="error-state">
           <p>No se pudo cargar el skill <strong>{{ skillName() }}</strong>.</p>
-          <a routerLink="/dashboard/ia" class="btn-primary">← Volver al catálogo</a>
+          <a routerLink="/dashboard/ia" class="btn-primary">Volver al catálogo</a>
         </div>
       }
 
@@ -58,7 +58,7 @@ function stripFrontmatter(md: string): string {
                 <span class="pill pill--area">{{ skill()!.area }}</span>
                 <span class="pill" [style.background]="nivelColor() + '1a'" [style.color]="nivelColor()">{{ skill()!.nivel }}</span>
                 @if (isNewSkill()) {
-                  <span class="badge badge--new">🆕 Nuevo</span>
+                  <span class="badge badge--new">Nuevo</span>
                 }
               </div>
               <p class="detalle__updated">Actualizado el {{ formatDate(skill()!.updated_at) }}</p>
@@ -119,22 +119,22 @@ function stripFrontmatter(md: string): string {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      color: #DD7244;
+      color: #2E3C59;
       text-decoration: none;
       font-weight: 600;
       font-size: 13px;
       padding: 5px 10px 5px 8px;
-      border-radius: 6px;
-      border: 1.5px solid #f5c6a8;
-      background: #fff8f5;
+      border-radius: 4px;
+      border: 1.5px solid #D5D5DD;
+      background: #ffffff;
       transition: background 0.15s ease, border-color 0.15s ease;
     }
     .breadcrumb__back:hover {
-      background: #FEF0E7;
-      border-color: #DD7244;
+      background: #EEF1F6;
+      border-color: #2E3C59;
     }
-    .breadcrumb__sep { color: #d1d5db; }
-    .breadcrumb__current { color: #6b7280; font-size: 13px; }
+    .breadcrumb__sep { color: #D5D5DD; }
+    .breadcrumb__current { color: #657A9B; font-size: 13px; }
 
     /* ── Header ── */
     .detalle__header {
@@ -175,7 +175,7 @@ function stripFrontmatter(md: string): string {
     .detalle__updated {
       margin: 0;
       font-size: 12px;
-      color: #9ca3af;
+      color: #657A9B;
     }
     .detalle__actions {
       display: flex;
@@ -189,9 +189,9 @@ function stripFrontmatter(md: string): string {
       align-items: center;
       gap: 8px;
       padding: 10px 20px;
-      border-radius: 8px;
+      border-radius: 4px;
       border: none;
-      background: #DD7244;
+      background: #2E3C59;
       color: white;
       font-size: 14px;
       font-weight: 600;
@@ -207,7 +207,7 @@ function stripFrontmatter(md: string): string {
       display: inline-flex;
       align-items: center;
       padding: 3px 10px;
-      border-radius: 20px;
+      border-radius: 4px;
       font-size: 12px;
       font-weight: 500;
     }
@@ -219,24 +219,24 @@ function stripFrontmatter(md: string): string {
     }
     .pill--area {
       background: #f5f5f7;
-      color: #374151;
-      border: 1px solid #e5e7eb;
+      color: #3E5170;
+      border: 1px solid #E8E9ED;
     }
     .badge--new {
       display: inline-flex;
       align-items: center;
       padding: 3px 10px;
-      border-radius: 20px;
+      border-radius: 4px;
       font-size: 12px;
       font-weight: 600;
-      background: #FEF0E7;
-      color: #DD7244;
-      border: 1px solid #f5c6a8;
+      background: #EEF1F6;
+      color: #2E3C59;
+      border: 1px solid #D5D5DD;
     }
 
     /* ── Manual panel ── */
     .manual-panel {
-      border-top: 2px solid #f1f2f4;
+      border-top: 2px solid #E8E9ED;
       padding-top: 24px;
     }
 
@@ -244,7 +244,7 @@ function stripFrontmatter(md: string): string {
     .markdown-body {
       font-size: 15px;
       line-height: 1.75;
-      color: #374151;
+      color: #3E5170;
       text-align: left;
     }
     .markdown-body * { text-align: left; box-sizing: border-box; }
@@ -262,7 +262,7 @@ function stripFrontmatter(md: string): string {
       text-align: left;
     }
     .markdown-body h3 {
-      font-size: 14px; font-weight: 600; color: #374151;
+      font-size: 14px; font-weight: 600; color: #3E5170;
       margin: 20px 0 8px; text-align: left;
     }
     .markdown-body p { margin: 0 0 14px; text-align: left; }
@@ -297,7 +297,7 @@ function stripFrontmatter(md: string): string {
       border-left: 4px solid #DD7244;
       padding: 10px 16px;
       margin: 0 0 16px;
-      background: #fff8f5;
+      background: #ffffff;
       border-radius: 0 6px 6px 0;
       color: #7c3d1a;
       text-align: left;
@@ -311,7 +311,7 @@ function stripFrontmatter(md: string): string {
     .markdown-body th {
       padding: 10px 14px; text-align: left;
       font-weight: 600; color: #2E3C59;
-      border-bottom: 2px solid #e5e7eb;
+      border-bottom: 2px solid #E8E9ED;
       font-size: 12px; text-transform: uppercase; letter-spacing: 0.4px;
     }
     .markdown-body td {
@@ -321,7 +321,7 @@ function stripFrontmatter(md: string): string {
     }
     .markdown-body tr:last-child td { border-bottom: none; }
     .markdown-body tbody tr:hover { background: #fafbfc; }
-    .markdown-body a { color: #DD7244; text-decoration: none; }
+    .markdown-body a { color: #2E3C59; text-decoration: none; }
     .markdown-body a:hover { text-decoration: underline; }
     .markdown-body hr {
       border: none; border-top: 1px solid #eef0f3; margin: 28px 0;
@@ -332,7 +332,7 @@ function stripFrontmatter(md: string): string {
     /* ── Skeletons ── */
     .skeleton-header {
       height: 100px;
-      border-radius: 10px;
+      border-radius: 8px;
       background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
       background-size: 200% 100%;
       animation: shimmer 1.4s infinite;
@@ -340,7 +340,7 @@ function stripFrontmatter(md: string): string {
     }
     .skeleton-body {
       height: 400px;
-      border-radius: 10px;
+      border-radius: 8px;
       background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
       background-size: 200% 100%;
       animation: shimmer 1.4s infinite;
@@ -354,13 +354,13 @@ function stripFrontmatter(md: string): string {
     .error-state {
       text-align: center;
       padding: 60px 20px;
-      color: #6b7280;
+      color: #657A9B;
     }
     .error-state p { font-size: 15px; margin-bottom: 20px; }
     .empty-tab {
       text-align: center;
       padding: 60px 20px;
-      color: #9ca3af;
+      color: #657A9B;
       font-size: 14px;
     }
 

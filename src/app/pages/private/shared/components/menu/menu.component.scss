@@ -2,92 +2,123 @@
 @use "theme" as theme;
 @use "mixins" as *;
 
+// Sidebar editorial: fondo claro, tipografía sobria, secciones numeradas
+// (01, 02, …) al estilo de las "practices" de revore.mx. Sin íconos.
 .menu {
-    background-color: map.get(theme.$primary-color, 500);
-    border-radius: 0 42px 42px 0;
+    background-color: #F7F8FA;
+    border-right: 1px solid map.get(theme.$primary-color, 100);
     overflow: hidden;
     box-sizing: border-box;
     display: grid;
-    gap: 24px;
+    gap: 32px;
     grid-template-columns: 100%;
     grid-template-rows: auto 1fr auto;
     min-height: 100vh;
-    padding: 42px 11px 28px 16px;
+    padding: 40px 20px 24px;
     position: sticky;
     top: 0;
     width: 100%;
+
     &__logo {
         display: block;
-        filter: brightness(0) invert(1);
         margin: 0 auto;
-        width: 125px;
+        width: 118px;
     }
+
     &__nav {
         overflow-y: auto;
         scrollbar-width: none;
         &::-webkit-scrollbar { display: none; }
     }
+
     &__ul {
+        counter-reset: menusection;
         list-style: none;
         text-align: left;
     }
+
     &__li {
+        counter-increment: menusection;
         & ul {
-            padding-left: 36px;
+            padding-left: 26px;
             box-sizing: border-box;
             list-style: none;
         }
+
+        // Numeración editorial solo en el primer nivel
+        & > .menu__item::before {
+            color: map.get(theme.$primary-color, 300);
+            content: counter(menusection, decimal-leading-zero);
+            font-family: "Inter", sans-serif;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            min-width: 18px;
+        }
     }
+
     &__item {
         align-items: center;
-        color: map.get(theme.$text-color, 100);
+        color: map.get(theme.$primary-color, 400);
         display: inline-flex;
-        font-family: "g-medium", sans-serif;
-        font-size: 14px;
-        font-weight: 400;
-        gap: 12px;
+        font-family: "Inter", sans-serif;
+        font-size: 13.5px;
+        font-weight: 500;
+        gap: 10px;
         justify-content: flex-start;
-        margin-bottom: 16px;
-        padding: 14px 0;
+        letter-spacing: 0.01em;
+        margin-bottom: 6px;
+        padding: 10px 8px;
         text-decoration: none;
+        transition: color 0.15s ease-out, background-color 0.15s ease-out;
         width: 100%;
         &:hover {
-            text-decoration: underline;
-        }
-        .icon,
-        .arrow {
-            filter: brightness(0) invert(1);
-            transition: all .2s ease-out;
-        }
-        .icon {
-            width: 24px;
-            height: 24px;
+            color: map.get(theme.$primary-color, 700);
         }
     }
-    &__item-subitem {
-        padding: 0;
+
+    &__label {
+        flex: 1;
     }
-    &__item-active {
-        color: map.get(theme.$secondary-color, 500);
-        .icon,
-        .arrow {
-            filter: invert(70%) sepia(29%) saturate(6579%) hue-rotate(332deg) brightness(92%) contrast(87%);
-        }
-        .arrow {
-            transform: rotate(90deg);
-        }
-    }
-    &__item-disable {
+
+    // Indicador tipográfico de expansión: "+" cerrado, "–" abierto
+    &__expand {
         color: map.get(theme.$primary-color, 300);
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 1;
+        &::before {
+            content: "+";
+        }
+    }
+
+    &__item-subitem {
+        font-size: 13px;
+        font-weight: 400;
+        margin-bottom: 2px;
+        padding: 7px 8px;
+    }
+
+    &__item-active {
+        background-color: map.get(theme.$primary-color, 100);
+        box-shadow: inset 2px 0 0 map.get(theme.$primary-color, 700);
+        color: map.get(theme.$primary-color, 700);
+        font-weight: 600;
+
+        & > .menu__expand::before {
+            content: "\2013"; // –
+        }
+    }
+
+    &__item-disable {
+        color: map.get(theme.$primary-color, 200);
         &:hover {
+            color: map.get(theme.$primary-color, 200);
             text-decoration: none;
             cursor: not-allowed;
         }
-        .icon,
-        .arrow {
-            filter: invert(64%) sepia(15%) saturate(375%) hue-rotate(183deg) brightness(83%) contrast(81%);
-        }
     }
+
     &__submenu{
         height: 0px;
         overflow: hidden;
@@ -98,12 +129,13 @@
     }
 
     &__footer {
+        border-top: 1px solid map.get(theme.$primary-color, 100);
         width: 100%;
         display: flex;
         flex-direction: column;
         justify-content: flex-end;
         gap: 16px;
-        padding-bottom: 10px;
+        padding: 18px 0 10px;
     }
 
     &__user-row {
@@ -115,24 +147,24 @@
     }
 
     &__user-avatar {
-        width: 36px;
-        height: 36px;
+        width: 34px;
+        height: 34px;
         border-radius: 50%;
-        background: linear-gradient(135deg, map.get(theme.$secondary-color, 400) 0%, map.get(theme.$secondary-color, 500) 100%);
+        background: map.get(theme.$primary-color, 700);
         display: flex;
         align-items: center;
         justify-content: center;
-        font-family: "g-bold", sans-serif;
-        font-size: 14px;
+        font-family: "Inter", sans-serif;
+        font-size: 12px;
+        font-weight: 600;
         color: white;
         flex-shrink: 0;
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.16);
     }
 
     &__user-email {
-        color: rgba(255, 255, 255, 0.9);
-        font-family: "g-medium", sans-serif;
-        font-size: 13px;
+        color: map.get(theme.$primary-color, 400);
+        font-family: "Inter", sans-serif;
+        font-size: 12.5px;
         line-height: 1;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -144,31 +176,27 @@
     &__logout {
         border: none;
         background: transparent;
-        width: 34px;
-        height: 34px;
-        border-radius: 50%;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
+        color: map.get(theme.$primary-color, 300);
         cursor: pointer;
-        transition: background 0.2s ease;
-
-        img {
-            width: 18px;
-            height: 18px;
-            filter: brightness(0) invert(1);
-        }
+        font-family: "Inter", sans-serif;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        padding: 6px 4px;
+        text-transform: uppercase;
+        transition: color 0.15s ease;
 
         &:hover {
-            background: rgba(255, 255, 255, 0.12);
+            color: map.get(theme.$primary-color, 700);
         }
     }
 
     &__powerby {
         display: block;
+        // El SVG original es blanco: se re-tinta a gris oscuro para fondo claro
+        filter: brightness(0) opacity(0.45);
         margin: 0 auto;
-        width: 142px;
-        opacity: 0.92;
+        width: 132px;
     }
 }
 
@@ -178,16 +206,15 @@
         width: 48px;
         height: 48px;
         border-radius: 50%;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: map.get(theme.$primary-color, 700);
         display: flex;
         align-items: center;
         justify-content: center;
-        font-family: "g-bold", sans-serif;
+        font-family: "Inter", sans-serif;
         font-size: 18px;
-        font-weight: 700;
+        font-weight: 600;
         color: white;
         flex-shrink: 0;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
 
     &__info {
@@ -199,8 +226,8 @@
     }
 
     &__name {
-        color: white;
-        font-family: "g-semibold", sans-serif;
+        color: map.get(theme.$primary-color, 700);
+        font-family: "Inter", sans-serif;
         font-size: 15px;
         font-weight: 600;
         margin: 0;
@@ -210,8 +237,8 @@
     }
 
     &__email {
-        color: rgba(255, 255, 255, 0.85);
-        font-family: "g-regular", sans-serif;
+        color: map.get(theme.$primary-color, 400);
+        font-family: "Inter", sans-serif;
         font-size: 12px;
         margin: 0;
         white-space: nowrap;
@@ -220,14 +247,14 @@
     }
 
     &__role {
-        color: rgba(255, 255, 255, 0.85);
-        font-family: "g-medium", sans-serif;
+        color: map.get(theme.$primary-color, 400);
+        font-family: "Inter", sans-serif;
         font-size: 12px;
         font-weight: 500;
         display: inline-block;
         padding: 4px 10px;
-        background: rgba(255, 255, 255, 0.14);
-        border-radius: 999px;
+        background: map.get(theme.$primary-color, 100);
+        border-radius: 4px;
         white-space: nowrap;
         width: fit-content;
     }

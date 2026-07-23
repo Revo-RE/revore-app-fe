@@ -108,9 +108,31 @@ export class HistorialComponent implements OnInit, OnDestroy {
         return IN_PROGRESS.includes(status);
     }
 
-    errorLabel(msg: string): string {
-        // Show only the first line (friendly message), detail goes in tooltip
-        return msg.split('\n')[0];
+    /**
+     * Convierte el mensaje de error crudo (que puede traer detalle técnico,
+     * stacktrace o comandos) en un mensaje claro para el usuario. Nunca
+     * expone el detalle técnico ni en la tabla ni en el tooltip.
+     */
+    errorLabel(msg: string | null | undefined): string {
+        const generic = 'No se pudo generar el reporte. Contacta a soporte.';
+        if (!msg) return generic;
+
+        // Corta todo el detalle técnico a partir de estos marcadores
+        const cutMarkers = ['Detalle:', 'Traceback', 'Command ', 'File "', 'TimeoutExpired'];
+        let clean = msg;
+        for (const m of cutMarkers) {
+            const i = clean.indexOf(m);
+            if (i !== -1) clean = clean.slice(0, i);
+        }
+        clean = clean.replace(/\s*\n\s*/g, ' ').trim().replace(/[.\s]+$/, '');
+        if (!clean) return generic;
+
+        // Si lo que queda todavía parece técnico, usa el mensaje genérico
+        const looksTechnical =
+            /(exception|traceback|null|undefined|line \d+|\.py|process|subprocess)/i.test(clean);
+        if (looksTechnical) return generic;
+
+        return clean + '.';
     }
 
     private readonly MKT_AGENCY_NAMES: Record<string, string> = {

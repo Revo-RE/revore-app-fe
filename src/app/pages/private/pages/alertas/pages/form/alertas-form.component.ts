@@ -183,31 +183,31 @@ import {
         .row { margin-bottom: 22px; }
         .row.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
         .row.autoname {
-            background: #f9fafb; padding: 14px 18px; border-radius: 6px;
-            border-left: 3px solid #ec6e3c; text-align: center; font-size: 16px;
+            background: #F7F8FA; padding: 14px 18px; border-radius: 6px;
+            border-left: 3px solid #DD7244; text-align: center; font-size: 16px;
         }
-        label { display: block; font-size: 14px; color: #374151; font-weight: 500; }
+        label { display: block; font-size: 14px; color: #3E5170; font-weight: 500; }
         .block-label { margin-bottom: 8px; }
-        .req { color: #dc2626; }
+        .req { color: #C0394B; }
         input[type="text"], input[type="time"], select, .emails-input {
             display: block; width: 100%; margin-top: 6px; padding: 10px 12px;
-            border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; background: white;
+            border: 1px solid #D5D5DD; border-radius: 6px; font-size: 14px; background: white;
         }
-        .hint { display:block; margin-top:4px; color:#6b7280; font-size:12px; font-weight:400; }
+        .hint { display:block; margin-top:4px; color:#657A9B; font-size:12px; font-weight:400; }
         .dias-grid { display: flex; gap: 8px; margin-bottom: 12px; }
         .dia-btn {
-            width: 38px; height: 38px; border-radius: 50%; border: 1px solid #d1d5db;
-            background: white; cursor: pointer; font-weight: 500; color: #374151;
+            width: 38px; height: 38px; border-radius: 50%; border: 1px solid #D5D5DD;
+            background: white; cursor: pointer; font-weight: 500; color: #3E5170;
         }
-        .dia-btn.selected { background: #ec6e3c; color: white; border-color: #ec6e3c; }
+        .dia-btn.selected { background: #2E3C59; color: white; border-color: #2E3C59; }
         .hora-label { max-width: 200px; }
         .toggle-row { display: flex; align-items: center; }
         .switch-label { display: flex; align-items: center; gap: 10px; font-weight: 500; cursor: pointer; }
         .actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 8px; }
-        .btn-primary { background: #ec6e3c; color: white; border: none; padding: 10px 22px; border-radius: 6px; font-weight: 500; cursor: pointer; }
+        .btn-primary { background: #2E3C59; color: white; border: none; padding: 10px 22px; border-radius: 6px; font-weight: 500; cursor: pointer; }
         .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
-        .btn-secondary { background: white; color: #374151; border: 1px solid #d1d5db; padding: 10px 18px; border-radius: 6px; font-weight: 500; cursor: pointer; }
-        .canal-display { margin-top: 6px; padding: 10px 12px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 14px; color: #374151; }
+        .btn-secondary { background: white; color: #3E5170; border: 1px solid #D5D5DD; padding: 10px 18px; border-radius: 6px; font-weight: 500; cursor: pointer; }
+        .canal-display { margin-top: 6px; padding: 10px 12px; background: #F7F8FA; border: 1px solid #E8E9ED; border-radius: 6px; font-size: 14px; color: #3E5170; }
     `]
 })
 export class AlertasFormComponent implements OnInit {

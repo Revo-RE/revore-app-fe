@@ -41,7 +41,11 @@ import { AlertaHistorialItem, CANALES_ALERTA, TIPOS_ALERTA } from '../../models/
                                     </span>
                                 </td>
                                 <td>
-                                    <span class="badge" [class]="'badge-' + item.estado">{{ item.estado }}</span>
+                                    <span class="badge" [class]="'badge-' + item.estado"
+                                        [title]="item.estado === 'fallido' && item.mensaje ? item.mensaje : ''">{{ item.estado }}</span>
+                                    @if (item.estado === 'fallido' && item.mensaje) {
+                                        <div class="fail-reason" [title]="item.mensaje">{{ item.mensaje }}</div>
+                                    }
                                 </td>
                             </tr>
                         }
@@ -54,26 +58,29 @@ import { AlertaHistorialItem, CANALES_ALERTA, TIPOS_ALERTA } from '../../models/
         .content { padding: 20px; }
         .empty {
             background: white; padding: 40px; border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08); text-align: center; color: #6b7280;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08); text-align: center; color: #657A9B;
         }
         .historial-table {
             width: 100%; border-collapse: collapse; background: white;
             border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
         .historial-table th, .historial-table td {
-            padding: 12px 16px; text-align: left; border-bottom: 1px solid #f1f2f4;
+            padding: 12px 16px; text-align: left; border-bottom: 1px solid #E8E9ED;
             font-size: 14px;
         }
-        .historial-table th { background: #f9fafb; color: #374151; font-weight: 600; }
+        .historial-table th { background: #F7F8FA; color: #3E5170; font-weight: 600; }
         .badge {
             padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500;
             text-transform: capitalize;
         }
         .badge-enviado { background: #d1fae5; color: #065f46; }
         .badge-fallido { background: #fee2e2; color: #991b1b; }
+        .fail-reason { color: #991b1b; font-size: 11.5px; margin-top: 4px; max-width: 320px;
+            line-height: 1.35; overflow: hidden; text-overflow: ellipsis; display: -webkit-box;
+            -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
         .badge-pendiente { background: #fef3c7; color: #92400e; }
         .dest-cell {
-            cursor: help; border-bottom: 1px dotted #9ca3af;
+            cursor: help; border-bottom: 1px dotted #657A9B;
             display: inline-block; max-width: 260px; overflow: hidden;
             text-overflow: ellipsis; white-space: nowrap; vertical-align: middle;
         }

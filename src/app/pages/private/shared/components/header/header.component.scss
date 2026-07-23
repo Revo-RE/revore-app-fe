@@ -1,28 +1,40 @@
 @use "sass:map";
 @use "theme" as theme;
+
+// Encabezado editorial: eyebrow en versalitas azul acero, título serif
+// grande y descripción sobria — jerarquía tipo revore.mx.
 .header {
+    border-bottom: 1px solid map.get(theme.$primary-color, 100);
     display: block;
+    margin-bottom: 32px;
+    padding-bottom: 24px;
     text-align: left;
     width: 100%;
     &__intro {
-        color: map.get(theme.$primary-color, 500);
-        font-family: "g-bold", sans-serif;
-        font-size: 24px;
-        font-weight: 400;
-        margin-bottom: 26px;
+        color: map.get(theme.$primary-color, 300);
+        font-family: "Inter", sans-serif;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.14em;
+        margin-bottom: 14px;
+        text-transform: uppercase;
     }
     &__title {
-        color: map.get(theme.$primary-color, 500);
-        font-family: "g-semi", sans-serif;
-        font-size: 28px;
-        font-weight: 400;
-        margin-bottom: 21px;
+        color: map.get(theme.$primary-color, 700);
+        font-family: theme.$font-heading;
+        font-size: 40px;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        line-height: 1.1;
+        margin-bottom: 14px;
     }
     &__description {
         color: map.get(theme.$primary-color, 400);
-        font-family: "g-medium", sans-serif;
-        font-size: 16px;
+        font-family: "Inter", sans-serif;
+        font-size: 15px;
         font-weight: 400;
-        margin-bottom: 56px;
+        line-height: 1.6;
+        margin-bottom: 8px;
+        max-width: 760px;
     }
 }

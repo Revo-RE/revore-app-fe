@@ -1,6 +1,5 @@
 import { Routes } from '@angular/router';
 
-import { RevenueManagementPlaceholderComponent } from './revenue-management-placeholder.component';
 import { RevenueModelLayoutComponent } from './pages/revenue-model/shared/layout/revenue-model-layout/revenue-model-layout.component';
 import { PriceListLayoutComponent } from './pages/revenue-model/pages/finantial/pages/price-list/layout/price-list-layout/price-list-layout.component';
 import { AppreciationLayoutComponent } from './pages/revenue-model/pages/finantial/pages/appreciation-model/layout/appreciation-layout/appreciation-layout.component';
@@ -10,11 +9,13 @@ import { GraphicsLayoutComponent } from './pages/revenue-model/pages/graphics/la
 export const routes: Routes = [
   {
     path: 'dashboard',
-    component: RevenueManagementPlaceholderComponent,
+    loadComponent: () =>
+      import('./pages/revenue-dashboard/revenue-dashboard.component').then(c => c.RevenueDashboardComponent),
   },
   {
-    path: 'reportes',
-    component: RevenueManagementPlaceholderComponent,
+    path: 'inventory',
+    loadComponent: () =>
+      import('./pages/inventory/inventory.component').then(c => c.InventoryComponent),
   },
   {
     path: 'revenue-model/finantial',

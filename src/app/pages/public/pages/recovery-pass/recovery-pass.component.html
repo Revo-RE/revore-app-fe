@@ -14,9 +14,7 @@
     <button class="form__submit" type="submit">
       Enviar
       @if(isLoading){
-        <img class="loading-icon" src="/assets/icons/loading.svg" alt="Cargando">
-      }@else {
-        <img src="/assets/icons/login.svg" alt="Icono Login">
+        <span class="spinner spinner-light"></span>
       }
     </button>
     <button class="form__back" routerLink="/login" type="button">

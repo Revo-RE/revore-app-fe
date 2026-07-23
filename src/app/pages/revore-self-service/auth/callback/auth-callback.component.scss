@@ -14,17 +14,13 @@
         align-items: center;
         gap: 16px;
         color: map.get(t.$primary-color, 400);
-        font-family: "g-medium", sans-serif;
+        font-family: "Inter", sans-serif;
         font-size: 16px;
     }
 
     &__spinner {
-        width: 40px;
-        height: 40px;
-        animation: spin 1s linear infinite;
+        border-width: 3px;
+        height: 32px;
+        width: 32px;
     }
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
 }

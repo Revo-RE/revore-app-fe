@@ -1,31 +1,47 @@
+// Paleta institucional — RevoRE Brand Guidelines (abril 2026)
+// Azul marino medio (#2E3C59) como color dominante, azul grisáceo para
+// secundarios, y naranja (#DD7244) como acento sutil: máximo un elemento
+// naranja destacado por página (barra de 3px junto a títulos o resaltado
+// puntual de un dato). Si dudas, no lo uses.
 $primary-color: (
-    100: #D5D8DE,
-    200: #ABB1BD,
-    300: #828A9B,
-    400: #58637A,
-    500: #2E3C59,
-    600: #253047,
-    700: #1C2435,
-    800: #121824,
-    900: #090C12,    
+    100: #F7F8FA,   // fondos alternados, hover de filas
+    200: #E8E9ED,   // bordes sutiles, separadores
+    250: #D5D5DD,   // gris claro — bordes de controles
+    300: #657A9B,   // azul grisáceo — labels, metadatos, números de página
+    400: #3E5170,   // azul intermedio — texto secundario
+    500: #2E3C59,   // azul marino medio — color dominante de UI
+    600: #1F2B42,   // hover de elementos primarios
+    700: #111B30,   // azul marino oscuro — títulos
+    800: #0A1224,
+    900: #020A19,   // negro profundo
 );
 $secondary-color: (
-    100: #F8E3DA,
-    200: #F1C7B4,
-    300: #EBAA8F,
-    400: #E48E69,
-    500: #DD7244,
-    600: #B15B36,
-    700: #854429,
-    800: #582E1B,
-    900: #2C170E,    
+    100: #FAE7DD,
+    200: #F3CDB9,
+    300: #ECB295,
+    400: #E59470,
+    500: #DD7244,   // naranja — SOLO acentos, nunca protagonista
+    600: #B55A34,
+    700: #884426,
+    800: #5B2D19,
+    900: #2E170D,
 );
 $text-color: (
     100: #fff,
-    500: #000000,
+    500: #111B30,
 );
 $aux-color: (
-    warning: #ffc721,
-    success: #1d9d61,
-    error: #e04b59
+    warning: #D97706,
+    success: #1D9D61,
+    error: #C0394B
 );
+
+// Tipografía — Inter en toda la aplicación (brand guideline: sin serif).
+// Títulos: Inter ExtraBold 800 · Subtítulos: Bold 700 · Cuerpo: Regular 400
+// Labels y encabezados de tabla: SemiBold 600 uppercase.
+$font-body: "Inter", "Helvetica Neue", Arial, sans-serif;
+$font-heading: "Inter", "Helvetica Neue", Arial, sans-serif;
+
+// Radios: controles discretos, superficies apenas suavizadas
+$radius-control: 4px;
+$radius-surface: 8px;

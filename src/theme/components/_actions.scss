@@ -1,0 +1,62 @@
+@use "../theme" as t;
+
+// Acciones tipográficas: sustituyen a los íconos de acción (editar,
+// eliminar, descargar…) por texto en versalitas, estilo consultoría.
+.action-link {
+    background: transparent;
+    border: none;
+    color: map-get(t.$primary-color, 400);
+    cursor: pointer;
+    font-family: "Inter", sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    padding: 2px 4px;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: color 0.15s ease-out;
+    white-space: nowrap;
+
+    &:hover {
+        color: map-get(t.$primary-color, 700);
+        text-decoration: underline;
+        text-underline-offset: 3px;
+    }
+
+    &-danger {
+        color: map-get(t.$aux-color, error);
+        &:hover {
+            color: map-get(t.$aux-color, error);
+        }
+    }
+
+    &-accent {
+        color: map-get(t.$secondary-color, 500);
+        &:hover {
+            color: map-get(t.$secondary-color, 600);
+        }
+    }
+}
+
+// Spinner CSS institucional (reemplaza loading.svg)
+.spinner {
+    animation: spinner-rotate 0.7s linear infinite;
+    border: 2px solid rgba(17, 27, 48, 0.15);
+    border-radius: 50%;
+    border-top-color: map-get(t.$primary-color, 700);
+    box-sizing: border-box;
+    display: inline-block;
+    height: 16px;
+    width: 16px;
+
+    &-light {
+        border-color: rgba(255, 255, 255, 0.35);
+        border-top-color: #fff;
+    }
+}
+
+@keyframes spinner-rotate {
+    to {
+        transform: rotate(360deg);
+    }
+}

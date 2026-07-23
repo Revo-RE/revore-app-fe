@@ -47,7 +47,7 @@ import { SkillRelease } from '../../models/skill.model';
                 }
                 @if (rel.html_url) {
                   <a [href]="rel.html_url" target="_blank" rel="noopener noreferrer" class="release-item__link" aria-label="Ver release {{ rel.version }} en GitHub">
-                    Ver en GitHub →
+                    Ver en GitHub
                   </a>
                 }
               </article>
@@ -85,7 +85,7 @@ import { SkillRelease } from '../../models/skill.model';
       align-items: flex-start;
       justify-content: space-between;
       padding: 24px 28px 20px;
-      border-bottom: 1px solid #f1f2f4;
+      border-bottom: 1px solid #E8E9ED;
       flex-shrink: 0;
     }
     .drawer__title {
@@ -97,20 +97,20 @@ import { SkillRelease } from '../../models/skill.model';
     .drawer__subtitle {
       margin: 0;
       font-size: 13px;
-      color: #6b7280;
+      color: #657A9B;
     }
     .drawer__close {
       background: none;
       border: none;
       cursor: pointer;
-      color: #6b7280;
+      color: #657A9B;
       padding: 4px;
-      border-radius: 6px;
+      border-radius: 4px;
       display: flex;
       align-items: center;
       transition: background 0.15s ease, color 0.15s ease;
     }
-    .drawer__close:hover { background: #f3f4f6; color: #111b30; }
+    .drawer__close:hover { background: #F7F8FA; color: #111b30; }
     .drawer__body {
       flex: 1;
       overflow-y: auto;
@@ -121,8 +121,8 @@ import { SkillRelease } from '../../models/skill.model';
     }
     .release-item {
       padding: 18px;
-      border: 1px solid #e5e7eb;
-      border-radius: 10px;
+      border: 1px solid #E8E9ED;
+      border-radius: 8px;
       background: #fafafa;
     }
     .release-item__header {
@@ -142,13 +142,13 @@ import { SkillRelease } from '../../models/skill.model';
     }
     .release-item__meta {
       font-size: 12px;
-      color: #9ca3af;
+      color: #657A9B;
       display: flex;
       gap: 4px;
     }
     .release-item__body {
       font-size: 13px;
-      color: #374151;
+      color: #3E5170;
       line-height: 1.6;
       margin-bottom: 12px;
     }
@@ -168,13 +168,13 @@ import { SkillRelease } from '../../models/skill.model';
     .release-item__body :global(code) {
       font-family: 'Courier New', monospace;
       font-size: 12px;
-      background: #f1f2f4;
+      background: #E8E9ED;
       padding: 2px 5px;
       border-radius: 4px;
     }
     .release-item__link {
       font-size: 12px;
-      color: #DD7244;
+      color: #2E3C59;
       text-decoration: none;
       font-weight: 500;
     }
@@ -183,7 +183,7 @@ import { SkillRelease } from '../../models/skill.model';
       display: inline-flex;
       align-items: center;
       padding: 2px 10px;
-      border-radius: 20px;
+      border-radius: 4px;
       font-size: 11px;
       font-weight: 500;
     }
@@ -195,7 +195,7 @@ import { SkillRelease } from '../../models/skill.model';
     .empty {
       text-align: center;
       padding: 40px;
-      color: #9ca3af;
+      color: #657A9B;
       font-size: 14px;
     }
   `]

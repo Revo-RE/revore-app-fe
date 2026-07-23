@@ -49,11 +49,11 @@
         #pass
       />
       <button
-        class="btn-oninput"
+        class="action-link form__toggle-pass"
         type="button"
         (click)="seePassword(!passHidden, pass)"
       >
-        <img src="/assets/icons/eye-slash.svg" alt="Eye" />
+        {{ passHidden ? 'Mostrar' : 'Ocultar' }}
       </button>
     </div>
     @if (formAccount.get('password')?.touched && formAccount.get('password')?.errors ) {
@@ -72,13 +72,7 @@
     }
     <button class="form__submit">
       Ingresar @if(isLoading){
-      <img
-        class="loading-icon"
-        src="/assets/icons/loading.svg"
-        alt="Cargando"
-      />
-      }@else {
-      <img src="/assets/icons/login.svg" alt="Icono Login" />
+        <span class="spinner spinner-light"></span>
       }
     </button>
     @if (errorMessage) {
@@ -89,13 +83,5 @@
     ¿Ya tienes una cuenta?
     <a class="outro__link" routerLink="/login">Ingresa ahora</a>
   </p>
-  <!-- <div class="login__separator">
-    <div class="separator__line"></div>
-    <span class="separator__text">O continuar con</span>
-  </div>
-  <button class="login__google">
-    <img src="/assets/icons/google.svg" alt="Icono Login" />
-    Ingresa con Google
-  </button> -->
 </div>
 <app-toast [data]="toastData"></app-toast>

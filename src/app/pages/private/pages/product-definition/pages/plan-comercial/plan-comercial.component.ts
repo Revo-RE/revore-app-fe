@@ -89,7 +89,7 @@ const CANALES = [
 
         <h3>{{ form.value.is_launch ? '3' : '2' }} · ¿De dónde saldrán las ventas?
           <span class="sum" [class.bad]="distSum() !== 100">
-            {{ distSum() === 100 ? '✓ suma 100%' : 'debe sumar 100% (va en ' + distSum() + '%)' }}
+            {{ distSum() === 100 ? 'suma 100%' : 'debe sumar 100% (va en ' + distSum() + '%)' }}
           </span>
         </h3>
         <div class="grid" formGroupName="dist">
@@ -105,15 +105,15 @@ const CANALES = [
           <span class="sum">de cada lead pagado, ¿cuántos avanzan?</span>
         </h3>
         <div class="grid" formGroupName="funnel">
-          <label>Lead → visita (%)
+          <label>Lead a visita (%)
             <input type="number" formControlName="conv_lead_visita" min="0.1" max="100" step="0.1" />
             <span class="hint">Default 5%: 1 de cada 20 leads agenda visita</span>
           </label>
-          <label>Visita → apartado (%)
+          <label>Visita a apartado (%)
             <input type="number" formControlName="conv_visita_apartado" min="0.1" max="100" step="0.1" />
             <span class="hint">Default 12.5%: 1 apartado cada 8 visitas</span>
           </label>
-          <label>Apartado → firma (%)
+          <label>Apartado a firma (%)
             <input type="number" formControlName="conv_apartado_firma" min="1" max="100" />
             <span class="hint">Default 80%: 4 de cada 5 apartados firman</span>
           </label>
@@ -125,7 +125,7 @@ const CANALES = [
 
         <h3>{{ form.value.is_launch ? '5' : '4' }} · Estacionalidad
           <span class="sum" [class.bad]="seasonDesbalance()">
-            {{ seasonDesbalance() ? 'año no neutro: suma ' + seasonSum() : '✓ año neutro (suma 12.0)' }}
+            {{ seasonDesbalance() ? 'año no neutro: suma ' + seasonSum() : 'año neutro (suma 12.0)' }}
           </span>
         </h3>
         <p class="section-hint">No todos los meses venden igual. 1.0 = mes normal, 1.2 = mes fuerte (+20%),
@@ -158,7 +158,7 @@ const CANALES = [
           <h3>
             Tu plan · {{ p.plan_period }}
             <span class="pill {{ p.semaforo }}">
-              {{ p.semaforo === 'verde' ? '✓ Plan viable' : p.semaforo === 'amarillo' ? 'Viable, con costo alto' : '✗ No viable así' }}
+              {{ p.semaforo === 'verde' ? 'Plan viable' : p.semaforo === 'amarillo' ? 'Viable, con costo alto' : 'No viable así' }}
             </span>
           </h3>
           <p class="section-hint">De cada $100 que vendas, <strong>\${{ (p.ratio * 100).toFixed(2) }}</strong>
@@ -166,11 +166,11 @@ const CANALES = [
 
           <div class="chain">
             <div class="step"><span>{{ p.leads_necesarios | number }}</span>leads<em>comprados con pauta</em></div>
-            <div class="arrow">→</div>
+            <div class="arrow" aria-hidden="true"></div>
             <div class="step"><span>{{ p.visitas_necesarias | number }}</span>visitas<em>al proyecto</em></div>
-            <div class="arrow">→</div>
+            <div class="arrow" aria-hidden="true"></div>
             <div class="step"><span>{{ p.apartados_necesarios | number:'1.0-1' }}</span>apartados</div>
-            <div class="arrow">→</div>
+            <div class="arrow" aria-hidden="true"></div>
             <div class="step hl"><span>{{ p.ventas_digital | number:'1.0-1' }}</span>ventas digitales<em>cada mes</em></div>
           </div>
 
@@ -213,12 +213,12 @@ const CANALES = [
   styles: [`
     .content { padding: 20px; max-width: 980px; margin: 0 auto; text-align: left; }
     .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; margin-bottom: 16px; }
-    .breadcrumb__back { display: inline-flex; align-items: center; gap: 6px; color: #DD7244; text-decoration: none;
-      font-weight: 600; font-size: 13px; padding: 5px 10px 5px 8px; border-radius: 6px; border: 1.5px solid #f5c6a8;
-      background: #fff8f5; transition: background 0.15s ease, border-color 0.15s ease; }
-    .breadcrumb__back:hover { background: #FEF0E7; border-color: #DD7244; }
-    .breadcrumb__sep { color: #d1d5db; }
-    .breadcrumb__current { color: #6b7280; font-size: 13px; }
+    .breadcrumb__back { display: inline-flex; align-items: center; gap: 6px; color: #2E3C59; text-decoration: none;
+      font-weight: 600; font-size: 13px; padding: 5px 10px 5px 8px; border-radius: 4px; border: 1.5px solid #D5D5DD;
+      background: #fff; transition: background 0.15s ease, border-color 0.15s ease; }
+    .breadcrumb__back:hover { background: #F7F8FA; border-color: #2E3C59; }
+    .breadcrumb__sep { color: #D5D5DD; }
+    .breadcrumb__current { color: #657A9B; font-size: 13px; }
     .intro { color: #657A9B; font-size: 13.5px; margin: 0 0 16px; max-width: 640px; }
     .card { background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,.1); padding: 24px; margin-bottom: 20px; }
     h3 { color: #2E3C59; margin: 22px 0 8px; font-size: 15px; }
@@ -230,14 +230,14 @@ const CANALES = [
     label.check { flex-direction: row; align-items: center; gap: 8px; margin-top: 18px; }
     .hint { font-weight: 400; color: #98A5BA; font-size: 11.5px; line-height: 1.4; }
     .hint.block { display: block; margin-top: 8px; }
-    input, select { padding: 8px 10px; border: 1px solid #D5D5DD; border-radius: 6px; font-size: 14px; color: #2E3C59; font-weight: 400; }
+    input, select { padding: 8px 10px; border: 1px solid #D5D5DD; border-radius: 4px; font-size: 14px; color: #2E3C59; font-weight: 400; }
     .sum { font-weight: normal; font-size: 12px; color: #1e8e3e; margin-left: 6px; }
     .sum.bad { color: #c0392b; font-weight: 600; }
     .actions { margin-top: 18px; }
-    button { background: #2E3C59; color: #fff; border: 0; border-radius: 6px; padding: 11px 24px; font-size: 14px; cursor: pointer; }
+    button { background: #2E3C59; color: #fff; border: 0; border-radius: 4px; padding: 11px 24px; font-size: 14px; cursor: pointer; }
     button:disabled { opacity: .5; cursor: not-allowed; }
     .error { color: #c0392b; margin-top: 10px; font-size: 13px; }
-    .pill { font-size: 12px; padding: 4px 12px; border-radius: 12px; margin-left: 8px; font-weight: 600; }
+    .pill { font-size: 12px; padding: 4px 12px; border-radius: 4px; margin-left: 8px; font-weight: 600; }
     .pill.verde { background: #e8f5e9; color: #1e8e3e; }
     .pill.amarillo { background: #fef7e0; color: #b9770e; }
     .pill.rojo { background: #fdecea; color: #c0392b; }
@@ -248,12 +248,12 @@ const CANALES = [
     .chain .step.hl { background: #2E3C59; }
     .chain .step.hl, .chain .step.hl span { color: #fff; }
     .chain .step.hl em { color: #B9C3D6; }
-    .chain .arrow { align-self: center; color: #98A5BA; font-size: 18px; }
+    .chain .arrow { align-self: center; width: 14px; height: 1px; background: #98A5BA; }
     .kpis { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; margin: 12px 0; }
     .kpis div { background: #F7F8FA; border-radius: 8px; padding: 12px 14px; font-size: 12px; color: #657A9B; display: flex; flex-direction: column; gap: 2px; }
     .kpis span { font-size: 18px; font-weight: 700; color: #2E3C59; }
     .kpis em { font-style: normal; font-size: 10.5px; color: #98A5BA; }
-    .callout { background: #fef7e0; border-left: 3px solid #DD7244; border-radius: 6px; padding: 14px 16px; margin: 14px 0; }
+    .callout { background: #F7F8FA; border-left: 3px solid #DD7244; border-radius: 6px; padding: 14px 16px; margin: 14px 0; }
     .callout strong { color: #2E3C59; font-size: 13px; display: block; margin-bottom: 6px; }
     .callout p { color: #6b5b2f; font-size: 13px; line-height: 1.55; margin: 6px 0 0; }
   `],

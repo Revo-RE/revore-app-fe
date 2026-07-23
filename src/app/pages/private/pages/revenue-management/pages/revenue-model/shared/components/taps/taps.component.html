@@ -8,9 +8,6 @@
     class="tabs__button"
     (click)="navigate(tab.link)"
   >
-    @if (tab.icon && tab.icon != '') {
-    <img [src]="'/assets/icons/' + tab.icon" [alt]="tab.name" />
-    }
     {{ tab.name }}
   </button>
   }

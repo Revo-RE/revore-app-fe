@@ -12,18 +12,9 @@
           }"
           [routerLink]="item.link"
         >
-          <img
-            class="icon"
-            [src]="'/assets/icons/' + item.icon"
-            [alt]="item.name"
-          />
-          <span>{{ item.name }}</span>
+          <span class="menu__label">{{ item.name }}</span>
           @if (item?.children?.length > 0) {
-          <img
-            class="arrow"
-            src="/assets/icons/arrow-right.svg"
-            alt="Flecha Ir"
-          />
+          <span class="menu__expand" aria-hidden="true"></span>
           }
         </a>
         @if (item?.children?.length > 0) {
@@ -39,13 +30,9 @@
               }"
               [routerLink]="subItem.link"
             >
-              <span>{{ subItem.name }}</span>
+              <span class="menu__label">{{ subItem.name }}</span>
               @if (subItem?.children?.length > 0) {
-              <img
-                class="arrow"
-                src="/assets/icons/arrow-right.svg"
-                alt="Flecha Ir"
-              />
+              <span class="menu__expand" aria-hidden="true"></span>
               }
             </a>
             @if (subItem?.children?.length > 0) {
@@ -78,7 +65,7 @@
       <div class="menu__user-avatar">{{ userInitials }}</div>
       <span class="menu__user-email">{{ userEmail || userName }}</span>
       <button class="menu__logout" (click)="closeSession()" title="Cerrar sesión">
-        <img src="/assets/icons/logout.svg" alt="Cerrar Sesión" />
+        Salir
       </button>
     </div>
     <img

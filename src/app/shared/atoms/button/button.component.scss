@@ -2,17 +2,33 @@
 .buttonatom {
     @include primaryButton();
     & {
-        font-family: "g-semi", sans-serif;
+        font-family: "Inter", sans-serif;
         font-size: 13px;
-        font-weight: 400;
+        font-weight: 500;
         line-height: 14px;
-        padding: 10px 14px;
+        padding: 10px 16px;
         width: fit-content;
     }
 
-    & img {
-        height: 17px;
-        width: 17px;
-        filter: brightness(0) invert(1);
+    &__spinner {
+        animation: buttonatom-spin 0.7s linear infinite;
+        border: 2px solid rgba(255, 255, 255, 0.35);
+        border-radius: 50%;
+        border-top-color: #fff;
+        box-sizing: border-box;
+        display: inline-block;
+        height: 14px;
+        width: 14px;
+    }
+
+    &-light &__spinner {
+        border-color: rgba(17, 27, 48, 0.2);
+        border-top-color: #111B30;
+    }
+}
+
+@keyframes buttonatom-spin {
+    to {
+        transform: rotate(360deg);
     }
 }

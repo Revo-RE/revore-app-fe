@@ -42,26 +42,26 @@ export class HorizontalLinesComponent {
         slantedText: false,
         textStyle: {
           fontSize: 10,
-          color: '#58637A',
+          color: '#3E5170',
         },
       },
       chartArea: { left: 50, top: 10, width: '100%', height: '250' },
       tooltip: {
-        color: '#58637A',
+        color: '#3E5170',
         fontSize: 10,
       },
       
-      colors: ['#E48E69', '#B15B36','#2E3C59', '#828A9B'],
+      colors: ['#E59470', '#B55A34','#2E3C59', '#657A9B'],
       hAxis: {
         textStyle: {
           fontSize: 10,
-          color: '#58637A',
+          color: '#3E5170',
         },
       },
       vAxis: {
         textStyle: {
           fontSize: 10,
-          color: '#58637A',
+          color: '#3E5170',
           
         },
       },
