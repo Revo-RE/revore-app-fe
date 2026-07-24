@@ -2,7 +2,7 @@
 
   <header class="inv__header">
     <p class="inv__eyebrow">Revenue Management</p>
-    <h1 class="inv__title">Inventory Management</h1>
+    <h1 class="inv__title">Registrar Operaciones</h1>
     <p class="inv__subtitle">Registra apartados, ventas, rentas y cancelaciones sobre el inventario</p>
   </header>
 
@@ -39,13 +39,25 @@
         </select>
       </div>
 
+      @if (availableStages.length > 0) {
+        <div class="fld">
+          <label class="fld__label">Fase / Torre <span class="fld__label-hint">(filtro extra — útil cuando hay unidades con el mismo número en distintas torres)</span></label>
+          <select class="fld__control" [(ngModel)]="stage_filter" (ngModelChange)="onStageFilterChange()" [disabled]="!project_id || loadingUnits()">
+            <option value="">Todas las fases</option>
+            @for (s of availableStages; track s) {
+              <option [value]="s">{{ s }}</option>
+            }
+          </select>
+        </div>
+      }
+
       <div class="fld">
         <label class="fld__label">Unidad</label>
         <select class="fld__control" [(ngModel)]="unit_id" (ngModelChange)="onUnitChange()" [disabled]="!project_id || loadingUnits()">
           <option value="" disabled>
             {{ !project_id ? 'Primero elige proyecto' : (loadingUnits() ? 'Cargando unidades…' : 'Selecciona una unidad') }}
           </option>
-          @for (u of units(); track u.id) {
+          @for (u of filteredUnits; track u.id) {
             <option [value]="u.id">{{ unitLabel(u) }}</option>
           }
         </select>
@@ -136,7 +148,7 @@
                 <tr>
                   <td>{{ op.fecha | date:'dd/MM/yy' }}</td>
                   <td class="inv-table__main">{{ op.project_name || '—' }}</td>
-                  <td>{{ op.unit_number || '—' }}</td>
+                  <td>{{ op.unit_number || '—' }}{{ op.unit_stage ? ' · ' + op.unit_stage : '' }}</td>
                   <td>{{ op.negocio ? negocioLabels[op.negocio] : (typeLabels[op.type] || '—') }}</td>
                   <td><span class="st" [ngClass]="statusClass(op.operacion === 'cierre' ? op.type : op.operacion)">{{ op.operacion ? operacionLabels[op.operacion] : '—' }}</span></td>
                   <td class="num">{{ op.amount != null ? (op.amount | currency:'MXN':'symbol-narrow':'1.0-0') : '—' }}</td>

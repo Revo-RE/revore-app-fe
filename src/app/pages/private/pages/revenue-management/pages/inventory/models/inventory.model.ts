@@ -78,6 +78,9 @@ export interface CatalogUnit {
   status: string | null;
   price: number | null;
   project_id: string;
+  /** Fase / etapa / torre de la unidad (ej. "Torre 1"). Distingue unidades
+   * con el mismo número en distintas fases del mismo proyecto. */
+  stage?: string | null;
 }
 
 /** Unidad completa para la tabla estilo lista de precios */
@@ -117,6 +120,7 @@ export interface InventoryOperation {
   project_name: string | null;
   unit_id: string;
   unit_number: string | null;
+  unit_stage: string | null;
   typology: string | null;
   unit_status: string | null;
   advisor_id: string | null;

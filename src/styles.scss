@@ -5,3 +5,42 @@
 @use "components" as *;
 @use "tools" as *;
 @use "prime_resets" as *;
+
+/* ── Fix panel del p-multiSelect (PrimeNG 20) ──────────────────────────────
+   El reset del proyecto no estiliza el overlay del multiselect, por lo que
+   salía transparente y encimado sobre el formulario (ej. modal "Ajuste de
+   precios 1"). Se le da fondo, borde, sombra y z-index para que flote sobre
+   el diálogo. Usa las clases de PrimeNG v20 (.p-multiselect-overlay/list/option). */
+.p-multiselect-overlay {
+  background: #ffffff;
+  border: 1px solid #e1e4ea;
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(17, 27, 48, 0.18);
+  z-index: 12000 !important;
+  overflow: hidden;
+}
+.p-multiselect-overlay .p-multiselect-list {
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  max-height: 260px;
+  overflow-y: auto;
+}
+.p-multiselect-overlay .p-multiselect-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  border-radius: 6px;
+  color: #2e3c59;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.p-multiselect-overlay .p-multiselect-option:hover {
+  background: #f5f6f8;
+}
+.p-multiselect-overlay .p-multiselect-option.p-multiselect-option-selected,
+.p-multiselect-overlay .p-multiselect-option[aria-selected="true"] {
+  background: #eef2f8;
+  color: #2e3c59;
+}

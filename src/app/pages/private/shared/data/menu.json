@@ -7,6 +7,29 @@
     "children": []
   },
   {
+    "name": "Inventory Management",
+    "icon": "diagram.svg",
+    "link": "/dashboard/revenue-management",
+    "active": true,
+    "children": [
+      {
+        "name": "Resumen de Inventario",
+        "link": "/dashboard/revenue-management/dashboard",
+        "active": true
+      },
+      {
+        "name": "Registrar Operaciones",
+        "link": "/dashboard/revenue-management/inventory",
+        "active": true
+      },
+      {
+        "name": "Modelo de Revenue",
+        "link": "/dashboard/revenue-management/revenue-model/finantial/price-list",
+        "active": true
+      }
+    ]
+  },
+  {
     "name": "Sales Tools",
     "icon": "moneys.svg",
     "link": "/dashboard/sales-tools",

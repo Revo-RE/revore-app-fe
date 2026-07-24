@@ -82,6 +82,15 @@ export class GenerarComponent implements OnInit {
         return !!this.selectedReportType && /c-?level/i.test(this.selectedReportType.name);
     }
 
+    /**
+     * El reporte de Inventario se genera por proyecto individual: el usuario
+     * elige desarrollo + proyecto (obligatorio). Siempre usa sub-proyectos,
+     * nunca grupos de líder/agencia.
+     */
+    get isInventoryType(): boolean {
+        return !!this.selectedReportType && /inventario/i.test(this.selectedReportType.name);
+    }
+
     /** Developers visibles en el dropdown. */
     get visibleDevelopers(): DbDeveloper[] {
         return this.developers;
@@ -195,6 +204,13 @@ export class GenerarComponent implements OnInit {
         // así que no se elige proyecto/grupo.
         if (this.isCLevelType) return;
         this.loadingRelated = true;
+        // El Inventario es por proyecto individual: siempre sub-proyectos,
+        // nunca grupos de líder/agencia.
+        if (this.isInventoryType) {
+            this.subProjects = await this.svc.getSubProjects(developerId);
+            this.loadingRelated = false;
+            return;
+        }
         const groups = await this.svc.getDeveloperGroups(developerId, this.selectedService ?? undefined);
         if (groups.length > 0) {
             this.developerGroups = groups;
@@ -218,7 +234,8 @@ export class GenerarComponent implements OnInit {
         const types = await this.svc.getReportTypes(this.selectedService);
         const base = types.length > 0 ? types : FALLBACK_TYPES;
         const hasDiario = base.some(t => t.name.toLowerCase().includes('diario'));
-        if (!hasDiario && this.selectedService !== 'marketing') {
+        // Revenue Management no lleva reporte diario sintético (solo Inventario).
+        if (!hasDiario && this.selectedService !== 'marketing' && this.selectedService !== 'revenue_management') {
             const label = SERVICE_LABELS[this.selectedService];
             const syntheticId = `diario-${this.selectedService}`;
             const diario: DbReportType = {
@@ -259,8 +276,11 @@ export class GenerarComponent implements OnInit {
         if (this.step === 3) return this.selectedModalidad !== null;
         if (this.step === 4) {
             const devOk = !!this.form.get('developer_id')!.value;
-            if (this.selectedModalidad === 'on_demand') return devOk;
-            return devOk && this.form.get('a_las')!.value != null;
+            // El Inventario exige proyecto específico (se genera por proyecto).
+            const projectOk = !this.isInventoryType || !!this.form.get('sub_project_id')!.value;
+            const baseOk = devOk && projectOk;
+            if (this.selectedModalidad === 'on_demand') return baseOk;
+            return baseOk && this.form.get('a_las')!.value != null;
         }
         return false;
     }

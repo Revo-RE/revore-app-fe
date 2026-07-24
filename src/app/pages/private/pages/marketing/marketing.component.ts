@@ -38,12 +38,15 @@ import { IHeader } from '@private/shared/interfaces/header.interface';
 export class MarketingComponent {
 	headerData: IHeader = { title: 'Marketing', margin_top: '45px' };
 
-	readonly atelierUrl = 'assets/atelier/index.html';
+	readonly atelierUrl: string;
 	readonly safeAtelierUrl: SafeResourceUrl;
 
 	constructor(sanitizer: DomSanitizer) {
-		// Pasa la URL del backend al Atelier para que jale desarrolladores/proyectos de la base
+		// Pasa la URL del backend al Atelier para que jale desarrolladores/proyectos de la base.
+		// Se usa tanto en el iframe incrustado como en el link "Abrir en pantalla completa",
+		// para que los desarrolladores carguen en ambos casos.
 		const api = encodeURIComponent(environment.revore.backendUrl);
-		this.safeAtelierUrl = sanitizer.bypassSecurityTrustResourceUrl(`${this.atelierUrl}?api=${api}`);
+		this.atelierUrl = `assets/atelier/index.html?api=${api}`;
+		this.safeAtelierUrl = sanitizer.bypassSecurityTrustResourceUrl(this.atelierUrl);
 	}
 }

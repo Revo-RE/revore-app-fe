@@ -41,6 +41,7 @@ export class InventoryComponent implements OnInit {
   // ── Selección de contexto ──
   developer_id = '';
   project_id = '';
+  stage_filter = '';
   unit_id = '';
 
   // ── Formulario ──
@@ -91,8 +92,26 @@ export class InventoryComponent implements OnInit {
     return this.units().find(u => u.id === this.unit_id) ?? null;
   }
 
+  /** Fases/torres distintas presentes en las unidades del proyecto (para el filtro). */
+  get availableStages(): string[] {
+    const stages = new Set<string>();
+    for (const u of this.units()) {
+      const s = (u.stage || '').trim();
+      if (s) stages.add(s);
+    }
+    return Array.from(stages).sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+  }
+
+  /** Unidades a listar en el selector, filtradas por fase si hay una elegida.
+   * Existe para desambiguar unidades con el mismo número en distintas torres/fases. */
+  get filteredUnits(): UnitRow[] {
+    if (!this.stage_filter) return this.units();
+    return this.units().filter(u => (u.stage || '') === this.stage_filter);
+  }
+
   unitLabel(u: UnitRow): string {
     const parts = [u.unit_number || 'S/N'];
+    if (u.stage) parts.push(u.stage);
     if (u.typology) parts.push(u.typology);
     if (u.status) parts.push(u.status);
     return parts.join(' · ');
@@ -108,13 +127,22 @@ export class InventoryComponent implements OnInit {
 
   onDeveloperChange(): void {
     this.project_id = '';
+    this.stage_filter = '';
     this.unit_id = '';
     this.units.set([]);
   }
 
   onProjectChange(): void {
+    this.stage_filter = '';
     this.unit_id = '';
     this.loadUnits();
+  }
+
+  onStageFilterChange(): void {
+    // Si la unidad elegida ya no aplica al filtrar por fase, se limpia.
+    if (this.unit_id && !this.filteredUnits.some(u => u.id === this.unit_id)) {
+      this.unit_id = '';
+    }
   }
 
   onUnitChange(): void {
@@ -165,6 +193,7 @@ export class InventoryComponent implements OnInit {
   resetForm(): void {
     this.developer_id = '';
     this.project_id = '';
+    this.stage_filter = '';
     this.unit_id = '';
     this.units.set([]);
     this.form = {

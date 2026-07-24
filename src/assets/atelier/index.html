@@ -107,6 +107,7 @@ repeating-conic-gradient(#EDEFF3 0 25%,#F7F8FA 0 50%) 0 0/28px 28px}
 #bwrap{flex:1;display:flex;flex-direction:column;overflow:hidden}
 #bfiltros{padding:16px 26px;border-bottom:1px solid var(--line);display:flex;gap:22px;flex-wrap:wrap;align-items:center;flex:none;background:#fff}
 #bfiltros .grupo{display:flex;gap:6px;align-items:center}
+#bfiltros .grupo-db{display:flex;gap:6px;align-items:center}
 #bfiltros .glbl{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--soft)}
 #bgal{flex:1;overflow-y:auto;padding:20px 26px;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));grid-auto-rows:min-content;align-items:start;gap:16px;align-content:start;background:#F1F2F5}
 .thumb{aspect-ratio:1/1;background:#EDEFF3;cursor:pointer;position:relative;overflow:hidden;border-radius:6px;box-shadow:0 1px 4px rgba(17,27,48,.20),0 0 0 1px rgba(17,27,48,.07);transition:transform .12s ease,box-shadow .12s ease}
@@ -114,6 +115,11 @@ repeating-conic-gradient(#EDEFF3 0 25%,#F7F8FA 0 50%) 0 0/28px 28px}
 .thumb img{width:100%;height:100%;object-fit:cover;display:block;border-radius:6px}
 .thumb .tag{position:absolute;bottom:0;left:0;right:0;font-size:9px;padding:3px 6px;background:rgba(17,27,48,.82);color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .thumb .gold{position:absolute;top:6px;right:6px;width:10px;height:10px;border-radius:50%;background:var(--acc)}
+.thumb-del{position:absolute;top:6px;right:6px;width:26px;height:26px;border-radius:50%;border:1px solid rgba(17,27,48,.12);
+  background:rgba(241,242,245,.96);color:#2E3C59;font-size:13px;cursor:pointer;display:none;align-items:center;justify-content:center;z-index:2;
+  box-shadow:0 1px 4px rgba(17,27,48,.25)}
+.thumb:hover .thumb-del{display:flex}
+.thumb-del:hover{background:#fff;color:#B3261E;border-color:#B3261E}
 #bcount{margin-left:auto;color:var(--soft);font-size:12px}
 
 /* modal */
@@ -221,6 +227,8 @@ background:repeating-conic-gradient(#EDEFF3 0 25%,#F7F8FA 0 50%) 0 0/28px 28px}
     <div class="lbl">Fotografía</div>
     <div id="drop">Arrastra aquí una foto desde Finder<br>(o haz clic para elegirla)</div>
     <input type="file" id="fileIn" accept="image/*" hidden>
+    <button type="button" class="btn sec" id="btnFotoBanco" style="margin-top:6px;font-size:12px;padding:8px 12px;width:100%">📁 Elegir del Banco de fotos</button>
+    <div class="hint">Puedes cargar la foto <b>desde tu computadora</b> (arriba) o <b>desde el Banco de fotos</b> del desarrollador — las dos formas funcionan igual.</div>
     <div class="lbl">Encuadre <span style="text-transform:none;letter-spacing:0">· o arrastra la foto sobre la pieza</span></div>
     <div class="row2"><input type="range" id="fx" min="0" max="100" value="50" title="horizontal">
     <input type="range" id="fy" min="0" max="100" value="50" title="vertical"></div>
@@ -282,9 +290,24 @@ background:repeating-conic-gradient(#EDEFF3 0 25%,#F7F8FA 0 50%) 0 0/28px 28px}
       <button id="tgPattern">Pattern</button>
       <button id="tgCentro">Centrar texto</button>
     </div>
+    <div class="lbl">Logo del desarrollador <span id="devLogoNombre" style="text-transform:none;letter-spacing:0;color:var(--soft)"></span></div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+      <div style="width:40px;height:40px;border-radius:8px;background:#EDEFF3;display:flex;align-items:center;justify-content:center;overflow:hidden;flex:none">
+        <img id="devLogoImgTag" style="max-width:100%;max-height:100%;display:none">
+        <span id="devLogoEmpty" style="font-size:8.5px;color:var(--soft);text-align:center;padding:2px;line-height:1.2">sin logo</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px;flex:1">
+        <button type="button" class="btn sec" id="devLogoUp" style="font-size:11px;padding:6px 10px">Subir logo</button>
+        <button type="button" class="btn sec" id="devLogoRm" style="font-size:11px;padding:6px 10px;display:none">✕ Quitar logo</button>
+        <button type="button" class="btn sec" id="devLogoRestore" style="font-size:11px;padding:6px 10px;display:none">↺ Usar el de referencia</button>
+      </div>
+      <input type="file" id="devLogoIn" accept="image/png,image/svg+xml,image/webp" hidden>
+    </div>
+    <div class="hint">Este es el logo por defecto de este desarrollador en <b>todas sus piezas</b> — se puede reemplazar o quitar (aplica también a Gran Ciudad). Se guarda en este navegador.</div>
+
     <div class="lbl">Logo de la pieza</div>
     <div id="logoDrop" style="border:1.5px dashed var(--line);padding:10px;text-align:center;color:var(--soft);cursor:pointer;font-size:11.5px">
-      Subir logo PNG de la sede (clic o arrastrar)<br>· vacío = monograma GC automático ·</div>
+      Subir logo PNG (clic o arrastrar)<br>· vacío = logo del desarrollador, o ninguno ·</div>
     <input type="file" id="logoIn" accept="image/png,image/svg+xml,image/webp" hidden>
     <div class="seg" style="margin-top:6px"><button id="logoClear" style="display:none">✕ Quitar logo subido</button></div>
     <div class="lbl">Posición del logo</div>
@@ -465,8 +488,12 @@ let ORO = {
    por defecto y su nombre visible. El desarrollador activo alimenta SEDES/ORO.
    Para agregar uno nuevo: copia el bloque y llena proyectos/copys/logo. */
 const DEVELOPERS = {
-  granciudad:{ nombre:"Gran Ciudad", logo:"assets/monogram_cream.png",
-               proyectos:SEDES, copys:ORO },
+  granciudad:{ nombre:"Gran Ciudad", logo:"assets/monogram_cream.png", logoDark:"assets/monogram_midnight.png",
+               proyectos:SEDES, copys:ORO,
+               /* Su Banco de fotos vive en Supabase Storage como el de cualquier otro
+                  desarrollador (id real en la tabla developers) — mismo flujo de
+                  subir/eliminar. Los Proyectos/Copys/logo de arriba siguen curados. */
+               photosDevId:"33d309ab-9fb1-4784-b9ca-64c8fcdc3d16" },
   /* Ejemplo para agregar otro desarrollador (descomenta y completa):
   otrodesarrollador:{ nombre:"Nombre Desarrollador", logo:"assets/tu_logo.png",
     proyectos:{
@@ -477,13 +504,48 @@ const DEVELOPERS = {
   */
 };
 let DEV = "granciudad";
+/* Logo por defecto del desarrollador activo (independiente del logo que el usuario
+   suba a mano por pieza en S.logoImg). Si el desarrollador no tiene logo configurado
+   (ej. desarrolladores que vienen de la base, sin logo aún), queda en null y la
+   pieza sale sin logo — el usuario puede subir uno o dejarla así.
+   Cada desarrollador puede además tener un logo "override" guardado en este navegador
+   (localStorage), que reemplaza o elimina el logo de referencia definido en DEVELOPERS
+   sin tocar el código: {data:"data:image/png;base64,...",name} para uno subido,
+   {removed:true} para dejarlo sin logo aunque el desarrollador sí traiga uno de fábrica. */
+let devLogoLight=null, devLogoDark=null;
+function devLogoKey(id){ return "atelier_dev_logo_"+id; }
+function getDevLogoOverride(id){ try{ return JSON.parse(localStorage.getItem(devLogoKey(id))||"null"); }catch(_){ return null; } }
+function setDevLogoOverride(id,val){ try{ val===null ? localStorage.removeItem(devLogoKey(id)) : localStorage.setItem(devLogoKey(id),JSON.stringify(val)); }catch(_){} }
+async function loadDevLogos(d){
+  const ov = getDevLogoOverride(DEV);
+  if(ov && ov.removed){ devLogoLight=null; devLogoDark=null; return; }
+  if(ov && ov.data){ const img=await loadImg(ov.data); devLogoLight=img; devLogoDark=img; return; }
+  devLogoLight = d && d.logo ? await loadImg(d.logo) : null;
+  devLogoDark = d && d.logoDark ? await loadImg(d.logoDark) : devLogoLight;
+}
+function syncHeaderLogos(){
+  const hl=document.getElementById("hdrLogo");
+  const ph=document.querySelector("#phead img");
+  if(devLogoLight){ if(hl){ hl.src=devLogoLight.src; hl.style.visibility=""; } if(ph){ ph.src=devLogoLight.src; ph.style.visibility=""; } }
+  else{ if(hl){ hl.removeAttribute("src"); hl.style.visibility="hidden"; }
+        if(ph){ ph.removeAttribute("src"); ph.style.visibility="hidden"; } }
+}
+function refreshDevLogoUI(){
+  const d = DEVELOPERS[DEV]; const ov = getDevLogoOverride(DEV);
+  const nm=document.getElementById("devLogoNombre"); if(nm) nm.textContent = d ? d.nombre : "";
+  const img=document.getElementById("devLogoImgTag"), empty=document.getElementById("devLogoEmpty");
+  const rm=document.getElementById("devLogoRm"), rs=document.getElementById("devLogoRestore");
+  if(devLogoLight){ img.src=devLogoLight.src; img.style.display="block"; if(empty)empty.style.display="none"; }
+  else{ img.style.display="none"; if(empty)empty.style.display="block"; }
+  if(rm) rm.style.display = devLogoLight ? "inline-block" : "none";
+  if(rs) rs.style.display = (!devLogoLight && d && d.logo && ov && ov.removed) ? "inline-block" : "none";
+}
 function setDev(id){
   const d = DEVELOPERS[id]; if(!d) return;
   DEV = id; SEDES = d.proyectos; ORO = d.copys;
   const dev = document.getElementById("hdrDev"); if(dev) dev.textContent = d.nombre;
-  if(d.logo){ const hl=document.getElementById("hdrLogo"); if(hl) hl.src=d.logo;
-    const ph=document.querySelector("#phead img"); if(ph) ph.src=d.logo; }
   S.sede = Object.keys(SEDES)[0];
+  loadDevLogos(d).then(()=>{ syncHeaderLogos(); refreshDevLogoUI(); if(typeof render==="function") render(); });
   if(typeof validaTipo==="function") validaTipo();
   if(typeof pintaCtl==="function") pintaCtl();
   if(typeof pintaVoz==="function") pintaVoz();
@@ -686,8 +748,38 @@ async function cargaLogo(f){ if(!f) return;
   $("#logoClear").style.display="inline-block";
   if(!S.logo){S.logo=true;$("#tgLogo").classList.add("on");} render(); }
 $("#logoClear").onclick=()=>{ S.logoImg=null; S.logoName=null; $("#logoClear").style.display="none";
-  logoDrop.innerHTML="Subir logo PNG de la sede (clic o arrastrar)<br>· vacío = monograma GC automático ·";
+  logoDrop.innerHTML="Subir logo PNG (clic o arrastrar)<br>· vacío = logo del desarrollador, o ninguno ·";
   logoDrop.style.borderColor="var(--line)"; render(); };
+
+/* --- Logo del desarrollador (por defecto para todas sus piezas, persistido en este navegador) --- */
+$("#devLogoUp").onclick=()=>$("#devLogoIn").click();
+$("#devLogoIn").onchange=e=>{
+  const f=e.target.files[0]; if(!f) return;
+  const reader=new FileReader();
+  reader.onload=async ()=>{
+    setDevLogoOverride(DEV,{data:reader.result,name:f.name});
+    await loadDevLogos(DEVELOPERS[DEV]);
+    syncHeaderLogos(); refreshDevLogoUI(); render();
+    toast("Logo del desarrollador actualizado");
+    e.target.value="";
+  };
+  reader.readAsDataURL(f);
+};
+$("#devLogoRm").onclick=async ()=>{
+  setDevLogoOverride(DEV,{removed:true});
+  await loadDevLogos(DEVELOPERS[DEV]);
+  syncHeaderLogos(); refreshDevLogoUI(); render();
+  toast("Logo del desarrollador eliminado");
+};
+$("#devLogoRestore").onclick=async ()=>{
+  setDevLogoOverride(DEV,null);
+  await loadDevLogos(DEVELOPERS[DEV]);
+  syncHeaderLogos(); refreshDevLogoUI(); render();
+  toast("Se restauró el logo de referencia");
+};
+/* --- Elegir foto desde el Banco (alternativa a arrastrar desde Finder) --- */
+$("#btnFotoBanco").onclick=()=>{ $('nav button[data-t="banco"]').click();
+  toast("Elige una foto y usa “Usar en el Compositor” para traerla aquí"); };
 $("#panW").oninput=e=>{const v=parseInt(e.target.value,10);S.panW=(v>=60&&v<=1920)?v:null;render();};
 $("#panH").oninput=e=>{const v=parseInt(e.target.value,10);S.panH=(v>=60&&v<=1920)?v:null;render();};
 $("#creamHex").oninput=e=>{const m=e.target.value.trim().match(/^#?([0-9a-fA-F]{6})$/);
@@ -830,9 +922,9 @@ async function render(handles=true){
     accRect={x:ax,y:ay,w:aw,h:ah};
   } else accRect=null;
 
-  if(S.logo){ // logo subido por sede, o monograma GC con contraste automático
+  if(S.logo){ // logo subido a mano para esta pieza, o el logo por defecto del desarrollador
     const oscuro = TIPOS[S.tipo].bloque ? S.panelCol!=="cream" : true;
-    const lg = S.logoImg || (oscuro?assets.monoCream:assets.monoMid);
+    const lg = S.logoImg || (oscuro?devLogoLight:devLogoDark);
     if(lg){ const lw=S.lsize*k, lh=lw*(lg.height/lg.width), mx=52*k, my=48*k;
       let lx, ly;
       if(S.logoXY){ lx=S.logoXY.x; ly=S.logoXY.y; }
@@ -1141,8 +1233,8 @@ $("#btnCheck").onclick=()=>$('nav button[data-t="check"]').click();
 /* =================== BANCO =================== */
 let bancoListo=false, bf={sede:"GCNP",ori:"",luz:"",txt:"",amen:"",gente:"",pg:0};
 const BANCO_PAGE=48;
-function isDBDev(){ return typeof DEV==="string" && DEV.startsWith("db_"); }
-function currentDevId(){ return isDBDev()? DEV.slice(3) : null; }
+function isDBDev(){ const d=DEVELOPERS[DEV]; return (d && d.photosDevId) ? true : (typeof DEV==="string" && DEV.startsWith("db_")); }
+function currentDevId(){ const d=DEVELOPERS[DEV]; if(d && d.photosDevId) return d.photosDevId; return (typeof DEV==="string" && DEV.startsWith("db_")) ? DEV.slice(3) : null; }
 function _api(){ return (new URLSearchParams(location.search).get("api")||"").replace(/\/$/,""); }
 function _token(){ try{ return JSON.parse(localStorage.getItem("revore_ss_auth")||"null")?.access_token||null; }catch(_){ return null; } }
 const AMEN_LBL={alberca:"Alberca",gym:"Gym",coworking:"Coworking",coffee:"Coffee bar",
@@ -1153,6 +1245,7 @@ function pintaBanco(){ bancoListo=true;
   // para desarrolladores cargados desde la base (su banco es libre por subida).
   document.querySelectorAll('#bfiltros .grupo').forEach(g=>{ g.style.display = dbMode ? 'none' : ''; });
   ensureUploadUI(dbMode);
+  ensureFiltrosDB(dbMode);
   if(dbMode){ cargarBancoDB(); return; }
   // --- Banco curado local (Gran Ciudad) ---
   if((window.FOTOS||[]).length && !("a" in window.FOTOS[0]))
@@ -1206,7 +1299,16 @@ function pintaPager(pages, onChange){
 /* ---- Banco por desarrollador (Supabase Storage vía backend) ---- */
 let bancoDBFotos=[];
 let bancoDBReq=0; // evita que una respuesta vieja (de otro desarrollador) pise la actual
+let bDB={txt:"",ori:""};
 const BANCO_TIMEOUT_MS = 12000; // si el backend no responde en 12s, mostramos un mensaje en vez de colgarnos
+function medirDims(url){
+  return new Promise(res=>{
+    const im=new Image();
+    im.onload=()=>res({w:im.naturalWidth,h:im.naturalHeight});
+    im.onerror=()=>res({w:0,h:0});
+    im.src=url;
+  });
+}
 async function cargarBancoDB(){
   const g=$("#bgal"); g.innerHTML='<p class="hint" style="padding:20px">Cargando fotos…</p>';
   const devId=currentDevId(), tk=_token();
@@ -1227,6 +1329,9 @@ async function cargarBancoDB(){
       return;
     }
     bancoDBFotos = await res.json();
+    if(bancoDBFotos.length){ g.innerHTML='<p class="hint" style="padding:20px">Cargando fotos… (analizando '+bancoDBFotos.length+')</p>'; }
+    await Promise.all(bancoDBFotos.map(async f=>{ const d=await medirDims(f.url); f._w=d.w; f._h=d.h; }));
+    if(myReq!==bancoDBReq) return; // pudo cambiar de desarrollador mientras medíamos
     bf.pg=0; renderBancoDB();
   }catch(e){
     clearTimeout(to);
@@ -1240,17 +1345,100 @@ async function cargarBancoDB(){
 }
 function renderBancoDB(){
   const g=$("#bgal"); g.innerHTML="";
-  const fs=bancoDBFotos, total=fs.length, pages=Math.max(1,Math.ceil(total/BANCO_PAGE));
+  let fs=bancoDBFotos;
+  if(bDB.txt) fs=fs.filter(f=>(f.file_name||"").toLowerCase().includes(bDB.txt));
+  if(bDB.ori==="h") fs=fs.filter(f=>(f._w||0)>(f._h||0)*1.05);
+  if(bDB.ori==="v") fs=fs.filter(f=>(f._h||0)>(f._w||0)*1.05);
+  const total=fs.length, pages=Math.max(1,Math.ceil(total/BANCO_PAGE));
   if(bf.pg>=pages) bf.pg=0;
   $("#bcount").textContent=total+" foto"+(total===1?"":"s")+(pages>1?" · pág. "+(bf.pg+1)+" de "+pages:"");
-  if(!total){ g.innerHTML='<p class="hint" style="padding:20px">Este desarrollador aún no tiene fotos. Usa “Subir fotos” para agregar las primeras.</p>';
+  if(!total){
+    g.innerHTML='<p class="hint" style="padding:20px">'+(bancoDBFotos.length?"Ninguna foto coincide con el filtro.":"Este desarrollador aún no tiene fotos. Usa “Subir fotos” para agregar las primeras.")+'</p>';
     const p=document.getElementById("bpager"); if(p)p.innerHTML=""; return; }
   fs.slice(bf.pg*BANCO_PAGE,bf.pg*BANCO_PAGE+BANCO_PAGE).forEach(f=>{
     const d=document.createElement("div");d.className="thumb";
     const i=document.createElement("img");i.loading="lazy";i.src=f.url;d.appendChild(i);
     const t=document.createElement("span");t.className="tag";t.textContent=f.file_name||"";d.appendChild(t);
-    d.onclick=()=>window.open(f.url,"_blank"); g.appendChild(d); });
+    const del=document.createElement("button");del.type="button";del.className="thumb-del";del.title="Eliminar foto";del.innerHTML="🗑";
+    del.onclick=e=>{ e.stopPropagation(); eliminarFotoDB(f); };
+    d.appendChild(del);
+    d.onclick=()=>abreFotoDB(f); g.appendChild(d); });
   pintaPager(pages, ()=>renderBancoDB());
+}
+function ensureFiltrosDB(show){
+  let wrap=document.getElementById("bDBFiltros");
+  if(!wrap){
+    wrap=document.createElement("div"); wrap.id="bDBFiltros"; wrap.style.cssText="display:flex;gap:22px;align-items:center;flex-wrap:wrap";
+    wrap.innerHTML=
+      '<div class="grupo-db"><span class="glbl">Orientación</span><span class="seg" id="bDBOri">'+
+        '<button type="button" data-v="" class="on">Todas</button>'+
+        '<button type="button" data-v="h">Horizontal</button>'+
+        '<button type="button" data-v="v">Vertical</button>'+
+      '</span></div>'+
+      '<div class="grupo-db"><input type="text" id="bDBTxt" placeholder="buscar por nombre…" style="width:210px"></div>';
+    const bfiltros=document.getElementById("bfiltros");
+    const bc=document.getElementById("bcount");
+    bfiltros.insertBefore(wrap, bc);
+    wrap.querySelectorAll('#bDBOri button').forEach(b=>b.onclick=()=>{
+      bDB.ori=b.dataset.v; bf.pg=0;
+      wrap.querySelectorAll('#bDBOri button').forEach(x=>x.classList.remove('on')); b.classList.add('on');
+      renderBancoDB();
+    });
+    document.getElementById('bDBTxt').oninput=e=>{ bDB.txt=e.target.value.toLowerCase(); bf.pg=0; renderBancoDB(); };
+  }
+  wrap.style.display = show ? 'flex' : 'none';
+}
+function abreFotoDB(f){
+  const kb = f.size ? Math.round(f.size/1024)+" KB" : "";
+  const fecha = f.created_at ? new Date(f.created_at).toLocaleDateString() : "";
+  $("#mbox").innerHTML=`<img src="${f.url}">
+  <div id="mmeta"><b>${f.file_name||"foto"}</b><br>${[f.content_type,kb].filter(Boolean).join(" · ")}<br>
+  Subida por ${f.uploaded_by_email||"—"}${fecha?" · "+fecha:""}</div>
+  <button class="btn" id="mUsarDB">▶ Usar en el Compositor</button>
+  <button class="btn sec" id="mScanDB">🔎 Enviar al Escáner QA</button>
+  <button class="btn sec" id="mCopyDB">Copiar URL de la foto</button>
+  <button class="btn sec" id="mDelDB" style="color:#B3261E;border-color:#B3261E">🗑 Eliminar foto</button>
+  <button class="btn sec" id="mXDB">Cerrar</button>`;
+  $("#modal").classList.add("on");
+  $("#mUsarDB").onclick=async()=>{ $("#modal").classList.remove("on"); await usarEnCompositorDB(f); };
+  $("#mScanDB").onclick=async()=>{ $("#modal").classList.remove("on"); await usarEnEscanerDB(f); };
+  $("#mCopyDB").onclick=()=>{ navigator.clipboard.writeText(f.url); toast("URL copiada"); };
+  $("#mDelDB").onclick=()=>{ $("#modal").classList.remove("on"); eliminarFotoDB(f); };
+  $("#mXDB").onclick=()=>$("#modal").classList.remove("on");
+}
+async function usarEnCompositorDB(f){
+  try{
+    const res=await fetch(f.url); if(!res.ok) throw new Error("fetch "+res.status);
+    const blob=await res.blob();
+    const file=new File([blob], f.file_name||"foto.jpg", {type: blob.type||f.content_type||"image/jpeg"});
+    await cargaFoto(file);
+    document.querySelector('nav button[data-t="comp"]').click();
+    toast("Foto cargada en el Compositor");
+  }catch(e){ console.error("[atelier] usarEnCompositorDB", e); toast("No se pudo cargar la foto en el Compositor"); }
+}
+async function usarEnEscanerDB(f){
+  try{
+    let img=null;
+    try{ const res=await fetch(f.url); const blob=await res.blob(); img=await createImageBitmap(blob); }
+    catch(_){ img=await loadImg(f.url); }
+    if(!img){ toast("No pude cargar la foto"); return; }
+    scSet(img, f.file_name||"foto");
+    document.querySelector('nav button[data-t="scan"]').click();
+  }catch(e){ console.error("[atelier] usarEnEscanerDB", e); toast("No se pudo enviar al Escáner QA"); }
+}
+async function eliminarFotoDB(f){
+  if(!confirm("¿Eliminar esta foto del banco? No se puede deshacer.")) return;
+  const tk=_token();
+  try{
+    const res=await fetch(_api()+"/api/marketing/photos/"+encodeURIComponent(f.id),
+      {method:"DELETE", headers: tk?{Authorization:"Bearer "+tk}:{}, credentials:"include"});
+    if(!res.ok){
+      toast(res.status===403 ? "Solo quien subió la foto puede borrarla" : "No se pudo eliminar la foto (error "+res.status+")");
+      return;
+    }
+    toast("Foto eliminada");
+    cargarBancoDB();
+  }catch(e){ console.error("[atelier] eliminarFotoDB", e); toast("No se pudo eliminar la foto"); }
 }
 function ensureUploadUI(show){
   let wrap=document.getElementById("bUploadWrap");
@@ -1357,10 +1545,14 @@ function pintaVoz(){ if(MUNDO==="pauta"){ pintaVozPauta(); return; } const w=$("
   h+=`<div class="vcard"><h3>Palabras ancla <span>(Stanley Italic — clic para copiar)</span></h3>`+
      ANCLA.map(a=>`<span class="chip st" onclick="navigator.clipboard.writeText('${a}');toast('Copiada')">${a}</span>`).join("")+`</div>`;
   Object.entries(SEDES).forEach(([k,s])=>{
-    h+=`<div class="vcard"><h3>${k} · ${s.nombre} <span>@${s.handle}</span></h3>
-    <p class="regla" style="margin-bottom:10px">${s.info}</p>
-    <span class="chip" onclick="navigator.clipboard.writeText('${s.linea}');toast('Línea comercial copiada')">📋 ${s.linea}</span>
-    <span class="chip" onclick="navigator.clipboard.writeText('${s.tags}');toast('Hashtags copiados')"># hashtags</span>`+
+    if(!ORO[k]) ORO[k]=[];
+    h+=`<div class="vcard"><h3>${k} · ${s.nombre} <span>@${s.handle||""}</span></h3>
+    <p class="regla" style="margin-bottom:10px">${s.info||""}</p>
+    ${s.linea?`<span class="chip" onclick="navigator.clipboard.writeText('${s.linea}');toast('Línea comercial copiada')">📋 ${s.linea}</span>`:""}
+    ${s.tags?`<span class="chip" onclick="navigator.clipboard.writeText('${s.tags}');toast('Hashtags copiados')"># hashtags</span>`:""}
+    <div style="margin:12px 0 4px">
+      <button type="button" class="btn sec btn-ia-copys" data-k="${k}" style="font-size:12px;padding:7px 12px">✨ Generar copys con IA</button>
+    </div>`+
     ORO[k].map(o=>`<div class="oro" onclick="navigator.clipboard.writeText(this.textContent.trim());toast('Ejemplo de oro copiado')">${o}</div>`).join("")+`</div>`; });
   h+=`<div class="vcard"><h3>Recordatorios del sistema</h3><p class="regla">
   · El concepto del mes debe derivar de un TEXTO literal del master graphic (tagline, manifiesto o palabra ancla).<br>
@@ -1368,7 +1560,46 @@ function pintaVoz(){ if(MUNDO==="pauta"){ pintaVozPauta(); return; } const w=$("
   · Nunca inventar precios ni promociones; ante la duda, [[dato a confirmar]].<br>
   · Estructura de caption: hook → desarrollo → línea comercial de la sede → hashtags.<br>
   · Cada corrección de la directora se cuenta a Claude para que quede en la memoria del sistema.</p></div>`;
-  w.innerHTML=h; }
+  w.innerHTML=h;
+  w.querySelectorAll('.btn-ia-copys').forEach(b=>b.onclick=()=>generarCopysIA(b.dataset.k, b));
+}
+/* Genera copys de marca con Claude (backend /api/marketing/copys/generate) y los
+   agrega a ORO[k] — quedan disponibles para copiar igual que los curados a mano. */
+async function generarCopysIA(k, btn){
+  const s = SEDES[k]; if(!s) return;
+  const api = _api();
+  if(!api){ toast("Abre el Atelier desde la app (Marketing) para generar copys con IA"); return; }
+  const original = btn.textContent;
+  btn.disabled = true; btn.textContent = "Generando…";
+  try{
+    const tk = _token();
+    const res = await fetch(api+"/api/marketing/copys/generate", {
+      method: "POST",
+      headers: Object.assign({"Content-Type":"application/json"}, tk?{Authorization:"Bearer "+tk}:{}),
+      credentials: "include",
+      body: JSON.stringify({
+        project_name: s.nombre || k,
+        brand_info: [s.info, s.linea].filter(Boolean).join(" · "),
+        handle: s.handle || null,
+        idioma: "es",
+        cantidad: 6
+      })
+    });
+    if(!res.ok){
+      const detalle = await res.json().catch(()=>null);
+      throw new Error((detalle && detalle.detail) || ("HTTP "+res.status));
+    }
+    const data = await res.json();
+    if(!ORO[k]) ORO[k]=[];
+    ORO[k] = (data.copys||[]).concat(ORO[k]); // los nuevos quedan arriba
+    toast((data.copys||[]).length+" copy(s) generados con IA");
+    pintaVoz();
+  }catch(e){
+    console.error("[atelier] generarCopysIA", e);
+    toast("No se pudieron generar copys: "+(e.message||"error desconocido"));
+    btn.disabled = false; btn.textContent = original;
+  }
+}
 
 /* =================== ESCÁNER QA =================== */
 /* Escáner de fotografías/piezas: análisis real de píxeles en el navegador (exposición,
@@ -1668,10 +1899,10 @@ $("#ckGo").onclick=ckAnalizar;
   // Los assets van incrustados (data URI) para que el lienzo nunca quede "sellado"
   // por seguridad del navegador y la exportación funcione siempre.
   const E = window.EMB||{};
-  assets.monoCream=await loadImg(E.monoCream||"assets/monogram_cream.png");
-  assets.monoMid=await loadImg(E.monoMid||"assets/monogram_midnight.png");
   assets.patCream=await loadImg(E.patCream||"assets/pattern_cream.png");
   assets.patMid=await loadImg(E.patMid||"assets/pattern_midnight.png");
+  await loadDevLogos(DEVELOPERS[DEV]);
+  syncHeaderLogos(); refreshDevLogoUI();
   await Promise.all([document.fonts.load("500 40px Maison"),document.fonts.load("300 40px Maison"),document.fonts.load("italic 40px Stanley")]);
   try{ const m=await kvGet("mundo"); if(m==="org"||m==="pauta") MUNDO=m; }catch(_){}
   pintaGrid(); pintaVoz(); initDir(); initFotoDir();

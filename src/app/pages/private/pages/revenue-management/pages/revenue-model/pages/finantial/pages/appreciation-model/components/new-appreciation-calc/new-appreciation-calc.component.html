@@ -18,6 +18,7 @@
                 <label class="modalform__label" for="num">Columnas</label>
                 <p-multiSelect [showHeader]="false" [options]="columsToSelect" optionLabel="nameSP"
                     [selectedItemsLabel]="selectedLabels" placeholder="Escoge una o varias" [focusOnHover]="true"
+                    appendTo="body" styleClass="revenue-multiselect"
                     (onChange)="changeSelection($event)" [disabled]="disabledSelect" #multiselect></p-multiSelect>
             </div>
             <div class="modalform__group modalform__group-complete">

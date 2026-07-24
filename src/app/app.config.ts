@@ -10,6 +10,7 @@ import { HTTP_INTERCEPTORS, provideHttpClient, withFetch, withInterceptorsFromDi
 
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { InterceptorService } from '@private/shared/core/interceptors/interceptor.service';
+import { RevenueMockInterceptor } from '@core/interceptors/revenue-mock.interceptor';
 import { provideEnvironmentNgxMask } from 'ngx-mask';
 
 const routerOptions: ExtraOptions = {
@@ -23,6 +24,8 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withFetch(), withInterceptorsFromDi()),
     provideAnimationsAsync(),
     provideEnvironmentNgxMask(),
+    // El mock va primero para poder cortocircuitar las llamadas del Modelo de Revenue en local.
+    { provide: HTTP_INTERCEPTORS, useClass: RevenueMockInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: InterceptorService, multi: true },
   ],
 };

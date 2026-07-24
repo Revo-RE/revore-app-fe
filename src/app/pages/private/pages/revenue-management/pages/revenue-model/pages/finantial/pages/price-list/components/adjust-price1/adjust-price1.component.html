@@ -7,6 +7,7 @@
                 <label class="modalform__label" for="num">Departamentos</label>
                 <p-multiSelect [showHeader]="false" [options]="depasToSelect" optionLabel="num"
                     [selectedItemsLabel]="selectedLabels" placeholder="Escoge uno o varios" [focusOnHover]="true"
+                    appendTo="body" styleClass="revenue-multiselect"
                     (onChange)="changeSelection($event)" [disabled]="disabledSelect" #multiselect></p-multiSelect>
             </div>
             <div class="modalform__group modalform__group-complete">

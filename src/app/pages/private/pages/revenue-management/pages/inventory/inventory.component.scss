@@ -208,6 +208,14 @@
         margin-bottom: 6px;
     }
 
+    &__label-hint {
+        font-weight: 400;
+        letter-spacing: normal;
+        text-transform: none;
+        font-size: 11px;
+        color: map.get(t.$primary-color, 250);
+    }
+
     &__control {
         width: 100%;
         box-sizing: border-box;

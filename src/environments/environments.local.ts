@@ -2,6 +2,10 @@ export const environment = {
     production: false,
     name: 'local',
 
+    // Mock local del Modelo de Revenue: sirve data ficticia para que tablas y
+    // gráficas funcionen sin el backend legacy. Poner en false para usar el API real.
+    useRevenueMock: true,
+
     apiUrl: 'http://localhost:3000',
     encryptKey: 'RevoreCompany#2023',
 
