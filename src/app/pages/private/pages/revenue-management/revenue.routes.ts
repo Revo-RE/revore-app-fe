@@ -18,6 +18,11 @@ export const routes: Routes = [
       import('./pages/inventory/inventory.component').then(c => c.InventoryComponent),
   },
   {
+    path: 'tower',
+    loadComponent: () =>
+      import('./pages/tower-view/tower-view.component').then(c => c.TowerViewComponent),
+  },
+  {
     path: 'revenue-model/finantial',
     component: RevenueModelLayoutComponent,
     children: [

@@ -1,0 +1,438 @@
+@use "sass:map";
+@use "theme" as t;
+
+// Vista Torre (stacking plan) — Inventory Management.
+// Sistema de diseño del brand guideline: navy dominante, naranja solo como
+// barra del título (la aporta la regla global h1[class*="__title"]::before).
+
+.twr {
+    padding: 32px 40px;
+    max-width: 1200px;
+    text-align: left;
+    position: relative;
+
+    &__header {
+        margin-bottom: 24px;
+    }
+
+    &__eyebrow {
+        font-family: "Inter", sans-serif;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: map.get(t.$primary-color, 300);
+        margin: 0 0 6px;
+    }
+
+    &__title {
+        font-size: 28px;
+        color: map.get(t.$primary-color, 700);
+        margin: 0 0 4px;
+    }
+
+    &__subtitle {
+        font-family: "Inter", sans-serif;
+        font-size: 14px;
+        color: map.get(t.$primary-color, 400);
+        margin: 0;
+    }
+
+    &__error {
+        background: rgba(map.get(t.$aux-color, error), 0.06);
+        border: 1px solid rgba(map.get(t.$aux-color, error), 0.35);
+        border-radius: t.$radius-control;
+        color: map.get(t.$aux-color, error);
+        font-size: 13px;
+        padding: 10px 14px;
+        margin-bottom: 16px;
+    }
+
+    &__loading,
+    &__empty {
+        font-family: "Inter", sans-serif;
+        font-size: 13px;
+        color: map.get(t.$primary-color, 300);
+        margin: 24px 0;
+    }
+
+    // ── Controles ──
+    &__controls {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    &__field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    &__label {
+        font-family: "Inter", sans-serif;
+        font-size: 10.5px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: map.get(t.$primary-color, 300);
+    }
+
+    &__select {
+        font-family: "Inter", sans-serif;
+        font-size: 13px;
+        color: map.get(t.$primary-color, 700);
+        background: white;
+        border: 1px solid map.get(t.$primary-color, 250);
+        border-radius: t.$radius-control;
+        padding: 8px 10px;
+        min-width: 190px;
+        cursor: pointer;
+
+        &:focus {
+            outline: none;
+            border-color: map.get(t.$primary-color, 500);
+        }
+
+        &:disabled {
+            background: map.get(t.$primary-color, 100);
+            color: map.get(t.$primary-color, 300);
+            cursor: not-allowed;
+        }
+    }
+
+    // Toggle Estatus / Precio-m²
+    &__toggle {
+        display: inline-flex;
+        border: 1px solid map.get(t.$primary-color, 250);
+        border-radius: t.$radius-control;
+        overflow: hidden;
+    }
+
+    &__toggle-btn {
+        font-family: "Inter", sans-serif;
+        font-size: 12.5px;
+        font-weight: 600;
+        color: map.get(t.$primary-color, 400);
+        background: white;
+        border: none;
+        padding: 9px 16px;
+        cursor: pointer;
+        transition: background 0.15s ease, color 0.15s ease;
+
+        & + & {
+            border-left: 1px solid map.get(t.$primary-color, 250);
+        }
+
+        &:hover {
+            background: map.get(t.$primary-color, 100);
+        }
+
+        &.is-active {
+            background: map.get(t.$primary-color, 500);
+            color: #fff;
+        }
+    }
+
+    // ── Resumen y leyenda ──
+    &__counts {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 16px;
+    }
+
+    &__legend {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 20px;
+    }
+
+    &__legend-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        font-family: "Inter", sans-serif;
+        font-size: 12px;
+        color: map.get(t.$primary-color, 400);
+        white-space: nowrap;
+    }
+
+    &__swatch {
+        width: 13px;
+        height: 13px;
+        border-radius: 3px;
+        display: inline-block;
+    }
+
+    // Barra de escala del heatmap
+    &__scale {
+        display: inline-block;
+        width: 180px;
+        height: 9px;
+        border-radius: 5px;
+        background: linear-gradient(
+            to right,
+            map.get(t.$primary-color, 200),
+            map.get(t.$primary-color, 700)
+        );
+    }
+}
+
+// Cápsulas de conteo
+.twr-pill {
+    font-family: "Inter", sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: map.get(t.$primary-color, 100);
+    color: map.get(t.$primary-color, 500);
+    border: 1px solid map.get(t.$primary-color, 200);
+
+    &--available {
+        background: rgba(map.get(t.$aux-color, success), 0.1);
+        color: map.get(t.$aux-color, success);
+        border-color: rgba(map.get(t.$aux-color, success), 0.25);
+    }
+
+    &--reserved {
+        background: rgba(map.get(t.$aux-color, warning), 0.1);
+        color: map.get(t.$aux-color, warning);
+        border-color: rgba(map.get(t.$aux-color, warning), 0.25);
+    }
+
+    &--sold {
+        background: map.get(t.$primary-color, 500);
+        color: #fff;
+        border-color: map.get(t.$primary-color, 500);
+    }
+}
+
+// ── Tarjeta por torre ──
+.twr-card {
+    background: white;
+    border: 1px solid map.get(t.$primary-color, 200);
+    border-radius: t.$radius-surface;
+    padding: 20px 22px 22px;
+    margin-bottom: 20px;
+
+    &__head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 16px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid map.get(t.$primary-color, 200);
+    }
+
+    &__title {
+        font-size: 16px;
+        color: map.get(t.$primary-color, 700);
+        margin: 0;
+    }
+
+    &__meta {
+        font-family: "Inter", sans-serif;
+        font-size: 12px;
+        color: map.get(t.$primary-color, 300);
+    }
+}
+
+// ── Matriz nivel × tipología ──
+// Filas = niveles, columnas = tipologías. Las columnas quedan alineadas para
+// poder recorrer una tipología en vertical a lo largo de toda la torre.
+.twr-matrix-wrap {
+    overflow-x: auto;
+}
+
+.twr-matrix {
+    --twr-level-col: 38px;
+
+    display: grid;
+    gap: 6px;
+    align-items: stretch;
+    min-width: min-content;
+
+    // Encabezado de columna: la tipología
+    &__col-head {
+        font-family: "Inter", sans-serif;
+        font-size: 10.5px;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: map.get(t.$primary-color, 300);
+        text-align: center;
+        padding-bottom: 6px;
+        border-bottom: 1px solid map.get(t.$primary-color, 200);
+        white-space: nowrap;
+    }
+
+    // Esquina vacía arriba-izquierda
+    &__corner {
+        border-bottom: 1px solid map.get(t.$primary-color, 200);
+    }
+
+    // Encabezado de fila: el nivel (P7, P6… PB)
+    &__row-head {
+        font-family: "Inter", sans-serif;
+        font-size: 11px;
+        font-weight: 700;
+        color: map.get(t.$primary-color, 300);
+        text-align: right;
+        align-self: center;
+        padding-right: 4px;
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+    }
+
+    // Celda: puede traer 0, 1 o varias unidades de esa tipología en ese nivel
+    &__cell {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    // Hueco: se deja visible porque un faltante también es información
+    &__empty {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 30px;
+        border: 1px dashed map.get(t.$primary-color, 200);
+        border-radius: t.$radius-control;
+        color: map.get(t.$primary-color, 250);
+        font-size: 13px;
+        line-height: 1;
+    }
+}
+
+// Chip de unidad — ocupa el ancho de su celda para que las columnas cuadren
+.twr-unit {
+    font-family: "Inter", sans-serif;
+    font-size: 11.5px;
+    font-weight: 600;
+    line-height: 1;
+    padding: 9px 8px;
+    width: 100%;
+    min-height: 30px;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+    border: 1px solid transparent;
+    border-radius: t.$radius-control;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: transform 0.1s ease, box-shadow 0.15s ease;
+
+    &:hover,
+    &:focus-visible {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(17, 27, 48, 0.18);
+        outline: none;
+    }
+
+    // Modo estatus
+    &.is-available {
+        background: rgba(map.get(t.$aux-color, success), 0.14);
+        border-color: rgba(map.get(t.$aux-color, success), 0.4);
+        color: #14764a;
+    }
+
+    &.is-reserved {
+        background: rgba(map.get(t.$aux-color, warning), 0.16);
+        border-color: rgba(map.get(t.$aux-color, warning), 0.42);
+        color: #9a5405;
+    }
+
+    &.is-sold {
+        background: map.get(t.$primary-color, 500);
+        border-color: map.get(t.$primary-color, 500);
+        color: #fff;
+    }
+
+    &.is-other {
+        background: map.get(t.$primary-color, 200);
+        border-color: map.get(t.$primary-color, 250);
+        color: map.get(t.$primary-color, 400);
+    }
+
+    // Modo heatmap — el color lo inyecta [ngStyle] desde el componente
+    &.is-heat {
+        border-color: rgba(17, 27, 48, 0.12);
+    }
+}
+
+// ── Tooltip de la unidad ──
+.twr-tip {
+    position: fixed;
+    right: 32px;
+    bottom: 32px;
+    z-index: 50;
+    width: 232px;
+    background: #fff;
+    border: 1px solid map.get(t.$primary-color, 200);
+    border-left: 3px solid map.get(t.$secondary-color, 500);
+    border-radius: t.$radius-surface;
+    box-shadow: 0 12px 32px rgba(17, 27, 48, 0.16);
+    padding: 16px 18px;
+
+    &__title {
+        font-family: "Inter", sans-serif;
+        font-size: 15px;
+        font-weight: 800;
+        color: map.get(t.$primary-color, 700);
+        margin: 0 0 10px;
+    }
+
+    &__list {
+        margin: 0;
+
+        div {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 4px 0;
+        }
+
+        dt {
+            font-family: "Inter", sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: map.get(t.$primary-color, 300);
+            margin: 0;
+        }
+
+        dd {
+            font-family: "Inter", sans-serif;
+            font-size: 12.5px;
+            font-weight: 600;
+            color: map.get(t.$primary-color, 700);
+            margin: 0;
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+        }
+    }
+
+    &__pct {
+        display: block;
+        font-weight: 400;
+        font-size: 11px;
+        color: map.get(t.$primary-color, 300);
+    }
+
+    &__hint {
+        font-family: "Inter", sans-serif;
+        font-size: 11px;
+        color: map.get(t.$primary-color, 300);
+        margin: 12px 0 0;
+        padding-top: 10px;
+        border-top: 1px solid map.get(t.$primary-color, 200);
+    }
+}

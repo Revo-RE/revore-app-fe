@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import {
   CatalogAdvisor,
   InventoryCatalog,
@@ -23,6 +24,7 @@ import { InventoryService } from './services/inventory.service';
 })
 export class InventoryComponent implements OnInit {
   private readonly svc = inject(InventoryService);
+  private readonly route = inject(ActivatedRoute);
 
   readonly catalog = signal<InventoryCatalog | null>(null);
   readonly units = signal<UnitRow[]>([]);
@@ -119,10 +121,47 @@ export class InventoryComponent implements OnInit {
 
   ngOnInit(): void {
     this.svc.catalog().subscribe({
-      next: cat => this.catalog.set(cat),
+      next: cat => {
+        this.catalog.set(cat);
+        this.applyPreselection();
+      },
       error: () => this.error.set('No se pudo cargar el catálogo de proyectos.'),
     });
     this.reloadOperations();
+  }
+
+  /** Precarga el contexto cuando se llega desde la Vista de Torre
+   * (?project_id=…&unit_id=…&stage=…) para no volver a capturarlo a mano. */
+  private applyPreselection(): void {
+    const qp = this.route.snapshot.queryParamMap;
+    const projectId = qp.get('project_id');
+    const unitId = qp.get('unit_id');
+    if (!projectId) return;
+
+    const cat = this.catalog();
+    const project = cat?.projects.find(p => p.id === projectId);
+    if (!project) return;
+
+    this.developer_id = project.developer_id || '';
+    this.project_id = project.id;
+    this.stage_filter = qp.get('stage') || '';
+
+    // Las unidades llegan por separado: se fija la unidad al terminar la carga.
+    this.loadingUnits.set(true);
+    this.svc.units(project.id).subscribe({
+      next: rows => {
+        this.units.set(rows);
+        this.loadingUnits.set(false);
+        if (unitId && rows.some(u => u.id === unitId)) {
+          this.unit_id = unitId;
+          this.onUnitChange();
+        }
+      },
+      error: () => {
+        this.error.set('No se pudieron cargar las unidades del proyecto.');
+        this.loadingUnits.set(false);
+      },
+    });
   }
 
   onDeveloperChange(): void {

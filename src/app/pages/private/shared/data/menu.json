@@ -18,6 +18,11 @@
         "active": true
       },
       {
+        "name": "Mapa de Inventario",
+        "link": "/dashboard/revenue-management/tower",
+        "active": true
+      },
+      {
         "name": "Registrar Operaciones",
         "link": "/dashboard/revenue-management/inventory",
         "active": true

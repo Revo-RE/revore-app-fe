@@ -94,6 +94,63 @@ export interface UnitRow extends CatalogUnit {
   price_m2: number | null;
 }
 
+// ── Vista Torre (stacking plan) ──
+// Inventario agrupado por torre y nivel para pintar el grid piso × unidad.
+
+/** Unidad tal como la pinta el chip del stacking plan. */
+export interface TowerUnit extends UnitRow {
+  status: string;
+}
+
+export interface TowerLevel {
+  level: number;
+  units: TowerUnit[];
+}
+
+export interface Tower {
+  name: string;
+  units_total: number;
+  /** Niveles de mayor a menor: el piso más alto se pinta arriba. */
+  levels: TowerLevel[];
+}
+
+export interface TowersView {
+  project_id: string;
+  units_total: number;
+  por_estatus: Record<string, number>;
+  typologies: string[];
+  /** Rango de precio/m² del proyecto, para la escala del heatmap. */
+  price_m2_min: number | null;
+  price_m2_max: number | null;
+  towers: Tower[];
+}
+
+/** Modos de color del stacking plan. */
+export type TowerColorMode = 'status' | 'heatmap';
+
+// ── Matriz nivel × tipología ──
+// Reordena las unidades de una torre en una tabla: las filas son los niveles y
+// las columnas las tipologías, para poder leer una tipología a lo largo de toda
+// la torre. Una celda puede traer 0, 1 o varias unidades.
+
+export interface TowerMatrixCell {
+  typology: string;
+  units: TowerUnit[];
+}
+
+export interface TowerMatrixRow {
+  level: number;
+  cells: TowerMatrixCell[];
+}
+
+export interface TowerMatrix {
+  name: string;
+  units_total: number;
+  /** Tipologías presentes en la torre — encabezados de columna. */
+  columns: string[];
+  rows: TowerMatrixRow[];
+}
+
 export interface CatalogAdvisor {
   id: string;
   project_id: string | null;

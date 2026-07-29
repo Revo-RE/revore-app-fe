@@ -1244,3 +1244,240 @@ export const MOCK_DEPARTMENTS = {
   ]
 };
 
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Vista Torre (stacking plan) — datos derivados de MOCK_DEPARTMENTS
+// ─────────────────────────────────────────────────────────────────────────────
+// Se construyen a partir de los mismos 54 departamentos del Excel para que la
+// vista de torre y la lista de precios cuenten la misma historia. Cada
+// "proyecto" ficticio reparte esos mismos departamentos en distinto número de
+// torres, para que el selector de desarrollador/proyecto tenga varias
+// combinaciones que probar en local (no solo una).
+
+const MOCK_STATUS_BY_STATE: Record<string, string> = {
+  vendido: 'VENDIDO',
+  disponible: 'DISPONIBLE',
+  apartado: 'APARTADO',
+};
+
+/** Desarrolladores reales del portafolio (mismos nombres que ya aparecen en
+ * Registrar Operaciones al pegarle al backend real). Aquí solo se usan para
+ * poblar el selector en local, sin backend: cada uno se queda con su único
+ * proyecto de prueba y un reparto de torres distinto para variar la vista. */
+const MOCK_DEVELOPERS_CONFIG = [
+  { id: 'mock-dev-dynamica', name: 'Dynamica' },
+  { id: 'mock-dev-gran-ciudad', name: 'Gran Ciudad' },
+  { id: 'mock-dev-san-carlos', name: 'Grupo San Carlos' },
+  { id: 'mock-dev-veq', name: 'GrupoVEQ' },
+  { id: 'mock-dev-inverti', name: 'Inverti' },
+  { id: 'mock-dev-nova-habita', name: 'Nova Habita' },
+  { id: 'mock-dev-otacc', name: 'OTACC' },
+  { id: 'mock-dev-procsa', name: 'PROCSA-Data' },
+  { id: 'mock-dev-tare', name: 'Tare' },
+];
+
+// Repartos de torre que se van alternando entre proyectos para que no todos
+// se vean iguales al probar la Vista de Torre en local.
+const MOCK_TOWER_LAYOUTS = [
+  ['Torre 1', 'Torre 2'],
+  ['Torre A', 'Torre B', 'Torre C'],
+  ['Torre Única'],
+  ['Norte', 'Sur'],
+];
+
+const MOCK_PROJECTS_CONFIG = MOCK_DEVELOPERS_CONFIG.map((dev, i) => ({
+  id: `mock-project-${dev.id}`,
+  name: dev.name,
+  developer_id: dev.id,
+  towers: MOCK_TOWER_LAYOUTS[i % MOCK_TOWER_LAYOUTS.length],
+}));
+
+/** Reparte los 54 departamentos del Excel en las torres indicadas, con ids
+ * únicos por proyecto para no chocar entre sí. */
+function buildProjectUnits(projectId: string, towerNames: string[]) {
+  return MOCK_DEPARTMENTS.departments.map((d: any, i: number) => {
+    const state = String(d?.departmentState?.state ?? 'disponible').toLowerCase();
+    // Cada 7ª unidad disponible pasa a apartada para poblar el color ámbar.
+    const status =
+      state === 'disponible' && i % 7 === 3
+        ? 'APARTADO'
+        : MOCK_STATUS_BY_STATE[state] ?? 'DISPONIBLE';
+    const price = Number(d.price) || 0;
+    const area = Number(d.m2total) || 0;
+    return {
+      id: `${projectId}-unit-${d.num}`,
+      unit_number: String(d.num),
+      typology: String(d.archetype ?? ''),
+      status,
+      price,
+      project_id: projectId,
+      stage: towerNames[i % towerNames.length],
+      level: Number(d.level) || 0,
+      bedrooms: Number(d.bedrooms) || null,
+      bathrooms: Number(d.bathrooms) || null,
+      total_area: area || null,
+      m2_interior: Number(d.m2int) || null,
+      m2_exterior: Number(d.m2ext) || null,
+      price_m2: Number(d.pricePerM2) || (price && area ? Math.round((price / area) * 100) / 100 : null),
+    };
+  });
+}
+
+/** Agrupa las unidades de un proyecto por torre y nivel, igual que
+ * GET /api/inventory/towers. */
+function buildTowersView(projectId: string, units: ReturnType<typeof buildProjectUnits>) {
+  const byTower = new Map<string, Map<number, any[]>>();
+  for (const u of units) {
+    const tower = u.stage || 'Sin torre';
+    if (!byTower.has(tower)) byTower.set(tower, new Map());
+    const levels = byTower.get(tower)!;
+    const lvl = u.level ?? 0;
+    if (!levels.has(lvl)) levels.set(lvl, []);
+    levels.get(lvl)!.push(u);
+  }
+
+  const towers = Array.from(byTower.keys())
+    .sort()
+    .map(name => {
+      const levels = byTower.get(name)!;
+      const levelsOut = Array.from(levels.keys())
+        // De mayor a menor: el piso más alto arriba.
+        .sort((a, b) => b - a)
+        .map(level => ({
+          level,
+          units: levels.get(level)!.slice().sort((a, b) =>
+            String(a.unit_number).localeCompare(String(b.unit_number)),
+          ),
+        }));
+      const total = levelsOut.reduce((n, l) => n + l.units.length, 0);
+      return { name, units_total: total, levels: levelsOut };
+    });
+
+  const pricesM2 = units.map(u => u.price_m2).filter((v): v is number => typeof v === 'number' && v > 0);
+  const porEstatus = units.reduce<Record<string, number>>((acc, u) => {
+    acc[u.status] = (acc[u.status] ?? 0) + 1;
+    return acc;
+  }, {});
+
+  return {
+    project_id: projectId,
+    units_total: units.length,
+    por_estatus: porEstatus,
+    typologies: Array.from(new Set(units.map(u => u.typology).filter(Boolean))).sort(),
+    price_m2_min: pricesM2.length ? Math.min(...pricesM2) : null,
+    price_m2_max: pricesM2.length ? Math.max(...pricesM2) : null,
+    towers,
+  };
+}
+
+/** Unidades y vista de torre de cada proyecto ficticio. */
+const MOCK_PROJECTS_DATA = MOCK_PROJECTS_CONFIG.map(p => {
+  const units = buildProjectUnits(p.id, p.towers);
+  return { ...p, units, towersView: buildTowersView(p.id, units) };
+});
+
+/** project_id → vista de torre, para que el interceptor responda según el
+ * proyecto que pida el frontend. */
+export const MOCK_TOWERS_BY_PROJECT: Record<string, ReturnType<typeof buildTowersView>> =
+  Object.fromEntries(MOCK_PROJECTS_DATA.map(p => [p.id, p.towersView]));
+
+/** Todas las unidades de todos los proyectos ficticios (para la lista de
+ * precios y otros usos que no distinguen por proyecto). */
+export const MOCK_TOWER_UNITS = MOCK_PROJECTS_DATA.flatMap(p => p.units);
+
+/** project_id → unidades en shape UnitRow, para GET /api/inventory/units
+ * (Registrar Operaciones: selector de unidad y prellenado de precio). */
+export const MOCK_UNITS_BY_PROJECT: Record<string, typeof MOCK_TOWER_UNITS> =
+  Object.fromEntries(MOCK_PROJECTS_DATA.map(p => [p.id, p.units]));
+
+/** Vista de torre por defecto (primer proyecto), por si se pide sin
+ * project_id. */
+export const MOCK_TOWERS = MOCK_PROJECTS_DATA[0].towersView;
+
+/** Resumen del portafolio ficticio para GET /api/inventory/summary
+ * (Resumen de Inventario). Se agrega directo de los proyectos mock. */
+export const MOCK_INVENTORY_SUMMARY = (() => {
+  const porEstatus: Record<string, number> = {};
+  let inventoryValue = 0;
+  const porProyecto = MOCK_PROJECTS_DATA.map(p => {
+    let disponibles = 0, vendidas = 0, apartadas = 0, otras = 0;
+    for (const u of p.units) {
+      porEstatus[u.status] = (porEstatus[u.status] ?? 0) + 1;
+      if (u.status === 'DISPONIBLE') { disponibles++; inventoryValue += u.price || 0; }
+      else if (u.status === 'VENDIDO' || u.status === 'RENTADO') vendidas++;
+      else if (u.status === 'APARTADO') apartadas++;
+      else otras++;
+    }
+    const total = p.units.length;
+    return {
+      project_id: p.id,
+      project_name: p.name,
+      total,
+      disponibles,
+      vendidas,
+      apartadas,
+      otras,
+      ventas_monto: p.units
+        .filter(u => u.status === 'VENDIDO' || u.status === 'RENTADO')
+        .reduce((s, u) => s + (u.price || 0), 0),
+      avance_pct: total ? Math.round(((vendidas + apartadas) / total) * 1000) / 10 : 0,
+    };
+  });
+
+  const ventasMonto = porProyecto.reduce((s, p) => s + p.ventas_monto, 0);
+  const ventasRegistradas = porProyecto.reduce((s, p) => s + p.vendidas, 0);
+
+  return {
+    proyectos: MOCK_PROJECTS_DATA.length,
+    unidades_total: MOCK_TOWER_UNITS.length,
+    por_estatus: porEstatus,
+    valor_inventario_disponible: inventoryValue,
+    operaciones_por_tipo: { venta: ventasRegistradas },
+    ventas_registradas: ventasRegistradas,
+    ventas_monto: ventasMonto,
+    por_proyecto: porProyecto.sort((a, b) => b.total - a.total),
+  };
+})();
+
+/** GET /api/inventory/sales — ventas/apartados del rango. En el mock no hay
+ * fechas reales de operación, así que se ignora el rango y se agrega todo
+ * el portafolio ficticio (suficiente para que la sección renderice). */
+export const MOCK_INVENTORY_SALES = (() => {
+  const vendidas = MOCK_TOWER_UNITS.filter(u => u.status === 'VENDIDO' || u.status === 'RENTADO');
+  const apartadas = MOCK_TOWER_UNITS.filter(u => u.status === 'APARTADO');
+  return {
+    from: null,
+    to: null,
+    unidades_vendidas: vendidas.length,
+    monto_vendido: vendidas.reduce((s, u) => s + (u.price || 0), 0),
+    ventas_plataforma: 0,
+    ventas_base_datos: vendidas.length,
+    apartados: apartadas.length,
+    monto_apartados: apartadas.reduce((s, u) => s + (u.price || 0), 0),
+    vendidas_sin_precio: vendidas.filter(u => !u.price).length,
+  };
+})();
+
+/** Catálogo para poblar los selectores de desarrollador y proyecto. */
+export const MOCK_INVENTORY_CATALOG = {
+  developers: MOCK_DEVELOPERS_CONFIG,
+  projects: MOCK_PROJECTS_DATA.map(p => ({
+    id: p.id,
+    name: p.name,
+    developer_id: p.developer_id,
+    units_count: p.units.length,
+  })),
+  units: MOCK_TOWER_UNITS.map(u => ({
+    id: u.id,
+    unit_number: u.unit_number,
+    typology: u.typology,
+    status: u.status,
+    price: u.price,
+    project_id: u.project_id,
+    stage: u.stage,
+  })),
+  advisors: MOCK_PROJECTS_DATA.flatMap(p => [
+    { id: `${p.id}-advisor-1`, project_id: p.id, name: 'Asesor Demo 1' },
+    { id: `${p.id}-advisor-2`, project_id: p.id, name: 'Asesor Demo 2' },
+  ]),
+};

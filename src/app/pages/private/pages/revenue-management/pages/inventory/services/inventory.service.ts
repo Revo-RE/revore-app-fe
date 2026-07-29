@@ -8,6 +8,7 @@ import {
   InventorySummary,
   OperationCreate,
   SalesSummary,
+  TowersView,
   UnitRow,
 } from '../models/inventory.model';
 
@@ -33,6 +34,13 @@ export class InventoryService {
 
   units(projectId: string): Observable<UnitRow[]> {
     return this.http.get<UnitRow[]>(`${this.base}/units`, { params: { project_id: projectId } });
+  }
+
+  /** Inventario agrupado por torre y nivel para la vista tipo stacking plan. */
+  towers(projectId: string): Observable<TowersView> {
+    return this.http.get<TowersView>(`${this.base}/towers`, {
+      params: { project_id: projectId },
+    });
   }
 
   operations(): Observable<InventoryOperation[]> {

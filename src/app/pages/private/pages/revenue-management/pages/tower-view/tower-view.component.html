@@ -1,0 +1,189 @@
+<div class="twr">
+  <!-- Encabezado -->
+  <header class="twr__header">
+    <div>
+      <p class="twr__eyebrow">Inventory Management</p>
+      <h1 class="twr__title">Mapa de Inventario</h1>
+      <p class="twr__subtitle">
+        Inventario por nivel y tipología. Cada chip es una unidad; haz clic para registrar una operación.
+      </p>
+    </div>
+  </header>
+
+  @if (error()) {
+    <div class="twr__error">{{ error() }}</div>
+  }
+
+  <!-- Controles: proyecto, modo de color y filtro de tipología -->
+  <div class="twr__controls">
+    <div class="twr__field">
+      <label class="twr__label" for="dev">Desarrollador</label>
+      <select id="dev" class="twr__select" [(ngModel)]="developer_id" (ngModelChange)="onDeveloperChange()">
+        <option value="">Selecciona…</option>
+        @for (d of catalog()?.developers ?? []; track d.id) {
+          <option [value]="d.id">{{ d.name }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="twr__field">
+      <label class="twr__label" for="proj">Proyecto</label>
+      <select id="proj" class="twr__select" [(ngModel)]="project_id" (ngModelChange)="onProjectChange()"
+              [disabled]="!developer_id">
+        <option value="">Selecciona…</option>
+        @for (p of developerProjects; track p.id) {
+          <option [value]="p.id">{{ p.name }} ({{ p.units_count }})</option>
+        }
+      </select>
+    </div>
+
+    @if (view()) {
+      <div class="twr__field">
+        <label class="twr__label" for="typ">Tipología</label>
+        <select id="typ" class="twr__select" [ngModel]="typologyFilter()"
+                (ngModelChange)="typologyFilter.set($event)">
+          <option value="">Todas</option>
+          @for (t of view()!.typologies; track t) {
+            <option [value]="t">{{ t }}</option>
+          }
+        </select>
+      </div>
+
+      <!-- Toggle de modo de color -->
+      <div class="twr__field">
+        <span class="twr__label">Color por</span>
+        <div class="twr__toggle" role="group" aria-label="Modo de color">
+          <button type="button" class="twr__toggle-btn"
+                  [class.is-active]="colorMode() === 'status'"
+                  (click)="setColorMode('status')">Estatus</button>
+          <button type="button" class="twr__toggle-btn"
+                  [class.is-active]="colorMode() === 'heatmap'"
+                  (click)="setColorMode('heatmap')">Precio/m²</button>
+        </div>
+      </div>
+    }
+  </div>
+
+  @if (loading()) {
+    <p class="twr__loading">Cargando inventario…</p>
+  }
+
+  @if (view() && !loading()) {
+    <!-- Resumen del proyecto -->
+    <div class="twr__counts">
+      <span class="twr-pill">{{ counts().total | number }} unidades</span>
+      <span class="twr-pill twr-pill--available">{{ counts().disponibles | number }} disponibles</span>
+      <span class="twr-pill twr-pill--reserved">{{ counts().apartadas | number }} apartadas</span>
+      <span class="twr-pill twr-pill--sold">{{ counts().vendidas | number }} vendidas</span>
+    </div>
+
+    <!-- Leyenda según el modo -->
+    @if (colorMode() === 'status') {
+      <div class="twr__legend">
+        <span class="twr__legend-item"><i class="twr__swatch is-available"></i> Disponible</span>
+        <span class="twr__legend-item"><i class="twr__swatch is-reserved"></i> Apartado</span>
+        <span class="twr__legend-item"><i class="twr__swatch is-sold"></i> Vendido</span>
+        <span class="twr__legend-item"><i class="twr__swatch is-other"></i> Otro</span>
+      </div>
+    } @else {
+      <div class="twr__legend">
+        <span class="twr__legend-item">
+          {{ view()!.price_m2_min | currency:'MXN':'symbol-narrow':'1.0-0' }}/m²
+        </span>
+        <i class="twr__scale"></i>
+        <span class="twr__legend-item">
+          {{ view()!.price_m2_max | currency:'MXN':'symbol-narrow':'1.0-0' }}/m²
+        </span>
+      </div>
+    }
+
+    <!-- Stacking plan por torre: matriz nivel × tipología -->
+    @for (m of matrices(); track m.name) {
+      <section class="twr-card">
+        <header class="twr-card__head">
+          <h2 class="twr-card__title">{{ m.name }}</h2>
+          <span class="twr-card__meta">{{ m.units_total | number }} unidades</span>
+        </header>
+
+        <div class="twr-matrix-wrap">
+          <div class="twr-matrix" [style.grid-template-columns]="gridTemplate(m)">
+            <!-- Encabezados: tipologías -->
+            <span class="twr-matrix__corner"></span>
+            @for (col of m.columns; track col) {
+              <span class="twr-matrix__col-head">Tipo {{ col }}</span>
+            }
+
+            <!-- Un renglón por nivel -->
+            @for (row of m.rows; track row.level) {
+              <span class="twr-matrix__row-head">{{ levelLabel(row.level) }}</span>
+              @for (cell of row.cells; track cell.typology) {
+                <div class="twr-matrix__cell">
+                  @for (u of cell.units; track u.id) {
+                    <button
+                      type="button"
+                      class="twr-unit"
+                      [class]="colorMode() === 'status' ? statusClass(u) : 'is-heat'"
+                      [ngStyle]="colorMode() === 'heatmap' ? heatmapStyle(u) : {}"
+                      (mouseenter)="onUnitEnter(u)"
+                      (mouseleave)="onUnitLeave()"
+                      (focus)="onUnitEnter(u)"
+                      (blur)="onUnitLeave()"
+                      (click)="goToOperation(u)"
+                      [attr.aria-label]="unitLabel(u) + ' — ' + u.status">
+                      {{ chipLabel(u) }}
+                    </button>
+                  }
+                  @if (cell.units.length === 0) {
+                    <span class="twr-matrix__empty" aria-hidden="true">·</span>
+                  }
+                </div>
+              }
+            }
+          </div>
+        </div>
+      </section>
+    }
+
+    @if (towers().length === 0) {
+      <p class="twr__empty">
+        No hay unidades que coincidan con el filtro seleccionado.
+      </p>
+    }
+  }
+
+  @if (!view() && !loading() && !error()) {
+    <p class="twr__empty">Selecciona un desarrollador y un proyecto para ver la torre.</p>
+  }
+
+  <!-- Tooltip flotante de la unidad -->
+  @if (hovered(); as u) {
+    <aside class="twr-tip" role="status">
+      <p class="twr-tip__title">{{ u.unit_number || 'S/N' }}</p>
+      <dl class="twr-tip__list">
+        @if (u.typology) {
+          <div><dt>Tipología</dt><dd>{{ u.typology }}</dd></div>
+        }
+        <div><dt>Nivel</dt><dd>{{ levelLabel(u.level ?? 0) }}</dd></div>
+        <div><dt>Estatus</dt><dd>{{ u.status | titlecase }}</dd></div>
+        @if (u.total_area) {
+          <div><dt>Superficie</dt><dd>{{ u.total_area | number:'1.0-2' }} m²</dd></div>
+        }
+        @if (u.price) {
+          <div><dt>Precio</dt><dd>{{ u.price | currency:'MXN':'symbol-narrow':'1.0-0' }}</dd></div>
+        }
+        @if (u.price_m2) {
+          <div>
+            <dt>Precio/m²</dt>
+            <dd>
+              {{ u.price_m2 | currency:'MXN':'symbol-narrow':'1.0-0' }}
+              @if (colorMode() === 'heatmap' && heatmapPct(u) !== null) {
+                <span class="twr-tip__pct">· {{ heatmapPct(u) }}% del rango</span>
+              }
+            </dd>
+          </div>
+        }
+      </dl>
+      <p class="twr-tip__hint">Clic para registrar operación</p>
+    </aside>
+  }
+</div>
