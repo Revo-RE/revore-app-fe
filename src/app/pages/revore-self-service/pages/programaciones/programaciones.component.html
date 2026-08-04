@@ -115,9 +115,9 @@
           }
           @if (!loadingRelated && developerGroups.length > 0) {
             <div class="ss-form__group">
-              <label class="ss-form__label">{{ groupLabel }}</label>
+              <label class="ss-form__label">{{ groupLabel }} *</label>
               <select class="ss-form__select" formControlName="developer_group_id">
-                <option [value]="null">Sin grupo específico</option>
+                <option value="" disabled>{{ selectPlaceholder }}</option>
                 @for (g of developerGroups; track g.id) {
                   <option [value]="g.id">{{ formatGroupOption(g) }}</option>
                 }
@@ -126,9 +126,9 @@
           }
           @if (!loadingRelated && subProjects.length > 0) {
             <div class="ss-form__group">
-              <label class="ss-form__label">{{ groupLabel }}</label>
+              <label class="ss-form__label">{{ groupLabel }} *</label>
               <select class="ss-form__select" formControlName="sub_project_id">
-                <option [value]="null">Sin proyecto específico</option>
+                <option value="" disabled>{{ selectPlaceholder }}</option>
                 @for (sp of subProjects; track sp.id) {
                   <option [value]="sp.id">{{ sp.name }}</option>
                 }

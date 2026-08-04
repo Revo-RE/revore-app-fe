@@ -85,8 +85,8 @@ export class ProgramacionesComponent implements OnInit {
     private buildForm(): void {
         this.form = this.fb.group({
             developer_id:       ['', Validators.required],
-            developer_group_id: [null],
-            sub_project_id:     [null],
+            developer_group_id: [''],
+            sub_project_id:     [''],
             report_type_id:     ['', Validators.required],
             day_of_week:        [1],
             hour:               [9],
@@ -112,6 +112,26 @@ export class ProgramacionesComponent implements OnInit {
         return 'Grupo';
     }
 
+    /** Placeholder del select de proyecto/grupo (opción no seleccionable). */
+    get selectPlaceholder(): string {
+        return `Selecciona ${this.groupLabel.toLowerCase()}`;
+    }
+
+    /**
+     * Elegir proyecto/grupo es obligatorio siempre que el select se muestre:
+     * ya no existe la opción "sin proyecto específico".
+     */
+    private syncProjectValidators(): void {
+        const apply = (name: string, required: boolean): void => {
+            const ctrl = this.form.get(name)!;
+            if (required) ctrl.setValidators(Validators.required);
+            else ctrl.clearValidators();
+            ctrl.updateValueAndValidity({ emitEvent: false });
+        };
+        apply('developer_group_id', this.developerGroups.length > 0);
+        apply('sub_project_id', this.developerGroups.length === 0 && this.subProjects.length > 0);
+    }
+
     /** El reporte de brokers aplica a todos los desarrollos (uno por desarrollo). */
     private isBrokersReportType(reportTypeId: string | null | undefined): boolean {
         const name = this.reportTypes.find(r => r.id === reportTypeId)?.name ?? '';
@@ -132,7 +152,8 @@ export class ProgramacionesComponent implements OnInit {
     async onDeveloperChange(developerId: string): Promise<void> {
         this.developerGroups = [];
         this.subProjects = [];
-        this.form.patchValue({ developer_group_id: null, sub_project_id: null }, { emitEvent: false });
+        this.form.patchValue({ developer_group_id: '', sub_project_id: '' }, { emitEvent: false });
+        this.syncProjectValidators();
         const selectedTypeId = this.form.get('report_type_id')?.value;
         // Brokers (uno por desarrollo) y C-Level (nivel portafolio) no eligen proyecto.
         if (this.hidesProjectSelection(selectedTypeId)) {
@@ -153,6 +174,7 @@ export class ProgramacionesComponent implements OnInit {
             if (token !== this.loadingToken) return;
             this.subProjects = subs;
         }
+        this.syncProjectValidators();
         this.loadingRelated = false;
     }
 
@@ -183,7 +205,8 @@ export class ProgramacionesComponent implements OnInit {
         this.developerGroups = [];
         this.subProjects = [];
         this.loadingRelated = false;
-        this.form.reset({ day_of_week: 1, hour: 9, active: true });
+        this.form.reset({ developer_group_id: '', sub_project_id: '', day_of_week: 1, hour: 9, active: true });
+        this.syncProjectValidators();
         this.showModal = true;
     }
 
@@ -211,14 +234,15 @@ export class ProgramacionesComponent implements OnInit {
 
         this.form.patchValue({
             developer_id:       s.developer_id,
-            developer_group_id: s.developer_group_id ?? null,
-            sub_project_id:     s.sub_project_id ?? null,
+            developer_group_id: s.developer_group_id ?? '',
+            sub_project_id:     s.sub_project_id ?? '',
             report_type_id:     s.report_type_id,
             day_of_week:        s.day_of_week,
             hour:               s.hour,
             recipients:         s.recipients.join(', '),
             active:             s.active,
         }, { emitEvent: false });
+        this.syncProjectValidators();
     }
 
     closeModal(): void {

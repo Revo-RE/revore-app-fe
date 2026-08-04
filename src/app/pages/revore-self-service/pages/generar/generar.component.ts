@@ -69,6 +69,19 @@ export class GenerarComponent implements OnInit {
         return this.developerGroups.length > 0 || this.subProjects.length > 0;
     }
 
+    /** Placeholder del select de proyecto/grupo (opción no seleccionable). */
+    get selectPlaceholder(): string {
+        return `Selecciona ${this.groupLabel.toLowerCase()}`;
+    }
+
+    /**
+     * Siempre que el select de proyecto/grupo se muestre, elegir una opción es
+     * obligatorio: no existe la alternativa "sin proyecto específico".
+     */
+    private get isProjectSelectionRequired(): boolean {
+        return this.hasSelection && !this.isCLevelType;
+    }
+
     /** El reporte de brokers aplica a todos los desarrollos (uno por desarrollo). */
     get isBrokersType(): boolean {
         return !!this.selectedReportType && /broker/i.test(this.selectedReportType.name);
@@ -174,8 +187,8 @@ export class GenerarComponent implements OnInit {
     private buildForm(): void {
         this.form = this.fb.group({
             developer_id:       ['', Validators.required],
-            developer_group_id: [null],
-            sub_project_id:     [null],
+            developer_group_id: [''],
+            sub_project_id:     [''],
             recipients:         [''],
             // on_demand
             fecha_corte:        [null],
@@ -196,7 +209,7 @@ export class GenerarComponent implements OnInit {
     async onDeveloperChange(developerId: string): Promise<void> {
         this.developerGroups = [];
         this.subProjects = [];
-        this.form.patchValue({ developer_group_id: null, sub_project_id: null });
+        this.form.patchValue({ developer_group_id: '', sub_project_id: '' });
         // Brokers usa solo el developer (un reporte por desarrollo, vía su
         // script_arg); no aplica selección de líder ni sub-proyecto.
         if (this.isBrokersType) return;
@@ -276,8 +289,9 @@ export class GenerarComponent implements OnInit {
         if (this.step === 3) return this.selectedModalidad !== null;
         if (this.step === 4) {
             const devOk = !!this.form.get('developer_id')!.value;
-            // El Inventario exige proyecto específico (se genera por proyecto).
-            const projectOk = !this.isInventoryType || !!this.form.get('sub_project_id')!.value;
+            // Si el select de proyecto/grupo está visible, elegir es obligatorio.
+            const control = this.developerGroups.length > 0 ? 'developer_group_id' : 'sub_project_id';
+            const projectOk = !this.isProjectSelectionRequired || !!this.form.get(control)!.value;
             const baseOk = devOk && projectOk;
             if (this.selectedModalidad === 'on_demand') return baseOk;
             return baseOk && this.form.get('a_las')!.value != null;
