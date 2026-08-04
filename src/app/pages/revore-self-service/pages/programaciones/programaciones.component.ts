@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { SelfServiceService } from '@revore/services/self-service.service';
 import {
     ScheduleWithRelations, DbDeveloper, DbDeveloperGroup, DbSubProject,
-    DbReportType,
+    DbReportType, filterHiddenProjects,
 } from '@revore/models/database.types';
 
 function formatHourRange(h: number): string {
@@ -132,6 +132,12 @@ export class ProgramacionesComponent implements OnInit {
         apply('sub_project_id', this.developerGroups.length === 0 && this.subProjects.length > 0);
     }
 
+    /** Oculta los proyectos pausados (solo aplica a Ventas Diario/Semanal). */
+    private hideProjects<T extends { name: string }>(items: T[], reportTypeId: string | null | undefined): T[] {
+        const rt = this.reportTypes.find(r => r.id === reportTypeId);
+        return filterHiddenProjects(items, rt?.service, rt?.name);
+    }
+
     /** El reporte de brokers aplica a todos los desarrollos (uno por desarrollo). */
     private isBrokersReportType(reportTypeId: string | null | undefined): boolean {
         const name = this.reportTypes.find(r => r.id === reportTypeId)?.name ?? '';
@@ -163,14 +169,17 @@ export class ProgramacionesComponent implements OnInit {
         this.loadingRelated = true;
         const token = ++this.loadingToken;
         const service = this.reportTypes.find(r => r.id === selectedTypeId)?.service;
-        const groups = await this.svc.getDeveloperGroups(developerId, service ?? undefined);
+        const groups = this.hideProjects(
+            await this.svc.getDeveloperGroups(developerId, service ?? undefined),
+            selectedTypeId,
+        );
         if (token !== this.loadingToken) return;
         if (groups.length > 0) {
             this.developerGroups = groups;
         } else {
             // Desarrolladores sin developer_groups (Tare, PROCSA, Nova Habita, …)
             // eligen proyecto vía sub_projects.
-            const subs = await this.svc.getSubProjects(developerId);
+            const subs = this.hideProjects(await this.svc.getSubProjects(developerId), selectedTypeId);
             if (token !== this.loadingToken) return;
             this.subProjects = subs;
         }

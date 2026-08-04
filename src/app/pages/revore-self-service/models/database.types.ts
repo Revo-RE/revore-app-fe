@@ -191,3 +191,31 @@ export const SERVICE_LABELS: Record<ServiceType, string> = {
 
 /** Servicios disponibles actualmente (los demás son "Próximamente") */
 export const ACTIVE_SERVICES: ServiceType[] = ['marketing', 'sales'];
+
+/**
+ * Proyectos pausados TEMPORALMENTE en los reportes de Ventas (Diario y
+ * Semanal) — acordado con Grupo San Carlos. Para reactivarlos, vaciar este
+ * arreglo. No afecta a ningún otro servicio ni tipo de reporte.
+ */
+export const VENTAS_HIDDEN_PROJECTS: string[] = [
+    'colinas de san isidro',
+    'parques vallarta',
+];
+
+function normalizeProjectName(name: string): string {
+    return name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+}
+
+/**
+ * Oculta los proyectos pausados cuando el reporte es de Ventas Diario o
+ * Semanal. En cualquier otro servicio o tipo devuelve la lista intacta.
+ */
+export function filterHiddenProjects<T extends { name: string }>(
+    items: T[],
+    service: string | null | undefined,
+    reportTypeName: string | null | undefined,
+): T[] {
+    if (service !== 'sales') return items;
+    if (!/diario|semanal/i.test(reportTypeName ?? '')) return items;
+    return items.filter(i => !VENTAS_HIDDEN_PROJECTS.includes(normalizeProjectName(i.name)));
+}

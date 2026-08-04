@@ -5,7 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { SelfServiceService } from '@revore/services/self-service.service';
 import {
     DbDeveloper, DbDeveloperGroup, DbSubProject, DbReportType,
-    ServiceType, SERVICE_LABELS,
+    ServiceType, SERVICE_LABELS, filterHiddenProjects,
 } from '@revore/models/database.types';
 
 function formatHourRange(h: number): string {
@@ -127,6 +127,11 @@ export class GenerarComponent implements OnInit {
         'líder 3': 'ARTURO LOPEZ OROZCO',
     };
 
+    /** Oculta los proyectos pausados (solo aplica a Ventas Diario/Semanal). */
+    private hideProjects<T extends { name: string }>(items: T[]): T[] {
+        return filterHiddenProjects(items, this.selectedService, this.selectedReportType?.name);
+    }
+
     private readonly MKT_AGENCY_NAMES: Record<string, string> = {
         'GRUPO SAN CARLOS 1': 'Madake (P & C)',
         'GRUPO SAN CARLOS 2': 'Madake (PV & SI)',
@@ -220,15 +225,17 @@ export class GenerarComponent implements OnInit {
         // El Inventario es por proyecto individual: siempre sub-proyectos,
         // nunca grupos de líder/agencia.
         if (this.isInventoryType) {
-            this.subProjects = await this.svc.getSubProjects(developerId);
+            this.subProjects = this.hideProjects(await this.svc.getSubProjects(developerId));
             this.loadingRelated = false;
             return;
         }
-        const groups = await this.svc.getDeveloperGroups(developerId, this.selectedService ?? undefined);
+        const groups = this.hideProjects(
+            await this.svc.getDeveloperGroups(developerId, this.selectedService ?? undefined),
+        );
         if (groups.length > 0) {
             this.developerGroups = groups;
         } else {
-            this.subProjects = await this.svc.getSubProjects(developerId);
+            this.subProjects = this.hideProjects(await this.svc.getSubProjects(developerId));
         }
         this.loadingRelated = false;
     }
