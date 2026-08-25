@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { SelfServiceService } from '@revore/services/self-service.service';
 import {
     DbDesarrollador, DbProyecto, MetaWithRelations, GoalType, GOAL_TYPES,
+    DbCategoria, DbReferenciaPlataforma, OrigenWithRelations,
 } from '@revore/models/database.types';
 
 @Component({
@@ -18,7 +19,7 @@ export class ConfiguracionComponent implements OnInit {
     isLoading = true;
 
     /** Sub-sección activa dentro de Configuración. 'none' muestra el selector. */
-    selectedConfig: 'none' | 'metas' = 'none';
+    selectedConfig: 'none' | 'metas' | 'origenes' = 'none';
 
     // Metas
     desarrolladores: DbDesarrollador[] = [];
@@ -40,17 +41,43 @@ export class ConfiguracionComponent implements OnInit {
 
     readonly GOAL_TYPES = GOAL_TYPES;
 
+    // Orígenes
+    categorias: DbCategoria[] = [];
+    referenciasPlataformas: DbReferenciaPlataforma[] = [];
+    origenes: OrigenWithRelations[] = [];
+    origenesLoading = false;
+    selectedOrigenDesarrolladorId = '';
+    selectedOrigenProyectoId = '';
+    selectedOrigenCategoriaId = '';
+    origenSearchTerm = '';
+    readonly origenesPageSize = 25;
+    origenesPage = 1;
+
+    showOrigenModal = false;
+    isEditingOrigen = false;
+    editingOrigenId: string | null = null;
+    isSavingOrigen = false;
+    origenError = '';
+    confirmDeleteOrigenId: string | null = null;
+    origenForm!: FormGroup;
+
     constructor(private svc: SelfServiceService, private fb: FormBuilder) {}
 
     async ngOnInit(): Promise<void> {
-        const [desarrolladores, proyectos, metas] = await Promise.all([
+        const [desarrolladores, proyectos, metas, categorias, referenciasPlataformas, origenes] = await Promise.all([
             this.svc.getDesarrolladores(),
             this.svc.getProyectos(),
             this.svc.getMetas(),
+            this.svc.getCategorias(),
+            this.svc.getReferenciasPlataformas(),
+            this.svc.getOrigenes(),
         ]);
         this.desarrolladores = desarrolladores;
         this.proyectos = proyectos;
         this.metas = metas;
+        this.categorias = categorias;
+        this.referenciasPlataformas = referenciasPlataformas;
+        this.origenes = origenes;
         this.isLoading = false;
         this.buildForms();
     }
@@ -66,6 +93,14 @@ export class ConfiguracionComponent implements OnInit {
             Visitas:          [0, [Validators.required, Validators.min(0)]],
             Apartados:        [0, [Validators.required, Validators.min(0)]],
             Ventas:           [0, [Validators.required, Validators.min(0)]],
+        });
+
+        this.origenForm = this.fb.group({
+            desarrollador_id:         ['', Validators.required],
+            Proyecto_id:              ['', Validators.required],
+            Nombre:                   ['', Validators.required],
+            Categoria_id:             ['', Validators.required],
+            Referencia_plataforma_id: [''],
         });
     }
 
@@ -119,6 +154,11 @@ export class ConfiguracionComponent implements OnInit {
     proyectosDelFiltro(): DbProyecto[] {
         if (!this.selectedMetaDesarrolladorId) return this.proyectos;
         return this.proyectos.filter(p => p.Desarrollador_id === this.selectedMetaDesarrolladorId);
+    }
+
+    proyectosDelFiltroOrigen(): DbProyecto[] {
+        if (!this.selectedOrigenDesarrolladorId) return this.proyectos;
+        return this.proyectos.filter(p => p.Desarrollador_id === this.selectedOrigenDesarrolladorId);
     }
 
     onMetaDesarrolladorChangeInForm(desarrolladorId: string): void {
@@ -220,5 +260,156 @@ export class ConfiguracionComponent implements OnInit {
         await this.svc.deleteMeta(this.confirmDeleteMetaId);
         this.metas = this.metas.filter(m => m.id !== this.confirmDeleteMetaId);
         this.confirmDeleteMetaId = null;
+    }
+
+    // ── Orígenes ────────────────────────────────────────────────────────────
+
+    categoriaNombre(id: string): string {
+        return this.categorias.find(c => c.id === id)?.Nombre ?? '—';
+    }
+
+    referenciaPlataformaNombre(id: string | null): string {
+        if (!id) return '—';
+        return this.referenciasPlataformas.find(r => r.id === id)?.Nombre ?? '—';
+    }
+
+    async onOrigenDesarrolladorFilter(id: string): Promise<void> {
+        this.selectedOrigenDesarrolladorId = id;
+        this.selectedOrigenProyectoId = '';
+        this.origenesPage = 1;
+        await this.reloadOrigenes();
+    }
+
+    async onOrigenProyectoFilter(id: string): Promise<void> {
+        this.selectedOrigenProyectoId = id;
+        this.origenesPage = 1;
+        await this.reloadOrigenes();
+    }
+
+    private async reloadOrigenes(): Promise<void> {
+        this.origenesLoading = true;
+        this.origenes = await this.svc.getOrigenes({
+            desarrolladorId: this.selectedOrigenDesarrolladorId || undefined,
+            proyectoId:      this.selectedOrigenProyectoId || undefined,
+        });
+        this.origenesLoading = false;
+        this.goToOrigenPage(this.origenesPage);
+    }
+
+    onOrigenCategoriaFilter(id: string): void {
+        this.selectedOrigenCategoriaId = id;
+        this.origenesPage = 1;
+    }
+
+    onOrigenSearch(term: string): void {
+        this.origenSearchTerm = term;
+        this.origenesPage = 1;
+    }
+
+    /** Filtros aplicados en cliente (categoría + texto) sobre lo ya traído de Supabase. */
+    get origenesFiltrados(): OrigenWithRelations[] {
+        let rows = this.origenes;
+        if (this.selectedOrigenCategoriaId) {
+            rows = rows.filter(o => o.Categoria_id === this.selectedOrigenCategoriaId);
+        }
+        const term = this.origenSearchTerm.trim().toLowerCase();
+        if (term) {
+            rows = rows.filter(o => o.Nombre.toLowerCase().includes(term));
+        }
+        return rows;
+    }
+
+    get origenesTotalPages(): number {
+        return Math.max(1, Math.ceil(this.origenesFiltrados.length / this.origenesPageSize));
+    }
+
+    get origenesPaged(): OrigenWithRelations[] {
+        const start = (this.origenesPage - 1) * this.origenesPageSize;
+        return this.origenesFiltrados.slice(start, start + this.origenesPageSize);
+    }
+
+    goToOrigenPage(page: number): void {
+        this.origenesPage = Math.min(Math.max(1, page), this.origenesTotalPages);
+    }
+
+    onOrigenDesarrolladorChangeInForm(desarrolladorId: string): void {
+        this.origenForm.patchValue({ desarrollador_id: desarrolladorId, Proyecto_id: '' });
+        this.proyectosFiltrados = this.proyectos.filter(p => p.Desarrollador_id === desarrolladorId);
+    }
+
+    openCreateOrigen(): void {
+        this.isEditingOrigen = false;
+        this.editingOrigenId = null;
+        this.origenError = '';
+        this.proyectosFiltrados = [];
+        this.origenForm.reset({
+            desarrollador_id: '',
+            Proyecto_id: '',
+            Nombre: '',
+            Categoria_id: '',
+            Referencia_plataforma_id: '',
+        });
+        this.showOrigenModal = true;
+    }
+
+    openEditOrigen(o: OrigenWithRelations): void {
+        this.isEditingOrigen = true;
+        this.editingOrigenId = o.id;
+        this.origenError = '';
+        const proyecto = this.proyectos.find(p => p.id === o.Proyecto_id);
+        const desarrolladorId = proyecto?.Desarrollador_id ?? '';
+        this.proyectosFiltrados = this.proyectos.filter(p => p.Desarrollador_id === desarrolladorId);
+        this.origenForm.patchValue({
+            desarrollador_id:         desarrolladorId,
+            Proyecto_id:              o.Proyecto_id,
+            Nombre:                   o.Nombre,
+            Categoria_id:             o.Categoria_id,
+            Referencia_plataforma_id: o.Referencia_plataforma_id ?? '',
+        });
+        this.showOrigenModal = true;
+    }
+
+    closeOrigenModal(): void {
+        this.showOrigenModal = false;
+        this.origenError = '';
+    }
+
+    async saveOrigen(): Promise<void> {
+        if (this.origenForm.invalid) return;
+        this.isSavingOrigen = true;
+        this.origenError = '';
+        const v = this.origenForm.value;
+
+        const payload = {
+            Proyecto_id:              v.Proyecto_id,
+            Nombre:                   String(v.Nombre).trim(),
+            Categoria_id:             v.Categoria_id,
+            Referencia_plataforma_id: v.Referencia_plataforma_id || null,
+        };
+
+        const { error } = this.isEditingOrigen && this.editingOrigenId
+            ? await this.svc.updateOrigen(this.editingOrigenId, payload)
+            : await this.svc.createOrigen(payload);
+
+        if (error) {
+            this.origenError = error.message;
+            this.isSavingOrigen = false;
+            return;
+        }
+
+        await this.reloadOrigenes();
+        this.isSavingOrigen = false;
+        this.closeOrigenModal();
+    }
+
+    requestDeleteOrigen(id: string): void { this.confirmDeleteOrigenId = id; }
+    cancelDeleteOrigen(): void { this.confirmDeleteOrigenId = null; }
+
+    async confirmDeleteOrigen(): Promise<void> {
+        if (!this.confirmDeleteOrigenId) return;
+        await this.svc.deleteOrigen(this.confirmDeleteOrigenId);
+        this.origenes = this.origenes.filter(o => o.id !== this.confirmDeleteOrigenId);
+        this.confirmDeleteOrigenId = null;
+        this.goToOrigenPage(this.origenesPage);
     }
 }

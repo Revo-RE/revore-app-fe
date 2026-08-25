@@ -5,6 +5,8 @@
       <h1 class="ss-configuracion__title">Configuración</h1>
       @if (selectedConfig === 'metas') {
         <p class="ss-configuracion__subtitle">Gestiona las metas mensuales por proyecto</p>
+      } @else if (selectedConfig === 'origenes') {
+        <p class="ss-configuracion__subtitle">Gestiona la categoría de cada origen de leads por proyecto</p>
       } @else {
         <p class="ss-configuracion__subtitle">Selecciona qué deseas configurar</p>
       }
@@ -26,13 +28,18 @@
         <span class="ss-config-card__label">Metas</span>
         <span class="ss-config-card__desc">Metas mensuales por proyecto (Inversión, Leads, Visitas, Apartados, Ventas)</span>
       </button>
+      <button class="ss-config-card" (click)="selectedConfig = 'origenes'">
+        <span class="ss-config-card__index">02</span>
+        <span class="ss-config-card__label">Orígenes</span>
+        <span class="ss-config-card__desc">Categoría de cada origen de leads por proyecto (Digital, Off-Line, Prospección, Referido, Broker)</span>
+      </button>
     </div>
 
   } @else if (selectedConfig === 'metas') {
 
     <!-- ── METAS ── -->
-    <div class="ss-section-header" style="gap:.75rem; flex-wrap:wrap;">
-      <div style="display:flex; gap:.5rem; flex-wrap:wrap; align-items:center;">
+    <div class="ss-section-header" style="align-items: flex-start; gap:.75rem; flex-wrap:wrap;">
+      <div class="ss-filters">
         <select class="ss-form__select" [value]="selectedMetaDesarrolladorId"
                 (change)="onMetaDesarrolladorFilter($any($event.target).value)">
           <option value="">Todos los desarrolladores</option>
@@ -100,6 +107,90 @@
             }
           </tbody>
         </table>
+      </div>
+    }
+
+  } @else if (selectedConfig === 'origenes') {
+
+    <!-- ── ORÍGENES ── -->
+    <div class="ss-section-header" style="align-items: flex-start; gap:.75rem; flex-wrap:wrap;">
+      <div class="ss-filters">
+        <select class="ss-form__select" [value]="selectedOrigenDesarrolladorId"
+                (change)="onOrigenDesarrolladorFilter($any($event.target).value)">
+          <option value="">Todos los desarrolladores</option>
+          @for (d of desarrolladores; track d.id) {
+            <option [value]="d.id">{{ d.Desarrollador }}</option>
+          }
+        </select>
+
+        <select class="ss-form__select" [value]="selectedOrigenProyectoId"
+                (change)="onOrigenProyectoFilter($any($event.target).value)">
+          <option value="">Todos los proyectos</option>
+          @for (p of proyectosDelFiltroOrigen(); track p.id) {
+            <option [value]="p.id">{{ p.Nombre }}</option>
+          }
+        </select>
+
+        <select class="ss-form__select" [value]="selectedOrigenCategoriaId"
+                (change)="onOrigenCategoriaFilter($any($event.target).value)">
+          <option value="">Todas las categorías</option>
+          @for (c of categorias; track c.id) {
+            <option [value]="c.id">{{ c.Nombre }}</option>
+          }
+        </select>
+
+        <input class="ss-form__input" type="text" placeholder="Buscar origen…"
+               [value]="origenSearchTerm" (input)="onOrigenSearch($any($event.target).value)" />
+
+        <span class="ss-section-count">{{ origenesFiltrados.length }} origen(es)</span>
+      </div>
+      <button class="ss-btn ss-btn--primary" (click)="openCreateOrigen()">Agregar origen</button>
+    </div>
+
+    @if (origenesLoading) {
+      <div class="ss-loading">Cargando orígenes…</div>
+    } @else if (origenesFiltrados.length === 0) {
+      <div class="ss-empty">
+        <p>No hay orígenes configurados con estos filtros.</p>
+        <button class="ss-btn ss-btn--outline" (click)="openCreateOrigen()">Agregar el primero</button>
+      </div>
+    } @else {
+      <div class="ss-table-wrap">
+        <table class="ss-table">
+          <thead>
+            <tr>
+              <th>Desarrollador</th>
+              <th>Proyecto</th>
+              <th>Origen</th>
+              <th>Categoría</th>
+              <th>Referencia de plataforma</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (o of origenesPaged; track o.id) {
+              <tr>
+                <td>{{ desarrolladorDeProyecto(o.Proyecto_id) }}</td>
+                <td><strong>{{ proyectoNombre(o.Proyecto_id) }}</strong></td>
+                <td>{{ o.Nombre }}</td>
+                <td><span class="ss-badge">{{ categoriaNombre(o.Categoria_id) }}</span></td>
+                <td>{{ referenciaPlataformaNombre(o.Referencia_plataforma_id) }}</td>
+                <td>
+                  <div class="ss-actions">
+                    <button class="action-link" (click)="openEditOrigen(o)">Editar</button>
+                    <button class="action-link action-link-danger" (click)="requestDeleteOrigen(o.id)">Eliminar</button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <div class="ss-pagination">
+        <button class="ss-btn ss-btn--outline ss-btn--sm" [disabled]="origenesPage <= 1" (click)="goToOrigenPage(origenesPage - 1)">Anterior</button>
+        <span class="ss-pagination__label">Página {{ origenesPage }} de {{ origenesTotalPages }}</span>
+        <button class="ss-btn ss-btn--outline ss-btn--sm" [disabled]="origenesPage >= origenesTotalPages" (click)="goToOrigenPage(origenesPage + 1)">Siguiente</button>
       </div>
     }
   }
@@ -213,6 +304,97 @@
       <div class="ss-dialog__actions">
         <button class="ss-btn ss-btn--outline" (click)="cancelDeleteMeta()">Cancelar</button>
         <button class="ss-btn ss-btn--danger" (click)="confirmDeleteMeta()">Eliminar</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ═══════════════════ MODAL ORIGEN ═══════════════════ -->
+@if (showOrigenModal) {
+  <div class="ss-overlay" (click)="closeOrigenModal()">
+    <div class="ss-modal" (click)="$event.stopPropagation()">
+      <div class="ss-modal__header">
+        <h2>{{ isEditingOrigen ? 'Editar origen' : 'Nuevo origen' }}</h2>
+        <button class="ss-modal__close" (click)="closeOrigenModal()" aria-label="Cerrar">&times;</button>
+      </div>
+      <div class="ss-modal__body">
+        <form [formGroup]="origenForm" class="ss-form">
+
+          <div class="ss-form__row">
+            <div class="ss-form__group">
+              <label class="ss-form__label">Desarrollador *</label>
+              <select class="ss-form__select" formControlName="desarrollador_id"
+                      (change)="onOrigenDesarrolladorChangeInForm($any($event.target).value)">
+                <option value="">Seleccionar…</option>
+                @for (d of desarrolladores; track d.id) {
+                  <option [value]="d.id">{{ d.Desarrollador }}</option>
+                }
+              </select>
+            </div>
+            <div class="ss-form__group">
+              <label class="ss-form__label">Sub-proyecto *</label>
+              <select class="ss-form__select" formControlName="Proyecto_id"
+                      [disabled]="!origenForm.get('desarrollador_id')?.value">
+                <option value="">Seleccionar…</option>
+                @for (p of proyectosFiltrados; track p.id) {
+                  <option [value]="p.id">{{ p.Nombre }}</option>
+                }
+              </select>
+            </div>
+          </div>
+
+          <div class="ss-form__group">
+            <label class="ss-form__label">Nombre del origen *</label>
+            <input class="ss-form__input" type="text" formControlName="Nombre" placeholder="Ej. Meta Ads, Referido, Broker…" />
+          </div>
+
+          <div class="ss-form__row">
+            <div class="ss-form__group">
+              <label class="ss-form__label">Categoría *</label>
+              <select class="ss-form__select" formControlName="Categoria_id">
+                <option value="">Seleccionar…</option>
+                @for (c of categorias; track c.id) {
+                  <option [value]="c.id">{{ c.Nombre }}</option>
+                }
+              </select>
+            </div>
+            <div class="ss-form__group">
+              <label class="ss-form__label">Referencia de plataforma</label>
+              <select class="ss-form__select" formControlName="Referencia_plataforma_id">
+                <option value="">Ninguna</option>
+                @for (r of referenciasPlataformas; track r.id) {
+                  <option [value]="r.id">{{ r.Nombre }}</option>
+                }
+              </select>
+            </div>
+          </div>
+
+          @if (origenError) {
+            <div class="ss-error">{{ origenError }}</div>
+          }
+        </form>
+      </div>
+      <div class="ss-modal__footer">
+        <button class="ss-btn ss-btn--outline" (click)="closeOrigenModal()">Cancelar</button>
+        <button class="ss-btn ss-btn--primary"
+                [disabled]="origenForm.invalid || isSavingOrigen"
+                (click)="saveOrigen()">
+          {{ isSavingOrigen ? 'Guardando…' : 'Guardar' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ═══════════════════ CONFIRM DELETE ORIGEN ═══════════════════ -->
+@if (confirmDeleteOrigenId) {
+  <div class="ss-overlay">
+    <div class="ss-dialog">
+      <h3>¿Eliminar origen?</h3>
+      <p>Esta acción no se puede deshacer.</p>
+      <div class="ss-dialog__actions">
+        <button class="ss-btn ss-btn--outline" (click)="cancelDeleteOrigen()">Cancelar</button>
+        <button class="ss-btn ss-btn--danger" (click)="confirmDeleteOrigen()">Eliminar</button>
       </div>
     </div>
   </div>

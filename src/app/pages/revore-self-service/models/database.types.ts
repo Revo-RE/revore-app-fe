@@ -64,6 +64,30 @@ export const GOAL_TYPES: { value: GoalType; label: string }[] = [
     { value: 'Prospeccion', label: 'Prospección' },
 ];
 
+export interface DbCategoria {
+    id: string;
+    Nombre: string;
+}
+
+export interface DbReferenciaPlataforma {
+    id: string;
+    Nombre: string;
+}
+
+export interface DbOrigen {
+    id: string;
+    Nombre: string;
+    Proyecto_id: string;
+    Categoria_id: string;
+    Referencia_plataforma_id: string | null;
+}
+
+export interface OrigenWithRelations extends DbOrigen {
+    Proyectos?: { Nombre: string; Desarrollador_id: string } | null;
+    Categorias?: { Nombre: string } | null;
+    Referencias_plataformas?: { Nombre: string } | null;
+}
+
 // ─── Table Interfaces ───────────────────────────────────────────────────────
 
 export interface DbUser {

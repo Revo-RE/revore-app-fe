@@ -9,6 +9,7 @@ import {
     DbSchedule, DbExecution, ExecutionWithRelations, ScheduleWithRelations,
     ExecutionStatus, ServiceType,
     DbDesarrollador, DbProyecto, DbMeta, MetaWithRelations, GoalType, MetaDetails,
+    DbCategoria, DbReferenciaPlataforma, DbOrigen, OrigenWithRelations,
 } from '../models/database.types';
 
 @Injectable({ providedIn: 'root' })
@@ -201,6 +202,56 @@ export class SelfServiceService {
 
     async deleteMeta(id: string): Promise<{ error: any }> {
         const { error } = await this.supabaseMetasS.db.from('Metas').delete().eq('id', id);
+        return { error };
+    }
+
+    // ── Orígenes (mismo proyecto Supabase que Metas) ──────────────────────────
+
+    async getCategorias(): Promise<DbCategoria[]> {
+        const { data } = await this.supabaseMetasS.db
+            .from('Categorias')
+            .select('*')
+            .order('Nombre');
+        return (data ?? []) as DbCategoria[];
+    }
+
+    async getReferenciasPlataformas(): Promise<DbReferenciaPlataforma[]> {
+        const { data } = await this.supabaseMetasS.db
+            .from('Referencias_plataformas')
+            .select('*')
+            .order('Nombre');
+        return (data ?? []) as DbReferenciaPlataforma[];
+    }
+
+    async getOrigenes(filters?: { desarrolladorId?: string; proyectoId?: string }): Promise<OrigenWithRelations[]> {
+        let query = this.supabaseMetasS.db
+            .from('Origenes')
+            .select('*, Proyectos(Nombre, Desarrollador_id), Categorias(Nombre), Referencias_plataformas(Nombre)')
+            .order('Nombre');
+
+        if (filters?.proyectoId) query = (query as any).eq('Proyecto_id', filters.proyectoId);
+
+        const { data } = await query;
+        let rows = (data ?? []) as OrigenWithRelations[];
+        // El filtro por desarrollador se aplica en cliente (FK indirecta vía Proyectos)
+        if (filters?.desarrolladorId) {
+            rows = rows.filter(o => o.Proyectos?.Desarrollador_id === filters.desarrolladorId);
+        }
+        return rows;
+    }
+
+    async createOrigen(payload: { Proyecto_id: string; Nombre: string; Categoria_id: string; Referencia_plataforma_id?: string | null }): Promise<{ error: any }> {
+        const { error } = await this.supabaseMetasS.db.from('Origenes').insert(payload as any);
+        return { error };
+    }
+
+    async updateOrigen(id: string, payload: Partial<Pick<DbOrigen, 'Nombre' | 'Categoria_id' | 'Proyecto_id' | 'Referencia_plataforma_id'>>): Promise<{ error: any }> {
+        const { error } = await this.supabaseMetasS.db.from('Origenes').update(payload as any).eq('id', id);
+        return { error };
+    }
+
+    async deleteOrigen(id: string): Promise<{ error: any }> {
+        const { error } = await this.supabaseMetasS.db.from('Origenes').delete().eq('id', id);
         return { error };
     }
 }
