@@ -1,0 +1,65 @@
+<div class="consent">
+  @switch (state) {
+    @case ('loading') {
+      <div class="consent__loading">
+        <span class="spinner consent__spinner" aria-label="Cargando"></span>
+        <p>Cargando solicitud…</p>
+      </div>
+    }
+
+    @case ('login') {
+      <div class="consent__card">
+        <h1 class="consent__title">Inicia sesión para continuar</h1>
+        <p class="consent__body">
+          Una aplicación está solicitando acceso a tu cuenta de RevoRE.<br>
+          Inicia sesión con tu cuenta de Google de RevoRE para revisar la solicitud.
+        </p>
+        <button class="consent__btn consent__btn--primary" type="button"
+                [disabled]="isSubmitting" (click)="signInWithGoogle()">
+          Continuar con Google
+        </button>
+      </div>
+    }
+
+    @case ('consent') {
+      <div class="consent__card">
+        @if (details!.client.logo_uri) {
+          <img class="consent__logo" [src]="details!.client.logo_uri" [alt]="details!.client.name">
+        }
+        <h1 class="consent__title">{{ details!.client.name }} quiere acceder a tu cuenta</h1>
+        <p class="consent__body">
+          Sesión iniciada como <strong>{{ details!.user.email }}</strong>
+        </p>
+
+        @if (scopes.length) {
+          <div class="consent__scopes">
+            <p class="consent__scopes-title">Esta aplicación podrá:</p>
+            <ul>
+              @for (scope of scopes; track scope) {
+                <li>{{ scope }}</li>
+              }
+            </ul>
+          </div>
+        }
+
+        <div class="consent__actions">
+          <button class="consent__btn consent__btn--secondary" type="button"
+                  [disabled]="isSubmitting" (click)="deny()">
+            Rechazar
+          </button>
+          <button class="consent__btn consent__btn--primary" type="button"
+                  [disabled]="isSubmitting" (click)="approve()">
+            Aprobar
+          </button>
+        </div>
+      </div>
+    }
+
+    @case ('error') {
+      <div class="consent__card">
+        <h1 class="consent__title">No se pudo completar la autorización</h1>
+        <p class="consent__body">{{ errorMessage }}</p>
+      </div>
+    }
+  }
+</div>

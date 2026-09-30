@@ -1,0 +1,131 @@
+@use "sass:map";
+@use "theme" as t;
+
+.consent {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background-color: #F7F8FA;
+    padding: 24px;
+    box-sizing: border-box;
+
+    &__loading {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+        color: map.get(t.$primary-color, 400);
+        font-family: "Inter", sans-serif;
+        font-size: 16px;
+    }
+
+    &__spinner {
+        border-width: 3px;
+        height: 32px;
+        width: 32px;
+    }
+
+    &__card {
+        background: #fff;
+        border-radius: t.$radius-surface;
+        border: 1px solid map.get(t.$primary-color, 200);
+        box-shadow: 0 2px 12px rgba(17, 27, 48, 0.06);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 48px 40px;
+        max-width: 440px;
+        width: 100%;
+        box-sizing: border-box;
+        text-align: center;
+    }
+
+    &__logo {
+        height: 48px;
+        width: 48px;
+        object-fit: contain;
+        margin-bottom: 16px;
+    }
+
+    &__title {
+        color: map.get(t.$primary-color, 700);
+        font-size: 24px;
+        line-height: normal;
+        margin: 0 0 16px;
+    }
+
+    &__body {
+        color: map.get(t.$primary-color, 400);
+        font-family: "Inter", sans-serif;
+        font-size: 15px;
+        line-height: 1.6;
+        margin: 0 0 24px;
+    }
+
+    &__scopes {
+        align-self: stretch;
+        border-top: 1px solid map.get(t.$primary-color, 200);
+        color: map.get(t.$primary-color, 700);
+        font-family: "Inter", sans-serif;
+        font-size: 14px;
+        margin-bottom: 32px;
+        padding-top: 16px;
+        text-align: left;
+
+        ul {
+            margin: 0;
+            padding-left: 20px;
+            line-height: 1.8;
+        }
+    }
+
+    &__scopes-title {
+        font-weight: 500;
+        margin: 0 0 8px;
+    }
+
+    &__actions {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        width: 100%;
+    }
+
+    &__btn {
+        border-radius: t.$radius-control;
+        box-sizing: border-box;
+        cursor: pointer;
+        font-family: "Inter", sans-serif;
+        font-size: 15px;
+        font-weight: 500;
+        line-height: normal;
+        padding: 12px 32px;
+
+        &--primary {
+            background-color: map.get(t.$primary-color, 700);
+            border: 1px solid map.get(t.$primary-color, 700);
+            color: map.get(t.$text-color, 100);
+
+            &:hover:not(:disabled) {
+                background-color: map.get(t.$primary-color, 500);
+                border-color: map.get(t.$primary-color, 500);
+            }
+        }
+
+        &--secondary {
+            background-color: #fff;
+            border: 1px solid map.get(t.$primary-color, 200);
+            color: map.get(t.$primary-color, 700);
+
+            &:hover:not(:disabled) {
+                border-color: map.get(t.$primary-color, 400);
+            }
+        }
+
+        &:disabled {
+            cursor: default;
+            opacity: 0.6;
+        }
+    }
+}

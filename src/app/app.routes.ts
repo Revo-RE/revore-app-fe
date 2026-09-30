@@ -28,5 +28,12 @@ export const routes: Routes = [
         path: 'revore/access-denied',
         loadComponent: () => import('./pages/revore-self-service/auth/access-denied/access-denied.component')
             .then(c => c.AccessDeniedComponent)
+    },
+    // Pantalla de consentimiento del OAuth Server de Supabase (Authorization Path).
+    // Pública: el propio componente maneja el caso sin sesión.
+    {
+        path: 'oauth/consent',
+        loadComponent: () => import('./pages/revore-self-service/auth/oauth-consent/oauth-consent.component')
+            .then(c => c.OAuthConsentComponent)
     }
 ];

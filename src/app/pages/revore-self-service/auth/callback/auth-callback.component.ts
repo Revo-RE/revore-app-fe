@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { User } from '@supabase/supabase-js';
 import { environment } from '@environments/environments.local';
 import { SupabaseService } from '@revore/services/supabase.service';
+import { takeOAuthReturnUrl } from '../oauth-consent/oauth-return';
 
 @Component({
     selector: 'app-revore-auth-callback',
@@ -19,6 +20,8 @@ export class AuthCallbackComponent implements OnInit {
     ) {}
 
     async ngOnInit(): Promise<void> {
+        // Se lee (y borra) siempre, para no dejar una URL vieja si este login falla
+        const oauthReturnUrl = takeOAuthReturnUrl();
         try {
             // PKCE flow: intercambiar code por session
             const code = new URLSearchParams(window.location.search).get('code');
@@ -44,7 +47,7 @@ export class AuthCallbackComponent implements OnInit {
 
             await this.upsertUserProfile(session.user);
             this.saveLocalUser(session.user);
-            this.router.navigateByUrl('/dashboard/sales-tools/dashboard');
+            this.router.navigateByUrl(oauthReturnUrl ?? '/dashboard/sales-tools/dashboard');
 
         } catch {
             this.hasError = true;
