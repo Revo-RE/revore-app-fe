@@ -9,6 +9,7 @@ import {
     DbSchedule, DbExecution, ExecutionWithRelations, ScheduleWithRelations,
     ExecutionStatus, ServiceType,
     DbDesarrollador, DbProyecto, DbMeta, MetaWithRelations, GoalType, MetaDetails,
+    DbCategoria, DbReferenciaPlataforma, DbOrigen, OrigenPayload,
 } from '../models/database.types';
 
 @Injectable({ providedIn: 'root' })
@@ -201,6 +202,56 @@ export class SelfServiceService {
 
     async deleteMeta(id: string): Promise<{ error: any }> {
         const { error } = await this.supabaseMetasS.db.from('Metas').delete().eq('id', id);
+        return { error };
+    }
+
+    // ── Orígenes (mismo proyecto Supabase que Metas) ─────────────────────────
+
+    async getCategorias(): Promise<DbCategoria[]> {
+        const { data } = await this.supabaseMetasS.db.from('Categorias').select('id, Nombre').order('Nombre');
+        return (data ?? []) as DbCategoria[];
+    }
+
+    async getReferenciasPlataformas(): Promise<DbReferenciaPlataforma[]> {
+        const { data } = await this.supabaseMetasS.db.from('Referencias_plataformas').select('id, Nombre').order('Nombre');
+        return (data ?? []) as DbReferenciaPlataforma[];
+    }
+
+    /**
+     * Trae TODOS los orígenes. PostgREST corta cada respuesta (1000 filas por
+     * defecto), así que se pagina hasta recibir una página vacía.
+     * Lanza el error de Supabase si alguna página falla.
+     */
+    async getOrigenes(): Promise<DbOrigen[]> {
+        const PAGE = 1000;
+        const rows: DbOrigen[] = [];
+        for (let from = 0; ; ) {
+            const { data, error } = await this.supabaseMetasS.db
+                .from('Origenes')
+                .select('id, Nombre, Proyecto_id, Categoria_id, Referencia_plataforma_id')
+                .order('Nombre')
+                .order('id')
+                .range(from, from + PAGE - 1);
+            if (error) throw error;
+            if (!data?.length) break;
+            rows.push(...(data as DbOrigen[]));
+            from += data.length;
+        }
+        return rows;
+    }
+
+    async createOrigen(payload: OrigenPayload): Promise<{ error: any }> {
+        const { error } = await this.supabaseMetasS.db.from('Origenes').insert(payload as any);
+        return { error };
+    }
+
+    async updateOrigen(id: string, payload: OrigenPayload): Promise<{ error: any }> {
+        const { error } = await this.supabaseMetasS.db.from('Origenes').update(payload as any).eq('id', id);
+        return { error };
+    }
+
+    async deleteOrigen(id: string): Promise<{ error: any }> {
+        const { error } = await this.supabaseMetasS.db.from('Origenes').delete().eq('id', id);
         return { error };
     }
 }

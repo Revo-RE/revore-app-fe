@@ -90,6 +90,12 @@
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true
+            },
+            "supabase-local": {
+              "fileReplacements": [{
+                "replace": "src/environments/environments.local.ts",
+                "with": "src/environments/environments.supabase.local.ts"
+              }]
             }
           },
           "defaultConfiguration": "production"
@@ -105,6 +111,10 @@
             },
             "development": {
               "buildTarget": "revore:build:development"
+            },
+            "supabase-local": {
+              "buildTarget": "revore:build:development,supabase-local",
+              "port": 3000
             }
           },
           "defaultConfiguration": "development"

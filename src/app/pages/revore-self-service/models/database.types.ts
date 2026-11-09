@@ -56,6 +56,26 @@ export interface MetaWithRelations extends DbMeta {
     Proyectos?: { Nombre: string; Desarrollador_id: string } | null;
 }
 
+export interface DbCategoria {
+    id: string;
+    Nombre: string;
+}
+
+export interface DbReferenciaPlataforma {
+    id: string;
+    Nombre: string;
+}
+
+export interface DbOrigen {
+    id: string;
+    Nombre: string;
+    Proyecto_id: string | null;
+    Categoria_id: string | null;
+    Referencia_plataforma_id: string | null;   // solo aplica a la categoría Digital
+}
+
+export type OrigenPayload = Pick<DbOrigen, 'Nombre' | 'Proyecto_id' | 'Categoria_id' | 'Referencia_plataforma_id'>;
+
 export const GOAL_TYPES: { value: GoalType; label: string }[] = [
     { value: 'General',     label: 'General' },
     { value: 'Digital',     label: 'Digital' },

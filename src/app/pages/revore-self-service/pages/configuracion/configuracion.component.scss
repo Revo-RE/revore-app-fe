@@ -336,7 +336,21 @@
         margin: 0 0 24px;
     }
     &__actions { display: flex; justify-content: flex-end; gap: 12px; }
+    &__error { margin: -8px 0 20px; }
 }
+
+// ── Orígenes: filtros + botón agregar ─────────────────────────────────────
+.ss-origenes-filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+
+    .ss-form__select, .ss-form__input { width: auto; min-width: 200px; }
+}
+
+.ss-origenes-actions { margin-bottom: 16px; }
 
 .ss-form {
     display: flex;
@@ -373,6 +387,11 @@
         width: 100%;
         box-sizing: border-box;
         &:focus { border-color: map.get(t.$primary-color, 700); }
+        &:disabled {
+            background: map.get(t.$primary-color, 100);
+            color: map.get(t.$primary-color, 300);
+            cursor: not-allowed;
+        }
     }
 }
 
