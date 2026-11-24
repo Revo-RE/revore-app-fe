@@ -155,7 +155,7 @@ export class SelfServiceService {
         return { error };
     }
 
-    // ── Metas (proyecto Supabase separado: xujscamqorwckpqamnie) ──────────────
+    // ── Metas (supabaseMetasS: mismo proyecto, pero sin sesión → rol anon) ────
 
     async getDesarrolladores(): Promise<DbDesarrollador[]> {
         const { data } = await this.supabaseMetasS.db
@@ -205,15 +205,18 @@ export class SelfServiceService {
         return { error };
     }
 
-    // ── Orígenes (mismo proyecto Supabase que Metas) ─────────────────────────
+    // ── Orígenes ─────────────────────────────────────────────────────────────
+    // Usa supabaseS (con la sesión del usuario): la base ve estas llamadas como
+    // `authenticated`. No usar supabaseMetasS aquí: va sin sesión (`anon`) y las
+    // políticas de escritura para anon en "Origenes" se van a eliminar.
 
     async getCategorias(): Promise<DbCategoria[]> {
-        const { data } = await this.supabaseMetasS.db.from('Categorias').select('id, Nombre').order('Nombre');
+        const { data } = await this.supabaseS.db.from('Categorias').select('id, Nombre').order('Nombre');
         return (data ?? []) as DbCategoria[];
     }
 
     async getReferenciasPlataformas(): Promise<DbReferenciaPlataforma[]> {
-        const { data } = await this.supabaseMetasS.db.from('Referencias_plataformas').select('id, Nombre').order('Nombre');
+        const { data } = await this.supabaseS.db.from('Referencias_plataformas').select('id, Nombre').order('Nombre');
         return (data ?? []) as DbReferenciaPlataforma[];
     }
 
@@ -226,7 +229,7 @@ export class SelfServiceService {
         const PAGE = 1000;
         const rows: DbOrigen[] = [];
         for (let from = 0; ; ) {
-            const { data, error } = await this.supabaseMetasS.db
+            const { data, error } = await this.supabaseS.db
                 .from('Origenes')
                 .select('id, Nombre, Proyecto_id, Categoria_id, Referencia_plataforma_id')
                 .order('Nombre')
@@ -241,17 +244,31 @@ export class SelfServiceService {
     }
 
     async createOrigen(payload: OrigenPayload): Promise<{ error: any }> {
-        const { error } = await this.supabaseMetasS.db.from('Origenes').insert(payload as any);
+        const { error } = await this.supabaseS.db.from('Origenes').insert(payload as any);
         return { error };
     }
 
+    // UPDATE y DELETE que RLS bloquea no dan error: regresan 0 filas. Por eso se
+    // pide `.select('id')` y una respuesta vacía se trata como error, para que la
+    // pantalla no muestre como guardado algo que la base no cambió.
+
     async updateOrigen(id: string, payload: OrigenPayload): Promise<{ error: any }> {
-        const { error } = await this.supabaseMetasS.db.from('Origenes').update(payload as any).eq('id', id);
-        return { error };
+        const { data, error } = await this.supabaseS.db
+            .from('Origenes').update(payload as any).eq('id', id).select('id');
+        if (error) return { error };
+        if (!data?.length) {
+            return { error: { message: 'No se guardó el cambio: el origen ya no existe o tu sesión no tiene permiso. Recarga la página o vuelve a iniciar sesión.' } };
+        }
+        return { error: null };
     }
 
     async deleteOrigen(id: string): Promise<{ error: any }> {
-        const { error } = await this.supabaseMetasS.db.from('Origenes').delete().eq('id', id);
-        return { error };
+        const { data, error } = await this.supabaseS.db
+            .from('Origenes').delete().eq('id', id).select('id');
+        if (error) return { error };
+        if (!data?.length) {
+            return { error: { message: 'No se eliminó: el origen ya no existe o tu sesión no tiene permiso. Recarga la página o vuelve a iniciar sesión.' } };
+        }
+        return { error: null };
     }
 }
