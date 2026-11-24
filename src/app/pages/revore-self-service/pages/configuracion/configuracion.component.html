@@ -305,9 +305,14 @@
     <div class="ss-dialog">
       <h3>¿Eliminar meta?</h3>
       <p>Esta acción no se puede deshacer.</p>
+      @if (deleteMetaError) {
+        <div class="ss-error ss-dialog__error">{{ deleteMetaError }}</div>
+      }
       <div class="ss-dialog__actions">
         <button class="ss-btn ss-btn--outline" (click)="cancelDeleteMeta()">Cancelar</button>
-        <button class="ss-btn ss-btn--danger" (click)="confirmDeleteMeta()">Eliminar</button>
+        <button class="ss-btn ss-btn--danger" [disabled]="isDeletingMeta" (click)="confirmDeleteMeta()">
+          {{ isDeletingMeta ? 'Eliminando…' : 'Eliminar' }}
+        </button>
       </div>
     </div>
   </div>

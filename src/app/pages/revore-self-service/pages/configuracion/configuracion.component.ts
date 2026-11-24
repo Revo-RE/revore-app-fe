@@ -55,6 +55,8 @@ export class ConfiguracionComponent implements OnInit {
     isSavingMeta = false;
     metaError = '';
     confirmDeleteMetaId: string | null = null;
+    isDeletingMeta = false;
+    deleteMetaError = '';
     metaForm!: FormGroup;
 
     readonly GOAL_TYPES = GOAL_TYPES;
@@ -267,13 +269,32 @@ export class ConfiguracionComponent implements OnInit {
         this.closeMetaModal();
     }
 
-    requestDeleteMeta(id: string): void { this.confirmDeleteMetaId = id; }
-    cancelDeleteMeta(): void { this.confirmDeleteMetaId = null; }
+    requestDeleteMeta(id: string): void {
+        this.deleteMetaError = '';
+        this.confirmDeleteMetaId = id;
+    }
+
+    cancelDeleteMeta(): void {
+        this.confirmDeleteMetaId = null;
+        this.deleteMetaError = '';
+    }
 
     async confirmDeleteMeta(): Promise<void> {
-        if (!this.confirmDeleteMetaId) return;
-        await this.svc.deleteMeta(this.confirmDeleteMetaId);
-        this.metas = this.metas.filter(m => m.id !== this.confirmDeleteMetaId);
+        const id = this.confirmDeleteMetaId;
+        if (!id || this.isDeletingMeta) return;
+        this.isDeletingMeta = true;
+        this.deleteMetaError = '';
+
+        const { error } = await this.svc.deleteMeta(id);
+        this.isDeletingMeta = false;
+
+        // Si la base no borró nada, la meta se queda en la lista y se avisa.
+        if (error) {
+            this.deleteMetaError = error.message;
+            return;
+        }
+
+        this.metas = this.metas.filter(m => m.id !== id);
         this.confirmDeleteMetaId = null;
     }
 

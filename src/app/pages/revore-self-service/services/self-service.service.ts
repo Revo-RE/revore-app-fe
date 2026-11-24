@@ -3,7 +3,6 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '@environments/environments.local';
 import { SupabaseService } from './supabase.service';
-import { SupabaseMetasService } from './supabase-metas.service';
 import {
     DbDeveloper, DbDeveloperGroup, DbSubProject, DbReportType,
     DbSchedule, DbExecution, ExecutionWithRelations, ScheduleWithRelations,
@@ -17,7 +16,6 @@ export class SelfServiceService {
 
     constructor(
         private supabaseS: SupabaseService,
-        private supabaseMetasS: SupabaseMetasService,
         private http: HttpClient,
     ) {}
 
@@ -155,10 +153,16 @@ export class SelfServiceService {
         return { error };
     }
 
-    // ── Metas (supabaseMetasS: mismo proyecto, pero sin sesión → rol anon) ────
+    // ── Metas, Desarrolladores y Proyectos ───────────────────────────────────
+    // Todo con supabaseS (sesión del usuario → rol `authenticated`). Nada de
+    // esta pantalla debe ir sin sesión: las políticas de anon se van a cerrar.
+    //
+    // UPDATE y DELETE que RLS bloquea no dan error: regresan 0 filas. Por eso se
+    // pide `.select('id')` y una respuesta vacía se trata como error, para que la
+    // pantalla no muestre como guardado algo que la base no cambió.
 
     async getDesarrolladores(): Promise<DbDesarrollador[]> {
-        const { data } = await this.supabaseMetasS.db
+        const { data } = await this.supabaseS.db
             .from('Desarrolladores')
             .select('*')
             .order('Desarrollador');
@@ -166,14 +170,14 @@ export class SelfServiceService {
     }
 
     async getProyectos(desarrolladorId?: string): Promise<DbProyecto[]> {
-        let query = this.supabaseMetasS.db.from('Proyectos').select('*').order('Nombre');
+        let query = this.supabaseS.db.from('Proyectos').select('*').order('Nombre');
         if (desarrolladorId) query = (query as any).eq('Desarrollador_id', desarrolladorId);
         const { data } = await query;
         return (data ?? []) as DbProyecto[];
     }
 
     async getMetas(filters?: { desarrolladorId?: string; proyectoId?: string; period?: string }): Promise<MetaWithRelations[]> {
-        let query = this.supabaseMetasS.db
+        let query = this.supabaseS.db
             .from('Metas')
             .select('*, Proyectos(Nombre, Desarrollador_id)')
             .order('period', { ascending: false });
@@ -191,24 +195,32 @@ export class SelfServiceService {
     }
 
     async createMeta(payload: { Proyecto_id: string; goal_type: GoalType; period: string; details: MetaDetails }): Promise<{ error: any }> {
-        const { error } = await this.supabaseMetasS.db.from('Metas').insert(payload as any);
+        const { error } = await this.supabaseS.db.from('Metas').insert(payload as any);
         return { error };
     }
 
     async updateMeta(id: string, payload: Partial<Pick<DbMeta, 'goal_type' | 'period' | 'details' | 'Proyecto_id'>>): Promise<{ error: any }> {
-        const { error } = await this.supabaseMetasS.db.from('Metas').update(payload as any).eq('id', id);
-        return { error };
+        const { data, error } = await this.supabaseS.db
+            .from('Metas').update(payload as any).eq('id', id).select('id');
+        if (error) return { error };
+        if (!data?.length) {
+            return { error: { message: 'No se guardó el cambio: la meta ya no existe o tu sesión no tiene permiso. Recarga la página o vuelve a iniciar sesión.' } };
+        }
+        return { error: null };
     }
 
     async deleteMeta(id: string): Promise<{ error: any }> {
-        const { error } = await this.supabaseMetasS.db.from('Metas').delete().eq('id', id);
-        return { error };
+        const { data, error } = await this.supabaseS.db
+            .from('Metas').delete().eq('id', id).select('id');
+        if (error) return { error };
+        if (!data?.length) {
+            return { error: { message: 'No se eliminó: la meta ya no existe o tu sesión no tiene permiso. Recarga la página o vuelve a iniciar sesión.' } };
+        }
+        return { error: null };
     }
 
     // ── Orígenes ─────────────────────────────────────────────────────────────
-    // Usa supabaseS (con la sesión del usuario): la base ve estas llamadas como
-    // `authenticated`. No usar supabaseMetasS aquí: va sin sesión (`anon`) y las
-    // políticas de escritura para anon en "Origenes" se van a eliminar.
+    // Mismo criterio que Metas: supabaseS y verificación de filas afectadas.
 
     async getCategorias(): Promise<DbCategoria[]> {
         const { data } = await this.supabaseS.db.from('Categorias').select('id, Nombre').order('Nombre');
@@ -247,10 +259,6 @@ export class SelfServiceService {
         const { error } = await this.supabaseS.db.from('Origenes').insert(payload as any);
         return { error };
     }
-
-    // UPDATE y DELETE que RLS bloquea no dan error: regresan 0 filas. Por eso se
-    // pide `.select('id')` y una respuesta vacía se trata como error, para que la
-    // pantalla no muestre como guardado algo que la base no cambió.
 
     async updateOrigen(id: string, payload: OrigenPayload): Promise<{ error: any }> {
         const { data, error } = await this.supabaseS.db
